@@ -33,7 +33,7 @@ from legacytl.tl.types import Channel, Message
 
 from .. import loader, main, utils
 from .._local_storage import RemoteStorage
-from ..compat import geek
+from ..compat import geek, hikka
 from ..inline.types import InlineCall
 from ..types import CoreOverwriteError, CoreUnloadError
 
@@ -531,6 +531,7 @@ class LoaderMod(loader.Module):
 
         module_name = f"legacy.modules.{uid}"
         doc = geek.compat(doc)
+        doc = hikka.compat(doc)
 
         async def core_overwrite(e: CoreOverwriteError):
             nonlocal message
