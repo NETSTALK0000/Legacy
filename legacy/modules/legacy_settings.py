@@ -725,7 +725,7 @@ class LegacySettingsMod(loader.Module):
                         },
                         {"text": self.strings("btn_no"), "action": "close"},
                     ],
-                    photo="https://imgur.com/a/NumfPGa.png",
+                    photo="https://i.postimg.cc/vTyjzbtL/legacy-web-interface.png",
                 ):
                     raise Exception
             except Exception:
@@ -759,7 +759,7 @@ class LegacySettingsMod(loader.Module):
                 self.strings("opening_tunnel"),
                 reply_markup={"text": "🕔 Wait...", "data": "empty"},
                 photo=(
-                    "https://imgur.com/a/MQJGI0w.png"
+                    "https://i.postimg.cc/52yrpPLG/legacy-opening-tunnel.png"
                 ),
             )
         else:
@@ -768,7 +768,7 @@ class LegacySettingsMod(loader.Module):
                 message=message,
                 reply_markup={"text": "🕔 Wait...", "data": "empty"},
                 photo=(
-                    "https://imgur.com/a/MQJGI0w.png"
+                    "https://i.postimg.cc/52yrpPLG/legacy-opening-tunnel.png"
                 ),
             )
 
@@ -777,7 +777,7 @@ class LegacySettingsMod(loader.Module):
         await form.edit(
             self.strings("tunnel_opened"),
             reply_markup={"text": self.strings("web_btn"), "url": url},
-            photo="https://imgur.com/a/lgmzCpj.png",
+            photo="https://i.postimg.cc/HxDPYdRD/legacy-tunnel-opened.png",
         )
 
     def _get_all_IDM(self, module: str):

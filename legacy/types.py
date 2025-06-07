@@ -302,7 +302,7 @@ class Module:
                 "✖️ <b>Declined joining <a"
                 f' href="https://t.me/{channel.username}">{utils.escape_html(channel.title)}</a></b>'
             ),
-            photo="https://imgur.com/a/gWKLn7h.png",
+            photo="https://i.postimg.cc/fRYzWTgD/legacy-join-request.png",
         )
 
     async def request_join(
@@ -354,7 +354,7 @@ class Module:
 
         await self.inline.bot.send_photo(
             self.tg_id,
-            "https://imgur.com/a/XpwmHo6.png",
+            "https://i.postimg.cc/Jh4zTCP8/legacy-joined.png",
             caption=(
                 self._client.loader.lookup("translations")
                 .strings("requested_join")
