@@ -1,10 +1,11 @@
 # ©️ Undefined & XDesai, 2025
 # This file is a part of Legacy Userbot
-# 🌐 https://github.com/hikariatama/Hikka
+# 🌐 https://github.com/Crayz310/Legacy
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 # ©️ Based on Dan Gazizullin's work
+# 🌐 https://github.com/hikariatama/Hikka
 
 import re
 
