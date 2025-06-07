@@ -354,7 +354,7 @@ class Module:
 
         await self.inline.bot.send_photo(
             self.tg_id,
-            "https://i.postimg.cc/Jh4zTCP8/legacy-joined.png",
+            "https://i.postimg.cc/fRYzWTgD/legacy-join-request.png",
             caption=(
                 self._client.loader.lookup("translations")
                 .strings("requested_join")
