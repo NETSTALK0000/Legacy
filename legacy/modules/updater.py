@@ -20,7 +20,12 @@ from legacytl.tl.functions.messages import (
     GetDialogFiltersRequest,
     UpdateDialogFilterRequest,
 )
-from legacytl.tl.types import DialogFilter, Message, TextWithEntities, DialogFilterDefault
+from legacytl.tl.types import (
+    DialogFilter,
+    Message,
+    TextWithEntities,
+    DialogFilterDefault,
+)
 
 from .. import loader, main, utils, version
 from .._internal import restart
@@ -110,8 +115,6 @@ class UpdaterMod(loader.Module):
         await self.process_restart_message(msg_obj)
 
         self.set("restart_ts", time.time())
-
-        await self._db.remote_force_save()
 
         with contextlib.suppress(Exception):
             await main.legacy.web.stop()
@@ -246,11 +249,14 @@ class UpdaterMod(loader.Module):
         args = utils.get_args_raw(message)
 
         if not args:
-          await utils.answer(message, self.strings("rollback_no_args"))
-          return
+            await utils.answer(message, self.strings("rollback_no_args"))
+            return
 
         try:
-            subprocess.run(["git", "reset", "--hard", f"{args}"], cwd=f"{os.getcwd()}",)
+            subprocess.run(
+                ["git", "reset", "--hard", f"{args}"],
+                cwd=f"{os.getcwd()}",
+            )
             await utils.answer(message, self.strings("rollback_ok"))
             await self.invoke("restart", "-f", peer=message.peer_id)
         except subprocess.CalledProcessError:
@@ -299,10 +305,7 @@ class UpdaterMod(loader.Module):
                     folder_id,
                     DialogFilter(
                         folder_id,
-                        title=TextWithEntities(
-                                    text='legacy',
-                                    entities=[]
-                                ),
+                        title=TextWithEntities(text="legacy", entities=[]),
                         pinned_peers=(
                             [
                                 await self._client.get_input_entity(
@@ -337,10 +340,7 @@ class UpdaterMod(loader.Module):
                                 and dialog.entity.id
                                 == self._client.loader.inline.bot_id
                             )
-                            or dialog.entity.id
-                            in [
-                                2577311568
-                            ]  # official legacy chat
+                            or dialog.entity.id in [2577311568]  # official legacy chat
                         ],
                         emoticon="🐱",
                         exclude_peers=[],

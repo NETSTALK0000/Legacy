@@ -279,20 +279,14 @@ class Evaluator(loader.Module):
     def censor(self, ret: str) -> str:
         ret = ret.replace(str(self._client.legacy_me.phone), "&lt;phone&gt;")
 
-        if redis := os.environ.get("REDIS_URL") or main.get_config_key("redis_uri"):
-            ret = ret.replace(redis, f'redis://{"*" * 26}')
-
-        if db := os.environ.get("DATABASE_URL") or main.get_config_key("db_uri"):
-            ret = ret.replace(db, f'postgresql://{"*" * 26}')
-
         if btoken := self._db.get("legacy.inline", "bot_token", False):
             ret = ret.replace(
                 btoken,
-                f'{btoken.split(":")[0]}:{"*" * 26}',
+                f"{btoken.split(':')[0]}:{'*' * 26}",
             )
 
         if htoken := self.lookup("loader").get("token", False):
-            ret = ret.replace(htoken, f'eugeo_{"*" * 26}')
+            ret = ret.replace(htoken, f"eugeo_{'*' * 26}")
 
         ret = ret.replace(
             StringSession.save(self._client.session),
@@ -348,7 +342,8 @@ class Evaluator(loader.Module):
                             lambda x: x[0][0] != "_"
                             and isinstance(x[1], ModuleType)
                             and x[1] != obj
-                            and x[1].__package__.rsplit(".", _depth)[0] == "legacytl.tl",
+                            and x[1].__package__.rsplit(".", _depth)[0]
+                            == "legacytl.tl",
                             obj.__dict__.items(),
                         )
                     ]
