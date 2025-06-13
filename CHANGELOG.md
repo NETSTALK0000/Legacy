@@ -19,3 +19,4 @@
 - No more shit in logs
 - New log levels added
 - Fixed work in Docker
+- Backup logic updated
