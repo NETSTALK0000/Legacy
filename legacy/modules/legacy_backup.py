@@ -141,7 +141,7 @@ class LegacyBackupMod(loader.Module):
 
             await self.inline.bot.send_document(
                 int(f"-100{self._backup_channel.id}"),
-                backup,
+                outfile,
                 reply_markup=self.inline.generate_markup(
                     [
                         [
