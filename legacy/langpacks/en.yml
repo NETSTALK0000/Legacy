@@ -199,12 +199,10 @@ legacy_backup:
   saved: "✅ Backup period saved. You can re-configure it later with .set_backup_period"
   never: "✅ I will not make automatic backups. You can re-configure it later with .set_backup_period"
   invalid_args: "🚫 <b>Specify correct backup period in hours, or `0` to disable</b>"
-  backup_caption: '<emoji document_id=5469718869536940860>👆</emoji> <b>This is your database backup. Do not give it to anyone, it contains personal info. If you need to restore it, you can use</b> <pre><code class="language-legacy">{prefix}restoredb</code></pre> <b>in reply to this file.</b>'
-  reply_to_file: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Reply to .json or .zip file</b>"
-  db_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Database updated, restarting...</b>"
-  modules_backup: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup of modules ({})</b>\n\n<b>You can restore it using:</b>\n<pre><code class=\"language-legacy\">{}restoremods</code></pre>"
-  mods_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Mods restored, restarting</b>"
-  backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup has been sent to saved messages</b>"
+  backup_caption: "👆 <b>This is your backup.\nDo not give it to anyone, it contains personal info.\nIf you need to restore it, you can use</b> <code>{prefix}restore</code> <b>in reply to this file or button below.</b>"
+  reply_to_file: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Reply to .backup file</b>"
+  backup_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Backup restored, restarting...</b>"
+  backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup has been sent to <a href='{}'>legacy-backups</a></b>"
 
 settings:
   name: "Settings"

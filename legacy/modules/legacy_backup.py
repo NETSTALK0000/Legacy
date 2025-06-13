@@ -123,10 +123,21 @@ class LegacyBackupMod(loader.Module):
                 self.get("last_backup") + self.get("period") - time.time()
             )
 
-            backup = io.BytesIO(json.dumps(self._db).encode())
-            backup.name = (
-                f"legacy-db-backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
-            )
+            db_dump = json.dumps(self._db).encode()
+
+            result = io.BytesIO()
+
+            with zipfile.ZipFile(result, "w", zipfile.ZIP_DEFLATED) as zipf:
+                for root, _, files in os.walk(loader.LOADED_MODULES_DIR):
+                    for file in files:
+                        if file.endswith(f"{self.tg_id}.py"):
+                            with open(os.path.join(root, file), "rb") as f:
+                                zipf.writestr(file, f.read())
+
+                zipf.writestr("db-backup.json", db_dump)
+
+            outfile = io.BytesIO(result.getvalue())
+            outfile.name = f"legacy-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
 
             await self.inline.bot.send_document(
                 int(f"-100{self._backup_channel.id}"),
@@ -137,9 +148,9 @@ class LegacyBackupMod(loader.Module):
                             {
                                 "text": "↪️ Restore this",
                                 "data": "legacy/backup/restore/confirm",
-                            }
-                        ]
-                    ]
+                            },
+                        ],
+                    ],
                 ),
             )
 
@@ -151,7 +162,7 @@ class LegacyBackupMod(loader.Module):
             await asyncio.sleep(60)
 
     @loader.callback_handler()
-    async def restore(self, call: BotInlineCall):
+    async def restore_inl(self, call: BotInlineCall):
         if not call.data.startswith("legacy/backup/restore"):
             return
 
@@ -172,70 +183,46 @@ class LegacyBackupMod(loader.Module):
             )
         )[0].download_media(bytes)
 
-        decoded_text = json.loads(file.decode())
+        try:
+            file = io.BytesIO(file)
+            file.name = "backup.zip"
 
-        with contextlib.suppress(KeyError):
-            decoded_text["legacy.inline"].pop("bot_token")
+            with zipfile.ZipFile(file) as zf:
+                with zf.open("db-backup.json", "r") as db_file:
+                    new_db = json.loads(db_file.read().decode())
 
-        if not self._db.process_db_autofix(decoded_text):
-            raise RuntimeError("Attempted to restore broken database")
+                    with contextlib.suppress(KeyError):
+                        new_db["legacy.inline"].pop("bot_token")
+                    
+                    if not self._db.process_db_autofix(new_db):
+                        raise RuntimeError("Attempted to restore broken database")
+                    
+                    self._db.clear()
+                    self._db.update(**new_db)
+                    self._db.save()
+                
+                for name in zf.namelist():
+                    if name == "db-backup.json":
+                        continue
 
-        self._db.clear()
-        self._db.update(**decoded_text)
-        self._db.save()
-
-        await call.answer(self.strings("db_restored"), show_alert=True)
-        await self.invoke("restart", "-f", peer=call.message.peer_id)
-
-    @loader.command()
-    async def backupdb(self, message: Message):
-        """| save backup of your bd"""
-        txt = io.BytesIO(json.dumps(self._db).encode())
-        txt.name = f"db-backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
-        await self._client.send_file(
-            "me",
-            txt,
-            caption=self.strings("backup_caption").format(
-                prefix=utils.escape_html(self.get_prefix())
-            ),
-        )
-        await utils.answer(message, self.strings("backup_sent"))
-
-    @loader.command()
-    async def restoredb(self, message: Message):
-        """[reply] | restore your bd"""
-        if not (reply := await message.get_reply_message()) or not reply.media:
-            await utils.answer(
-                message,
-                self.strings("reply_to_file"),
-            )
+                    path = loader.LOADED_MODULES_PATH / Path(name).name
+                    with zf.open(name, "r") as module:
+                        path.write_bytes(module.read())
+        except Exception:
+            logger.exception("Unable to restore backup")
             return
 
-        file = await reply.download_media(bytes)
-        decoded_text = json.loads(file.decode())
+        await call.answer(self.strings("db_restored"), show_alert=True)
+        await self.invoke("restart", "-f", peer=self.inline.bot_id)
 
-        with contextlib.suppress(KeyError):
-            decoded_text["legacy.inline"].pop("bot_token")
-
-        if not self._db.process_db_autofix(decoded_text):
-            raise RuntimeError("Attempted to restore broken database")
-
-        self._db.clear()
-        self._db.update(**decoded_text)
-        self._db.save()
-
-        await utils.answer(message, self.strings("db_restored"))
-        await self.invoke("restart", "-f", peer=message.peer_id)
-
-    @loader.command()
-    async def backupmods(self, message: Message):
-        """| save backup of mods"""
-        mods_quantity = len(self.lookup("Loader").get("loaded_modules", {}))
+    @loader.command(
+        ru_doc="Создать бэкап"
+    )
+    async def backup(self, message: Message):
+        """| Backup your data"""
+        db_dump = json.dumps(self._db).encode()
 
         result = io.BytesIO()
-        result.name = "mods.zip"
-
-        db_mods = json.dumps(self.lookup("Loader").get("loaded_modules", {})).encode()
 
         with zipfile.ZipFile(result, "w", zipfile.ZIP_DEFLATED) as zipf:
             for root, _, files in os.walk(loader.LOADED_MODULES_DIR):
@@ -243,69 +230,75 @@ class LegacyBackupMod(loader.Module):
                     if file.endswith(f"{self.tg_id}.py"):
                         with open(os.path.join(root, file), "rb") as f:
                             zipf.writestr(file, f.read())
-                            mods_quantity += 1
 
-            zipf.writestr("db_mods.json", db_mods)
+            zipf.writestr("db-backup.json", db_dump)
 
-        archive = io.BytesIO(result.getvalue())
-        archive.name = f"mods-{datetime.datetime.now():%d-%m-%Y-%H-%M}.zip"
+        outfile = io.BytesIO(result.getvalue())
+        outfile.name = f"legacy-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
 
-        await utils.answer_file(
-            message,
-            archive,
-            caption=self.strings("modules_backup").format(
-                mods_quantity,
-                utils.escape_html(self.get_prefix()),
+
+        await self.inline.bot.send_document(
+            int(f"-100{self._backup_channel.id}"),
+            outfile,
+            caption=self.strings("backup_caption").format(prefix=self.get_prefix()),
+            reply_markup=self.inline.generate_markup(
+                [
+                    [
+                        {
+                            "text": "↪️ Restore this",
+                            "data": "legacy/backup/restore/confirm",
+                        },
+                    ],
+                ],
             ),
         )
 
-    @loader.command()
-    async def restoremods(self, message: Message):
-        """[reply] | restore your mods"""
+        await utils.answer(message, self.strings("backup_sent").format(f"https://t.me/c/{self._backup_channel.id}"))
+
+
+    @loader.command(
+        ru_doc="Восстановить бэкап из файла"
+    )
+    async def restore(self, message: Message):
+        """[reply] | Restore your data"""
         if not (reply := await message.get_reply_message()) or not reply.media:
             await utils.answer(message, self.strings("reply_to_file"))
             return
 
+        logger.info("📚 Trying to restore backup")
+
         file = await reply.download_media(bytes)
+
         try:
-            decoded_text = json.loads(file.decode())
+            file = io.BytesIO(file)
+            file.name = "backup.zip"
+
+            with zipfile.ZipFile(file) as zf:
+                with zf.open("db-backup.json", "r") as db_file:
+                    new_db = json.loads(db_file.read().decode())
+
+                    with contextlib.suppress(KeyError):
+                        new_db["legacy.inline"].pop("bot_token")
+                    
+                    if not self._db.process_db_autofix(new_db):
+                        raise RuntimeError("Attempted to restore broken database")
+                    
+                    self._db.clear()
+                    self._db.update(**new_db)
+                    self._db.save()
+                
+                for name in zf.namelist():
+                    if name == "db-backup.json":
+                        continue
+
+                    path = loader.LOADED_MODULES_PATH / Path(name).name
+                    with zf.open(name, "r") as module:
+                        path.write_bytes(module.read())
         except Exception:
-            try:
-                file = io.BytesIO(file)
-                file.name = "mods.zip"
+            logger.exception("Unable to restore backup")
+            await utils.answer(message, self.strings("reply_to_file"))
+            return
 
-                with zipfile.ZipFile(file) as zf:
-                    with zf.open("db_mods.json", "r") as modules:
-                        db_mods = json.loads(modules.read().decode())
-                        if isinstance(db_mods, dict) and all(
-                            (
-                                isinstance(key, str)
-                                and isinstance(value, str)
-                                and utils.check_url(value)
-                            )
-                            for key, value in db_mods.items()
-                        ):
-                            self.lookup("Loader").set("loaded_modules", db_mods)
-
-                    for name in zf.namelist():
-                        if name == "db_mods.json":
-                            continue
-
-                        path = loader.LOADED_MODULES_PATH / Path(name).name
-                        with zf.open(name, "r") as module:
-                            path.write_bytes(module.read())
-            except Exception:
-                logger.exception("Unable to restore modules")
-                await utils.answer(message, self.strings("reply_to_file"))
-                return
-        else:
-            if not isinstance(decoded_text, dict) or not all(
-                isinstance(key, str) and isinstance(value, str)
-                for key, value in decoded_text.items()
-            ):
-                raise RuntimeError("Invalid backup")
-
-            self.lookup("Loader").set("loaded_modules", decoded_text)
-
-        await utils.answer(message, self.strings("mods_restored"))
+        await utils.answer(message, self.strings("db_restored"))
         await self.invoke("restart", "-f", peer=message.peer_id)
+        
