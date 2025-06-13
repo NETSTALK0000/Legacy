@@ -212,11 +212,12 @@ class LegacyBackupMod(loader.Module):
             logger.exception("Unable to restore backup")
             return
 
-        await call.answer(self.strings("db_restored"), show_alert=True)
+        await call.answer(self.strings("backup_restored"), show_alert=True)
         await self.invoke("restart", "-f", peer=self.inline.bot_id)
 
     @loader.command(
-        ru_doc="Создать бэкап"
+        ru_doc="Создать бэкап",
+        ua_doc="Створити резервну копію"
     )
     async def backup(self, message: Message):
         """| Backup your data"""
@@ -257,7 +258,8 @@ class LegacyBackupMod(loader.Module):
 
 
     @loader.command(
-        ru_doc="Восстановить бэкап из файла"
+        ru_doc="Восстановить бэкап из файла",
+        ua_doc="Відновити резервну копію з файлу"
     )
     async def restore(self, message: Message):
         """[reply] | Restore your data"""
@@ -299,6 +301,6 @@ class LegacyBackupMod(loader.Module):
             await utils.answer(message, self.strings("reply_to_file"))
             return
 
-        await utils.answer(message, self.strings("db_restored"))
+        await utils.answer(message, self.strings("backup_restored"))
         await self.invoke("restart", "-f", peer=message.peer_id)
         
