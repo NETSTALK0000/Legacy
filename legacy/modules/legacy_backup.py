@@ -193,14 +193,14 @@ class LegacyBackupMod(loader.Module):
 
                     with contextlib.suppress(KeyError):
                         new_db["legacy.inline"].pop("bot_token")
-                    
+
                     if not self._db.process_db_autofix(new_db):
                         raise RuntimeError("Attempted to restore broken database")
-                    
+
                     self._db.clear()
                     self._db.update(**new_db)
                     self._db.save()
-                
+
                 for name in zf.namelist():
                     if name == "db-backup.json":
                         continue
@@ -215,10 +215,7 @@ class LegacyBackupMod(loader.Module):
         await call.answer(self.strings("backup_restored"), show_alert=True)
         await self.invoke("restart", "-f", peer=self.inline.bot_id)
 
-    @loader.command(
-        ru_doc="Создать бэкап",
-        ua_doc="Створити резервну копію"
-    )
+    @loader.command()
     async def backup(self, message: Message):
         """| Backup your data"""
         db_dump = json.dumps(self._db).encode()
@@ -237,7 +234,6 @@ class LegacyBackupMod(loader.Module):
         outfile = io.BytesIO(result.getvalue())
         outfile.name = f"legacy-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
 
-
         await self.inline.bot.send_document(
             int(f"-100{self._backup_channel.id}"),
             outfile,
@@ -254,13 +250,14 @@ class LegacyBackupMod(loader.Module):
             ),
         )
 
-        await utils.answer(message, self.strings("backup_sent").format(f"https://t.me/c/{self._backup_channel.id}"))
+        await utils.answer(
+            message,
+            self.strings("backup_sent").format(
+                f"https://t.me/c/{self._backup_channel.id}"
+            ),
+        )
 
-
-    @loader.command(
-        ru_doc="Восстановить бэкап из файла",
-        ua_doc="Відновити резервну копію з файлу"
-    )
+    @loader.command()
     async def restore(self, message: Message):
         """[reply] | Restore your data"""
         if not (reply := await message.get_reply_message()) or not reply.media:
@@ -281,14 +278,14 @@ class LegacyBackupMod(loader.Module):
 
                     with contextlib.suppress(KeyError):
                         new_db["legacy.inline"].pop("bot_token")
-                    
+
                     if not self._db.process_db_autofix(new_db):
                         raise RuntimeError("Attempted to restore broken database")
-                    
+
                     self._db.clear()
                     self._db.update(**new_db)
                     self._db.save()
-                
+
                 for name in zf.namelist():
                     if name == "db-backup.json":
                         continue
@@ -303,4 +300,4 @@ class LegacyBackupMod(loader.Module):
 
         await utils.answer(message, self.strings("backup_restored"))
         await self.invoke("restart", "-f", peer=message.peer_id)
-        
+
