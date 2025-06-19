@@ -91,13 +91,19 @@ class APIRatelimiterMod(loader.Module):
             ),
             loader.ConfigValue(
                 "forbidden_methods",
-                ["joinChannel", "importChatInvite"],
+                ["joinChannel", "importChatInvite", "changePhone", "resetPassword", "DeleteAccount"],
                 lambda: self.strings("_cfg_forbidden_methods"),
                 validator=loader.validators.MultiChoice(
                     [
+                        "getUserPhotos",
                         "sendReaction",
                         "joinChannel",
                         "importChatInvite",
+                        "exportChatInvite",
+                        "setPrivacy",
+                        "changePhone",
+                        "resetPassword",
+                        "DeleteAccount",
                     ]
                 ),
                 on_change=lambda: (
