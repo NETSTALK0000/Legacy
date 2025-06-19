@@ -20,3 +20,4 @@
 - New log levels added
 - Fixed work in Docker
 - Backup logic updated
+- Forbid Constructors work has been restored
