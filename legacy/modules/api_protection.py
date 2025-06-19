@@ -43,23 +43,22 @@ GROUPS = [
     "stats",
 ]
 
+def get_methods_from_group(group_obj):
+    return [
+        method
+        for method_name in dir(group_obj)
+        if isinstance((method := getattr(group_obj, method_name, None)), type) and issubclass(method, TLRequest)
+    ]
 
-CONSTRUCTORS = {
-    (lambda x: x[0].lower() + x[1:])(
-        method.__class__.__name__.rsplit("Request", 1)[0]
-    ): method.CONSTRUCTOR_ID
-    for method in utils.array_sum(
-        [
-            [
-                method
-                for method in dir(getattr(functions, group))
-                if isinstance(method, TLRequest)
-            ]
-            for group in GROUPS
-        ]
-    )
-}
+CONSTRUCTORS = {}
 
+for group in GROUPS:
+    group_obj = getattr(functions, group, None)
+    if group_obj:
+        methods = get_methods_from_group(group_obj)
+        for method in methods:
+            constructor_name = method.__name__.rsplit("Request", 1)[0].lower()
+            CONSTRUCTORS[constructor_name] = method.CONSTRUCTOR_ID
 
 @loader.tds
 class APIRatelimiterMod(loader.Module):
@@ -101,11 +100,16 @@ class APIRatelimiterMod(loader.Module):
                         "importChatInvite",
                     ]
                 ),
-                on_change=lambda: self._client.forbid_constructors(
-                    map(
-                        lambda x: CONSTRUCTORS[x],
-                        self.config["forbidden_constructors"],
-                    )
+                on_change=lambda: (
+                    logger.debug(f"Forbidden constructors config: {self.config['forbidden_methods']}"),
+                    self._client.forbid_constructors(
+                        list(
+                            map(
+                                lambda x: CONSTRUCTORS.get(x.lower(), None),
+                                self.config["forbidden_methods"],
+                            ),
+                        ),
+                    ),
                 ),
             ),
         )
