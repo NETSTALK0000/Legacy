@@ -234,7 +234,7 @@ class LegacyBackupMod(loader.Module):
         outfile = io.BytesIO(result.getvalue())
         outfile.name = f"legacy-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
 
-        await self.inline.bot.send_document(
+        backup_msg = await self.inline.bot.send_document(
             int(f"-100{self._backup_channel.id}"),
             outfile,
             caption=self.strings("backup_caption").format(prefix=self.get_prefix()),
@@ -253,7 +253,7 @@ class LegacyBackupMod(loader.Module):
         await utils.answer(
             message,
             self.strings("backup_sent").format(
-                f"https://t.me/c/{self._backup_channel.id}"
+                f"https://t.me/c/{self._backup_channel.id}/{backup_msg.message_id}"
             ),
         )
 
