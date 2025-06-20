@@ -107,8 +107,7 @@ class APIRatelimiterMod(loader.Module):
                     ]
                 ),
                 on_change=lambda: (
-                    logger.debug(f"Forbidden constructors config: {self.config['forbidden_methods']}"),
-                    self._client.forbid_constructors(
+                    _client.forbid_constructors(
                         list(
                             map(
                                 lambda x: CONSTRUCTORS.get(x.lower(), None),

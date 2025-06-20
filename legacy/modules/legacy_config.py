@@ -498,10 +498,12 @@ class LegacyConfigMod(loader.Module):
         obj_type: typing.Union[bool, str] = False,
     ):
         try:
-            if value in self.lookup(mod).config._config[option].value:
-                self.lookup(mod).config._config[option].value.remove(value)
+            current_val = self.lookup(mod).config._config[option].value.copy()
+            if value in current_val:
+                current_val.remove(value)
             else:
-                self.lookup(mod).config._config[option].value += [value]
+                current_val.append(value)
+            self.lookup(mod).config._config[option].value = current_val
 
             self.lookup(mod).config.reload()
         except loader.validators.ValidationError as e:
