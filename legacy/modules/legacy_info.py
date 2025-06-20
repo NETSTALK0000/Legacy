@@ -66,7 +66,8 @@ class LegacyInfoMod(loader.Module):
             ("🌼", "<emoji document_id=5224219153077914783>❤️</emoji>"),
             ("🎡", "<emoji document_id=5226711870492126219>🎡</emoji>"),
             ("🐧", "<emoji document_id=5361541227604878624>🐧</emoji>"),
-            ("🦊", "<emoji document_id=5283051451889756068>🦊</emoji>")
+            ("🦊", "<emoji document_id=5283051451889756068>🦊</emoji>"),
+            ("🧨", "<emoji document_id=5379774338733994368>🧨</emoji>")
         ]:
             platform = platform.replace(emoji, icon)
         return (self.config["custom_message"].format(

@@ -98,9 +98,13 @@ IS_AEZA = "aeza" in socket.gethostname()
 IS_DJHOST = "IS_DJHOST" in os.environ
 IS_USERLAND = "userland" in os.environ
 IS_SKIRIHOST = "SKIRIHOST" in os.environ
+IS_ORACLE = False
 IS_WSL = False
 with contextlib.suppress(Exception):
     from platform import uname
+
+    if "oracle" in uname().release:
+        IS_ORACLE = True
 
     if "microsoft-standard" in uname().release:
         IS_WSL = True
