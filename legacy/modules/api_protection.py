@@ -43,12 +43,15 @@ GROUPS = [
     "stats",
 ]
 
+
 def get_methods_from_group(group_obj):
     return [
         method
         for method_name in dir(group_obj)
-        if isinstance((method := getattr(group_obj, method_name, None)), type) and issubclass(method, TLRequest)
+        if isinstance((method := getattr(group_obj, method_name, None)), type)
+        and issubclass(method, TLRequest)
     ]
+
 
 CONSTRUCTORS = {}
 
@@ -59,6 +62,7 @@ for group in GROUPS:
         for method in methods:
             constructor_name = method.__name__.rsplit("Request", 1)[0].lower()
             CONSTRUCTORS[constructor_name] = method.CONSTRUCTOR_ID
+
 
 @loader.tds
 class APIRatelimiterMod(loader.Module):
@@ -91,7 +95,13 @@ class APIRatelimiterMod(loader.Module):
             ),
             loader.ConfigValue(
                 "forbidden_methods",
-                ["joinChannel", "importChatInvite", "changePhone", "resetPassword", "DeleteAccount"],
+                [
+                    "joinChannel",
+                    "importChatInvite",
+                    "changePhone",
+                    "resetPassword",
+                    "DeleteAccount",
+                ],
                 lambda: self.strings("_cfg_forbidden_methods"),
                 validator=loader.validators.MultiChoice(
                     [
@@ -107,7 +117,7 @@ class APIRatelimiterMod(loader.Module):
                     ]
                 ),
                 on_change=lambda: (
-                    _client.forbid_constructors(
+                    self._client.forbid_constructors(
                         list(
                             map(
                                 lambda x: CONSTRUCTORS.get(x.lower(), None),
