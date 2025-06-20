@@ -27,11 +27,13 @@ import contextlib
 import inspect
 import logging
 import os
+import requests
 
 import aiohttp_jinja2
 import jinja2
 from aiohttp import web
 
+from .. import utils
 from ..database import Database
 from ..loader import Modules
 from ..tl_cache import CustomTelegramClient
@@ -88,7 +90,17 @@ class Web(root.Web):
 
         if not url:
             # вырезана проверка на докер
-            ip = "127.0.0.1"
+            platform = utils.get_named_platform()
+ 
+            if any(keyword in platform for keyword in ['WSL', 'UserLand', 'Termux']):
+                ip = "127.0.0.1"
+            else:
+                try:
+                    resp = requests.get('http://ifconfig.me/ip', timeout=5)
+                    resp.raise_for_status()
+                    ip = resp.text.strip()
+                except (requests.exceptions.RequestException, ValueError):
+                    ip = "127.0.0.1"
 
             url = f"http://{ip}:{self.port}"
 
