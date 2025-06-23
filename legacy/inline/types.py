@@ -5,6 +5,7 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import logging
+from typing import Optional
 
 from aiogram.types import CallbackQuery
 from aiogram.types import InlineQuery as AiogramInlineQuery
@@ -135,6 +136,16 @@ class InlineCall(CallbackQuery, InlineMessage):
             unit_id,
             call.inline_message_id,
         )
+    
+    async def answer(self, text: Optional[str] = None, *args, **kwargs):
+        if text:
+            text = utils.remove_html(text)
+        
+        return await self.original_call.answer(
+            text=text,
+            *args,
+            **kwargs
+        )
 
 
 class BotInlineCall(CallbackQuery, BotInlineMessage):
@@ -167,6 +178,16 @@ class BotInlineCall(CallbackQuery, BotInlineMessage):
             unit_id,
             call.message.chat.id,
             call.message.message_id,
+        )
+    
+    async def answer(self, text: Optional[str] = None, *args, **kwargs):
+        if text:
+            text = utils.remove_html(text)
+        
+        return await self.original_call.answer(
+            text=text,
+            *args,
+            **kwargs
         )
 
 

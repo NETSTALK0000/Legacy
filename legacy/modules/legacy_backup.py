@@ -212,7 +212,7 @@ class LegacyBackupMod(loader.Module):
             logger.exception("Unable to restore backup")
             return
 
-        await call.answer(utils.remove_html(self.strings("backup_restored")), show_alert=True)
+        await call.answer(self.strings("backup_restored"), show_alert=True)
         await self.invoke("restart", "-f", peer=self.inline.bot_id)
 
     @loader.command()
