@@ -81,7 +81,7 @@ class Evaluator(loader.Module):
                     utils.escape_html(self.censor(str(result))),
                 ) + (self.strings("output").format(
                     "python",
-                    utils.escape_html(printed_output)
+                    utils.escape_html(self.censor(printed_output))
                 ) if printed_output else ""),
             )
 
