@@ -812,7 +812,8 @@ async def asset_channel(
 
     if _folder:
         if _folder != "legacy":
-            raise NotImplementedError
+            #finish later
+            _folder = "legacy"
 
         folders = await client(GetDialogFiltersRequest())
 
