@@ -487,6 +487,7 @@ translations:
 
 eval:
   eval: "<emoji document_id={}>💻</emoji><b> Код:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<emoji document_id=5197688912457245639>✅</emoji><b> Результат:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  output: "\n\n<emoji document_id=5472111548572900003>⌨️</emoji> <b>Вывод:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   err: "<emoji document_id={}>💻</emoji><b> Код:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<emoji document_id=5210952531676504517>🚫</emoji> <b>Ошибка:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   _cls_doc: "Выполняет код на различных языках программирования"
   compiling: "<emoji document_id=5325787248363314644>🫥</emoji> <b>Компиляция кода...</b>"

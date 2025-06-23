@@ -12,6 +12,7 @@ import sys
 import tempfile
 import typing
 from types import ModuleType
+from io import StringIO
 
 import legacytl
 from legacytl.errors.rpcerrorlist import MessageIdInvalidError
@@ -32,11 +33,16 @@ class Evaluator(loader.Module):
     @loader.command(alias="eval")
     async def e(self, message: Message):
         try:
-            result = await meval(
-                utils.get_args_raw(message),
-                globals(),
-                **await self.getattrs(message),
-            )
+            output_buffer = StringIO()
+
+            with contextlib.redirect_stdout(output_buffer):
+                result = await meval(
+                    utils.get_args_raw(message),
+                    globals(),
+                    **await self.getattrs(message),
+                )
+
+            printed_output = output_buffer.getvalue()
         except Exception:
             item = HikkaException.from_exc_info(*sys.exc_info())
 
@@ -73,7 +79,10 @@ class Evaluator(loader.Module):
                     utils.escape_html(utils.get_args_raw(message)),
                     "python",
                     utils.escape_html(self.censor(str(result))),
-                ),
+                ) + (utils.escape_html(self.strings("output").format(
+                    "python",
+                    printed_output
+                )) if printed_output else ""),
             )
 
     @loader.command()
