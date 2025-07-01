@@ -131,6 +131,14 @@ class APIRatelimiterMod(loader.Module):
 
     async def client_ready(self):
         asyncio.ensure_future(self._install_protection())
+        self._client.forbid_constructors(
+             list(
+                  map(
+                       lambda x: CONSTRUCTORS.get(x.lower(), None),
+                       self.config["forbidden_methods"],
+                  ),
+             ),
+        )
 
     async def _install_protection(self):
         await asyncio.sleep(30)  # Restart lock
