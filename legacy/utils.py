@@ -602,6 +602,8 @@ async def get_target(message: Message, arg_no: int = 0) -> typing.Optional[int]:
 
     if len(get_args(message)) > arg_no:
         user = get_args(message)[arg_no]
+        if user.isdigit():
+            user = int(user)
     elif message.is_reply:
         return (await message.get_reply_message()).sender_id
     elif hasattr(message.peer_id, "user_id"):
@@ -812,7 +814,7 @@ async def asset_channel(
 
     if _folder:
         if _folder != "legacy":
-            #finish later
+            # finish later
             _folder = "legacy"
 
         folders = await client(GetDialogFiltersRequest())
@@ -985,9 +987,8 @@ def get_platform_emoji() -> str:
     if main.IS_DOCKER:
         return BASE.format(5456574628933693253)
 
-    
-
     return BASE.format(5467541303938019154)
+
 
 def uptime() -> int:
     """
@@ -1009,6 +1010,7 @@ def formatted_uptime() -> str:
         return f"{days} day(s), {time_formatted}"
     return time_formatted
 
+
 async def add_uptime(minutes: int) -> str:
     """
     Adds a custom uptime in minutes to the current uptime.
@@ -1020,6 +1022,7 @@ async def add_uptime(minutes: int) -> str:
     init_ts -= seconds
     return "Added uptime!"
 
+
 async def set_uptime(minutes: int) -> str:
     """
     Sets a custom uptime in minutes. This will adjust the init_ts accordingly.
@@ -1030,6 +1033,7 @@ async def set_uptime(minutes: int) -> str:
     init_ts = time.perf_counter() - seconds
 
     return " Uptime is on offer!"
+
 
 def ascii_face() -> str:
     """
@@ -1580,6 +1584,7 @@ def get_ram_usage() -> float:
     except Exception:
         return 0
 
+
 async def get_cpu_usage_async() -> float:
     from aiopsutil import AsyncPSUtil
 
@@ -1589,10 +1594,14 @@ async def get_cpu_usage_async() -> float:
 
     return cpu_usage
 
+
 def get_cpu_usage() -> float:
     try:
         import subprocess
-        result = subprocess.run(['ps', '-p', str(os.getpid()), '-o', '%cpu'], capture_output=True, text=True)
+
+        result = subprocess.run(
+            ["ps", "-p", str(os.getpid()), "-o", "%cpu"], capture_output=True, text=True
+        )
         cpu_usage = float(result.stdout.splitlines()[1].strip())
         return round(cpu_usage, 2)
     except Exception as e:
@@ -1625,7 +1634,10 @@ def get_version_raw() -> str:
 
     return version.__version__
 
-async def send_reaction(client: CustomTelegramClient, message: Message, emoji: typing.Union[int, str]) -> None:
+
+async def send_reaction(
+    client: CustomTelegramClient, message: Message, emoji: typing.Union[int, str]
+) -> None:
     """
     Send reaction to specified message
 
@@ -1639,9 +1651,21 @@ async def send_reaction(client: CustomTelegramClient, message: Message, emoji: t
     try:
         me = await client.get_me()
         if isinstance(emoji, int) and me.premium:
-            await client(SendReactionRequest(peer=message.chat_id, msg_id=message.id, reaction=[ReactionCustomEmoji(document_id=emoji)]))
+            await client(
+                SendReactionRequest(
+                    peer=message.chat_id,
+                    msg_id=message.id,
+                    reaction=[ReactionCustomEmoji(document_id=emoji)],
+                )
+            )
         elif isinstance(emoji, str):
-            await client(SendReactionRequest(peer=message.chat_id, msg_id=message.id, reaction=[ReactionEmoji(emoticon=emoji)]))
+            await client(
+                SendReactionRequest(
+                    peer=message.chat_id,
+                    msg_id=message.id,
+                    reaction=[ReactionEmoji(emoticon=emoji)],
+                )
+            )
     except Exception as e:
         logger.error(f"Unable to send reaction to the specified message: {e}")
         return
