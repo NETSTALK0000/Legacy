@@ -85,13 +85,11 @@ class Web:
             "docker": "https://github.com/hikariatama/assets/raw/master/spouting-whale_1f433.png",
         }[
             (
-                (
-                    "termux"
-                    if "com.termux" in os.environ.get("PREFIX", "")
-                    else "docker"
-                    if "DOCKER" in os.environ
-                    else "vds"
-                )
+                "termux"
+                if "com.termux" in os.environ.get("PREFIX", "")
+                else "docker"
+                if "DOCKER" in os.environ
+                else "vds"
             )
         ]
 
@@ -236,9 +234,6 @@ class Web:
         self._qr_login = True
 
     async def init_qr_login(self, request: web.Request) -> web.Response:
-        if self.client_data and "LAVHOST" in os.environ:
-            return web.Response(status=403, body="Forbidden by host EULA")
-
         if not self._check_session(request):
             return web.Response(status=401)
 
@@ -299,17 +294,11 @@ class Web:
         )
 
     async def can_add(self, request: web.Request) -> web.Response:
-        if self.client_data and "LAVHOST" in os.environ:
-            return web.Response(status=403, body="Forbidden by host EULA")
-
         return web.Response(status=200, body="Yes")
 
     async def send_tg_code(self, request: web.Request) -> web.Response:
         if not self._check_session(request):
             return web.Response(status=401, body="Authorization required")
-
-        if self.client_data and "LAVHOST" in os.environ:
-            return web.Response(status=403, body="Forbidden by host EULA")
 
         if self._pending_client:
             return web.Response(status=208, body="Already pending")

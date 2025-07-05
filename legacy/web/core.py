@@ -78,9 +78,6 @@ class Web(root.Web):
     async def get_url(self, proxy_pass: bool) -> str:
         url = None
 
-        if all(option in os.environ for option in {"LAVHOST", "USER", "SERVER"}):
-            return f"https://{os.environ['USER']}.{os.environ['SERVER']}.lavhost.ml"
-
         if proxy_pass:
             with contextlib.suppress(Exception):
                 url = await asyncio.wait_for(
@@ -91,12 +88,12 @@ class Web(root.Web):
         if not url:
             # вырезана проверка на докер
             platform = utils.get_named_platform()
- 
-            if any(keyword in platform for keyword in ['WSL', 'UserLand', 'Termux']):
+
+            if any(keyword in platform for keyword in ["WSL", "UserLand", "Termux"]):
                 ip = "127.0.0.1"
             else:
                 try:
-                    resp = requests.get('http://ifconfig.me/ip', timeout=5)
+                    resp = requests.get("http://ifconfig.me/ip", timeout=5)
                     resp.raise_for_status()
                     ip = resp.text.strip()
                 except (requests.exceptions.RequestException, ValueError):
