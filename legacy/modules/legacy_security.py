@@ -1178,13 +1178,6 @@ class LegacySecurityMod(loader.Module):
     @loader.command()
     async def tsec(self, message: Message):
         if not (args := utils.get_args(message)):
-            if (
-                not self._client.dispatcher.security.tsec_chat
-                and not self._client.dispatcher.security.tsec_user
-            ):
-                await utils.answer(message, self.strings("no_rules"))
-                return
-
             await utils.answer(
                 message,
                 self.strings("rules").format(
