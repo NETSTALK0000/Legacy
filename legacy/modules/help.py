@@ -47,13 +47,8 @@ class Help(loader.Module):
             ),
         )
 
-    @loader.command(
-        ru_doc="[args] | Спрячет ваши модули",
-        ua_doc="[args] | Сховає ваші модулі",
-        de_doc="[args] | Versteckt Ihre Module",
-    )
+    @loader.command()
     async def helphide(self, message: Message):
-        """[args] | hide your modules"""
         if not (modules := utils.get_args(message)):
             await utils.answer(message, self.strings("no_mod"))
             return
@@ -208,13 +203,8 @@ class Help(loader.Module):
             ),
         )
 
-    @loader.command(
-        ru_doc="[args] | Помощь с вашими модулями!",
-        ua_doc="[args] | допоможіть з вашими модулями!",
-        de_doc="[args] | Hilfe mit deinen Modulen!",
-    )
+    @loader.command()
     async def help(self, message: Message):
-        """[-f] [-h] | help with your modules!"""
         args = utils.get_args_raw(message)
         force = False
         only_hidden = False
@@ -337,19 +327,19 @@ class Help(loader.Module):
             ),
             len(no_commands_),
         )
+        full_list = (
+            core_ + plain_ + no_commands_
+            if force
+            else hidden_mods + no_commands_
+            if only_hidden
+            else core_ + plain_
+        )
 
         await utils.answer(
             message,
-            (
-                self.config["desc_icon"]
-                + " {}\n <blockquote>{}</blockquote><blockquote>{}</blockquote>"
-            ).format(
+            (self.config["desc_icon"] + " {}\n {}{}").format(
                 reply,
-                "".join(
-                    (core_ + plain_ + (no_commands_ if force else []))
-                    if not only_hidden
-                    else hidden_mods + no_commands_
-                ),
+                "".join(full_list),
                 (
                     ""
                     if self.lookup("Loader").fully_loaded
@@ -358,14 +348,8 @@ class Help(loader.Module):
             ),
         )
 
-    @loader.command(
-        ru_doc="| Ссылка на чат помощи",
-        ua_doc="| посилання для чату служби підтримки",
-        de_doc="| Link zum Support-Chat",
-    )
+    @loader.command()
     async def support(self, message):
-        """| link for support chat"""
-
         await utils.answer(
             message,
             self.strings("support").format(

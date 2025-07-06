@@ -396,6 +396,9 @@ help:
   not_exact: "<emoji document_id=5355133243773435190>☝️</emoji> <b>No exact match occured, so the closest result is shown instead</b>"
   request_join: "You requested link for Legacy support chat"
   core_notice: "<emoji document_id=5355133243773435190>☝️</emoji> <b>This is a core module. You can't unload it nor replace</b>"
+  _cmd_doc_support: "| link for support chat"
+  _cmd_doc_helphide: "[args] | hide your modules"
+  _cmd_doc_help: "[-f] [-h] | help with your modules!"
 
 legacy_info:
   name: "LegacyInfo"
@@ -605,4 +608,3 @@ $inline:
   command: "🌙 Command «{}»"
   button403: "You are not allowed to press this button!"
   keep_id: "⚠️ Do not remove ID! {}"
-
