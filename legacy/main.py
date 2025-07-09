@@ -95,7 +95,6 @@ IS_DOCKER = "DOCKER" in os.environ
 IS_RAILWAY = "RAILWAY" in os.environ
 IS_HIKKAHOST = "HIKKAHOST" in os.environ
 IS_AEZA = "aeza" in socket.gethostname()
-IS_DJHOST = "IS_DJHOST" in os.environ
 IS_USERLAND = "userland" in os.environ
 IS_ORACLE = False
 IS_WSL = False
