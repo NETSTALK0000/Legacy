@@ -935,9 +935,6 @@ def get_named_platform() -> str:
     if main.IS_HIKKAHOST:
         return "🌼 HikkaHost"
 
-    if main.IS_SKIRIHOST:
-        return "🦊 SkiriHost"
-
     if main.IS_ORACLE:
         return "🧨 Oracle"
 
@@ -977,9 +974,6 @@ def get_platform_emoji() -> str:
 
     if main.IS_RAILWAY:
         return BASE.format(5456525163795344370)
-
-    if main.IS_SKIRIHOST:
-        return BASE.format(5262972342342022881)
 
     if main.IS_ORACLE:
         return BASE.format(5380110961090788815)
