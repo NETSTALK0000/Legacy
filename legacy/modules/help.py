@@ -232,7 +232,7 @@ class Help(loader.Module):
 
             if len(mod.commands) == 0 and len(mod.inline_handlers) == 0:
                 no_commands_ += [
-                    "\n{} <code>{}</code>\n".format(
+                    "{} <code>{}</code>\n".format(
                         self.config["empty_emoji"], mod.strings["name"]
                     )
                 ]
@@ -249,7 +249,7 @@ class Help(loader.Module):
                 name = getattr(mod, "name", "ERROR")
 
             core = mod.__origin__.startswith("<core")
-            tmp += "\n{} <code>{}</code>".format(
+            tmp += "{} <code>{}</code>".format(
                 self.config["core_emoji"] if core else self.config["plain_emoji"], name
             )
             first = True
@@ -287,7 +287,7 @@ class Help(loader.Module):
                     tmp += f" | <emoji document_id=6030400221232501136>🤖</emoji> {cmd}"
 
             if commands or icommands:
-                tmp += " )"
+                tmp += " )\n"
                 if core:
                     core_ += [tmp]
                 else:
@@ -307,7 +307,7 @@ class Help(loader.Module):
             for mod in hidden:
                 if mod in mod_names:
                     hidden_mods += [
-                        "\n{} <code>{}</code>".format(self.config["empty_emoji"], mod)
+                        "{} <code>{}</code>\n".format(self.config["empty_emoji"], mod)
                     ]
         hidden_mods.sort(key=extract_name)
 
@@ -334,19 +334,32 @@ class Help(loader.Module):
             if only_hidden
             else core_ + plain_
         )
-
-        await utils.answer(
-            message,
-            (self.config["desc_icon"] + " {}\n {}{}").format(
-                reply,
-                f"<blockquote>{''.join(full_list)}</blockquote>",
-                (
-                    ""
-                    if self.lookup("Loader").fully_loaded
-                    else f"\n\n{self.strings('partial_load')}"
+        if len("".join(full_list)) >= 4096:
+            await utils.answer(
+                message,
+                (self.config["desc_icon"] + " {}\n {}{}").format(
+                    reply,
+                    "".join(full_list),
+                    (
+                        ""
+                        if self.lookup("Loader").fully_loaded
+                        else f"\n\n{self.strings('partial_load')}"
+                    ),
                 ),
-            ),
-        )
+            )
+        else:
+            await utils.answer(
+                message,
+                (self.config["desc_icon"] + " {}\n {}{}").format(
+                    reply,
+                    f"<blockquote>{''.join(full_list)}</blockquote>",
+                    (
+                        ""
+                        if self.lookup("Loader").fully_loaded
+                        else f"\n\n{self.strings('partial_load')}"
+                    ),
+                ),
+            )
 
     @loader.command()
     async def support(self, message):
