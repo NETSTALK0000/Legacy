@@ -21,10 +21,10 @@ from legacytl.tl.functions.account import GetPasswordRequest
 from legacytl.tl.functions.auth import CheckPasswordRequest
 from legacytl.utils import parse_phone
 
-from .. import main
-from ..tl_cache import CustomTelegramClient
-from .._internal import restart
-from ..version import __version__
+from . import main
+from .tl_cache import CustomTelegramClient
+from ._internal import restart
+from .version import __version__
 
 import logging
 
