@@ -807,6 +807,12 @@ class Legacy:
             upd = "Update required" if diff else "Up-to-date"
 
             logo = (
+                "   __\n"
+                "  / /  ___  __ _  __ _  ___ _   _\n"
+                " / /  / _ \\/ _` |/ _` |/ __| | | |\n"
+                "/ /__|  __/ (_| | (_| | (__| |_| |\n"
+                "\\____/\\___|\\__, |\\__,_|\\___|\\__, |\n"
+                "           |___/            |___/\n\n"
                 f"• Build: {build[:7]}\n"
                 f"• Version: {__version__}\n"
                 f"• {upd}\n"
