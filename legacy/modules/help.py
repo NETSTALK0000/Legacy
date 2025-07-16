@@ -249,7 +249,7 @@ class Help(loader.Module):
                 name = getattr(mod, "name", "ERROR")
 
             core = mod.__origin__.startswith("<core")
-            tmp += "\n{} <code>{}</code>".format(
+            tmp += "{} <code>{}</code>".format(
                 self.config["core_emoji"] if core else self.config["plain_emoji"], name
             )
             first = True
@@ -287,7 +287,7 @@ class Help(loader.Module):
                     tmp += f" | <emoji document_id=6030400221232501136>🤖</emoji> {cmd}"
 
             if commands or icommands:
-                tmp += " )"
+                tmp += " )\n"
                 if core:
                     core_ += [tmp]
                 else:

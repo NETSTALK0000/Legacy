@@ -506,12 +506,12 @@ async def answer(
     if isinstance(response, str) and not kwargs.pop("asfile", False):
         text, entities = parse_mode.parse(response)
 
-        if len(text) >= 4096 and not hasattr(message, "legacy_grepped"):
+        if len(text) >= 4071 and not hasattr(message, "legacy_grepped"):
             try:
                 if not message.client.loader.inline.init_complete:
                     raise
 
-                strings = list(smart_split(text, entities, 4096))
+                strings = list(smart_split(text, entities, 4071))
 
                 if len(strings) > 10:
                     raise
