@@ -296,7 +296,18 @@ inline_stuff:
   bot_username_occupied: "<emoji document_id=5210952531676504517>🚫</emoji> <b>This username is already occupied</b>"
   bot_updated: "<emoji document_id=6318792204118656433>🎉</emoji> <b>Config successfully saved. Restart userbot to apply changes</b>"
   this_is_legacy: "🌙 <b>Hi! This is Legacy — powerful modular Telegram userbot. You can install it to your account!</b>\n\n<b>🌍 <a href=\"https://github.com/Crayz310/Legacy\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/legacy_help\">Support chat</a></b>"
+  enter_phone: "📱 Enter your phone number:"
+  wrong_number: "❌ Invalid phone number. Please try logging in again"
+  no_phone: "⚠️ Phone number not found. Please try logging in again"
+  received_code: "📩 Enter the received code (format: 000.00):"
+  wrong_code: "❗️ Incorrect code. Please try again:"
+  expired_code: "❌ Code has expired. Please try logging in again"
+  no_code: "⚠️ Code not found. Please try logging in again"
+  enter_2fa: "🔐 Enter your 2FA password:"
+  wrong_2fa: "❗️ Incorrect 2FA. Please try again:"
+  success_auth: "✅ Successfully authenticated"
   _cmd_doc_ch_legacy_bot: "<username> - Change your Legacy inline bot username"
+  _cmd_doc_iauth: "Add user via inline bot"
   _cls_doc: "Provides support for inline stuff"
 
 test:
