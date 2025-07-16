@@ -339,7 +339,7 @@ class Help(loader.Module):
             message,
             (self.config["desc_icon"] + " {}\n {}{}").format(
                 reply,
-                "".join(full_list),
+                f"<blockquote>{''.join(full_list)}</blockquote>",
                 (
                     ""
                     if self.lookup("Loader").fully_loaded
