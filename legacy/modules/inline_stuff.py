@@ -186,6 +186,10 @@ class InlineStuff(loader.Module):
                 await message.answer(self.strings("success_auth"))
                 self.reset_state(user_id)
             except ValueError as e:
+                if "Invalid code" in str(e):
+                    await message.answer(self.strings("wrong_code"))
+                    return
+
                 if "2FA" in str(e):
                     self._temp_data[user_id].update({"code": code})
                     await message.answer(self.strings("enter_2fa"))
