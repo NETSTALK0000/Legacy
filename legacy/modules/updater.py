@@ -342,7 +342,7 @@ class UpdaterMod(loader.Module):
                             )
                             or dialog.entity.id in [2577311568]  # official legacy chat
                         ],
-                        emoticon="🐱",
+                        emoticon="⭐️",
                         exclude_peers=[],
                         contacts=False,
                         non_contacts=False,
