@@ -232,7 +232,7 @@ class Help(loader.Module):
 
             if len(mod.commands) == 0 and len(mod.inline_handlers) == 0:
                 no_commands_ += [
-                    "\n{} <code>{}</code>\n".format(
+                    "{} <code>{}</code>\n".format(
                         self.config["empty_emoji"], mod.strings["name"]
                     )
                 ]
@@ -307,7 +307,7 @@ class Help(loader.Module):
             for mod in hidden:
                 if mod in mod_names:
                     hidden_mods += [
-                        "\n{} <code>{}</code>".format(self.config["empty_emoji"], mod)
+                        "{} <code>{}</code>\n".format(self.config["empty_emoji"], mod)
                     ]
         hidden_mods.sort(key=extract_name)
 
@@ -334,19 +334,32 @@ class Help(loader.Module):
             if only_hidden
             else core_ + plain_
         )
-
-        await utils.answer(
-            message,
-            (self.config["desc_icon"] + " {}\n {}{}").format(
-                reply,
-                f"<blockquote>{''.join(full_list)}</blockquote>",
-                (
-                    ""
-                    if self.lookup("Loader").fully_loaded
-                    else f"\n\n{self.strings('partial_load')}"
+        if len("".join(full_list)) >= 4096:
+            await utils.answer(
+                message,
+                (self.config["desc_icon"] + " {}\n {}{}").format(
+                    reply,
+                    "".join(full_list),
+                    (
+                        ""
+                        if self.lookup("Loader").fully_loaded
+                        else f"\n\n{self.strings('partial_load')}"
+                    ),
                 ),
-            ),
-        )
+            )
+        else:
+            await utils.answer(
+                message,
+                (self.config["desc_icon"] + " {}\n {}{}").format(
+                    reply,
+                    f"<blockquote>{''.join(full_list)}</blockquote>",
+                    (
+                        ""
+                        if self.lookup("Loader").fully_loaded
+                        else f"\n\n{self.strings('partial_load')}"
+                    ),
+                ),
+            )
 
     @loader.command()
     async def support(self, message):
