@@ -15,7 +15,7 @@
 
 <b>⚙ Manual installation (no script):</b><br>
 ```bash
-apt update && apt install git python3 -y && git clone https://github.com/Crayz310/Legacy && cd Legacy && pip install -r requirements.txt && python3 -m hikka
+apt update && apt install git python3 -y && git clone https://github.com/Crayz310/Legacy && cd Legacy && pip install -r requirements.txt && python3 -m legacy
 ```
 
 <i>If you are on VPS\VDS, type <code>--proxy-pass</code> in the end of command to open SSH tunnel to your Legacy web interface, or use <code>--no-web</code> to complete setup in console</i><br>
