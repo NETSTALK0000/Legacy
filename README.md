@@ -128,7 +128,7 @@ Check out <a href="https://web.archive.org/dev.hikka.pw">dev.hikka.pw</a> for de
 <ul>
     <li><a href="https://gitlab.com/hackintosh5">Hackintosh5</a> for FTG, which is the base of Hikka</li>
     <li><a href="https://github.com/beveiled">Hikariatama</a> for Hikka, which is the base of project</li>
-    <li><a href="https://gitlab.com/hackintosh5">Codrago</a> for Heroku <b>(Some patches were taken from Heroku v1.6.8)</b></li>
+    <li><a href="https://github.com/coddrago">Codrago</a> for Heroku <b>(Some patches were taken from Heroku v1.6.8)</b></li>
     <li><a href="https://t.me/GunyaKshin">Codwiz</a> for Ukrainian translation pack</li>
     <li><a href="https://t.me/Admt_450">ɴᴇᴛ『s』ᴛᴀʟᴋ『2』『4』</a> for testing and finding bugs</li>
     <li><a href="https://t.me/lonami">Lonami</a> for Telethon, which is the base of Legacy-TL-New</li>
