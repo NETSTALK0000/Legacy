@@ -8,59 +8,56 @@
 
 ### Disclaimer
 
-> Even though Heroku has extended security measures for scam-modules protection, flood-based account restrictions protection and others, it still may cause damage to server / account if you install module from untrusted developer. Please, consider downloading modules exceptionally from official repository or from trusted developers. If you are not sure about whether module is safe or not, please, DO NOT INSTALL IT. Same goes for unknown commands (.terminal, .e, .eval, .ec, .ecpp, etc.). You have been warned.
+> If you are a paranoid person, you should not use this userbot. This userbot is not a virus, but it can be used for malicious purposes. You are responsible for all actions taken by your account.
 
 <hr>
-<h2><img src="https://github.com/hikariatama/assets/raw/master/1326-command-window-line-flat.webp" height="54" align="middle"> Installation</h2>
+<h2><img src="https://img.icons8.com/?size=100&id=Jd0d5Iz2TZIb&format=png&color=000000" height="54" align="center" style="margin-right: 7px;">Installation</h2>
 
-### Installation page
+<b>⚙ Manual installation (no script):</b><br>
+```bash
+apt update && apt install git python3 -y && git clone https://github.com/Crayz310/Legacy && cd Legacy && pip install -r requirements.txt && python3 -m hikka
+```
 
-<img src="https://github.com/hikariatama/assets/raw/master/install_qr.gif" height="256">
-
-
-<b>Manual installation (no script):</b><br>
-<code>apt update && apt install git python3 -y && git clone https://github.com/Crayz310/Legacy && cd Legacy && pip install -r requirements.txt && python3 -m hikka</code><br.>
 <i>If you are on VPS\VDS, type <code>--proxy-pass</code> in the end of command to open SSH tunnel to your Legacy web interface, or use <code>--no-web</code> to complete setup in console</i><br>
-<br>
-<b>Some further details:</b>
 
-<details>
- <summary>Pre-installed automatic database backuper</summary>
- <img src="https://user-images.githubusercontent.com/36935426/202905566-964d2904-f3ce-4a14-8f05-0e7840e1b306.png" width="300">
-</details>
-<details>
- <summary>Welcome installation info</summary>
- <img src="https://user-images.githubusercontent.com/36935426/202905720-6319993b-697c-4b09-a194-209c110c79fd.png" width="300">
- <img src="https://user-images.githubusercontent.com/36935426/202905746-2a511129-0208-4581-bb27-7539bd7b53c9.png" width="300">
-</details>
+<b>🐬 Docker:</b><br>
+```bash
+git clone https://github.com/Crayz310/Legacy && cd Legacy && sudo docker build . -t Crayz310/Legacy:latest
+```
 
+```bash
+sudo docker run --restart=unless-stopped --name <container name> -p <port>:8080 --detach -it Crayz310/Legacy:latest
+```
 <hr>
-<h2><img src="https://github.com/hikariatama/assets/raw/master/35-edit-flat.webp" height="54" align="middle"> Changes</h2>
+<h2><img src="https://img.icons8.com/?size=100&id=PClBimo4GQGJ&format=png&color=000000" height="54" align="center" style="margin-right: 7px;"> Changes</h2>
 
 <ul>
  <li>🆕 <b>Latest Telegram layer</b> with reactions, video stickers and other stuff</li>
  <li>🔓 <b>Security</b> improvements, including <b>native entity caching</b> and <b>targeted security rules</b></li>
  <li>🎨 <b>UI/UX</b> improvements</li>
  <li>📼 Improved and new <b>core modules</b></li>
- <li>⏱ Quick <b>bug fixes</b> (compared to official FTG and GeekTG)</li>
+ <li>⏱ Quick <b>bug fixes</b></li>
  <li>▶️ <b>Inline forms, galleries and lists</b></li>
  <li>🔁 Full <b>backward compatibility</b> with FTG, Hikka and GeekTG modules</li>
 </ul>
+
 <hr>
-<h2 border="none"><img src="https://github.com/hikariatama/assets/raw/master/1312-micro-sd-card-flat.webp" height="54" align="middle"> Requirements</h2>
+<h2 border="none"><img src="https://img.icons8.com/?size=100&id=5cJddikxEAhI&format=png&color=000000" height="54" align="center" style="margin-right: 7px;"> Requirements</h2>
 <ul>
- <li>Python 3.9-3.12</li>
- <li>API_ID and HASH from <a href="https://my.telegram.org/apps" color="#2594cb">Telegram</a></li>
+ <li>🐍 Python 3.9-3.12</li>
+ <li>🔑 API_ID and HASH from <a href="https://my.telegram.org/apps" color="#2594cb">Telegram</a></li>
 </ul>
+
 <hr>
-<h2 border="none"><img src="https://github.com/hikariatama/assets/raw/master/680-it-developer-flat.webp" height="54" align="middle"> Documentation</h2>
+<h2 border="none"><img src="https://img.icons8.com/?size=100&id=rLMbY01ZXrPE&format=png&color=000000" height="54" align="center" style="margin-right: 7px;"> Documentation</h2>
 
 Check out <a href="https://web.archive.org/dev.hikka.pw">dev.hikka.pw</a> for developers' documentation and <a href="https://web.archive.org/hikka.pw">hikka.pw</a> for users' documentation<br>
 
 <hr>
-<h2 border="none"><img src="https://github.com/hikariatama/assets/raw/master/981-consultation-flat.webp" height="54" align="middle"> <a href="https://t.me/legacy_help">Support</a></h2>
+<h2 border="none"><img src="https://img.icons8.com/?size=100&id=wuPAd75eU6lM&format=png&color=000000" height="54" align="center" style="margin-right: 7px;"> <a href="https://t.me/legacy_help">Support</a></h2>
+
 <hr>
-<h2 border="none"><img src="https://github.com/hikariatama/assets/raw/master/541-hand-washing-step-12-flat.webp" height="54" align="middle"> Features</h2>
+<h2 border="none"><img src="https://img.icons8.com/?size=100&id=YCbKhwUNH1pc&format=png&color=000000" height="54" align="center" style="margin-right: 7px;"> Features</h2>
 <table>
  <tr>
   <td>
@@ -72,10 +69,10 @@ Check out <a href="https://web.archive.org/dev.hikka.pw">dev.hikka.pw</a> for de
  </tr>
  <tr>
   <td>
-   <img src="https://user-images.githubusercontent.com/36935426/202842205-9a3906f8-37b1-47f4-acd1-ae441f84aeab.gif">
+   <img src="https://i.postimg.cc/T3VSMbvQ/legacy-inline-form.gif">
   </td>
   <td>
-   <img src="https://user-images.githubusercontent.com/36935426/202842215-b7bddaf2-f544-4823-80b4-5c2cccaf2157.gif">
+   <img src="https://i.postimg.cc/1XDTmVN9/legacy-inline.gif">
   </td>
  </tr>
 </table>
@@ -90,10 +87,10 @@ Check out <a href="https://web.archive.org/dev.hikka.pw">dev.hikka.pw</a> for de
  </tr>
  <tr>
   <td>
-   <img src="https://user-images.githubusercontent.com/36935426/202842234-e53f616d-7423-4a64-a5da-fb71282ad2c4.gif">
+   <img src="https://i.postimg.cc/nzGcXrm1/legacy-inline-cmds.gif">
   </td>
   <td>
-   <img src="https://user-images.githubusercontent.com/36935426/160476037-9537f1c7-8b72-408f-b84c-b89825930bf5.gif">
+   <img src="https://i.postimg.cc/HsXHnVC8/legacy-feedback.gif">
   </td>
  </tr>
 </table>
@@ -108,32 +105,31 @@ Check out <a href="https://web.archive.org/dev.hikka.pw">dev.hikka.pw</a> for de
  </tr>
  <tr>
   <td>
-   <img src="https://user-images.githubusercontent.com/36935426/202842250-b60d218e-9df4-47f6-8c67-b2ef641b4d2d.gif">
+   <img src="https://i.postimg.cc/FHHPqBGF/legacy-inline-logs.gif">
   </td>
   <td>
-   <img src="https://user-images.githubusercontent.com/36935426/202842263-ee2d5c94-3fd5-43b3-b8ac-2397b69e0fc6.gif">
+   <img src="https://i.postimg.cc/FzbcshFt/legacy-grep.gif">
   </td>
  </tr>
 </table>
 
 <b>👨‍👦 NoNick, NoNickUser, NoNickCmd, NoNickChat - use another account for userbot</b>
-<img src="https://user-images.githubusercontent.com/36935426/202842278-37fbc518-1679-45d7-92f5-9e519275630d.png">
+<img src="https://i.postimg.cc/wvX3DFCL/legacy-nonick.gif">
 
 <hr>
-<i>⚠️ This project is provided as-is. Developer doesn't take ANY responsibility over any problems, caused by userbot. By installing Legacy you take all risks on you. This is but not limited to account bans, deleted (by Telegram algorithms) messages, SCAM-modules, leaked sessions (due to SCAM-modules). It is <b>highly</b> recommended to enable the API Flood protection (.api_fw_protection) and not to install many modules at once. By using Heroku you give your consent to any actions made by your account in background in purposes of automatization. Please, consider reading https://core.telegram.org/api/terms for more information.</i>
 
-<b>Special thanks to:</b>
+### Warning
+
+> This project is provided as-is. Developer doesn't take ANY responsibility over any problems, caused by userbot. By installing Legacy you take all risks on you. This is but not limited to account bans, deleted (by Telegram algorithms) messages, SCAM-modules, leaked sessions (due to SCAM-modules). It is **highly** recommended to enable the API Flood protection (.api_fw_protection) and not to install many modules at once. By using Legacy you give your consent to any actions made by your account in background in purposes of automatization. Please, consider reading https://core.telegram.org/api/terms for more information.
+
+<hr>
+<h2><img src="https://img.icons8.com/?size=100&id=haPxINLo0tRS&format=png&color=000000" height="54" align="center" style="margin-right: 7px;">Special thanks to:</h2>
 
 <ul>
-    <li><a href="https://gitlab.com/hackintosh5">Hackintosh5</a> for FTG, which is the base of project</li>
+    <li><a href="https://gitlab.com/hackintosh5">Hackintosh5</a> for FTG, which is the base of Hikka</li>
+    <li><a href="https://github.com/beveiled">Hikariatama</a> for Hikka, which is the base of project</li>
+    <li><a href="https://gitlab.com/hackintosh5">Codrago</a> for Heroku <b>(Some patches were taken from Heroku v1.6.8)</b></li>
     <li><a href="https://t.me/GunyaKshin">Codwiz</a> for Ukrainian translation pack</li>
+    <li><a href="https://t.me/Admt_450">ɴᴇᴛ『s』ᴛᴀʟᴋ『2』『4』</a> for testing and finding bugs</li>
     <li><a href="https://t.me/lonami">Lonami</a> for Telethon, which is the base of Legacy-TL-New</li>
 </ul>
-
-<b>Acknowledgments</b>
-
-<ul>
-    <li>Thanks to all contributors, especially <a href="https://github.com/coddrago">@coddrago (Antoshka)</a>. Your support and free PR is priceless! ❤️</li>
-</ul>
-
-> if there is no benefit from the PR, we will remove the gratitude 😥
