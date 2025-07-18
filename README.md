@@ -130,6 +130,6 @@ Check out <a href="https://web.archive.org/dev.hikka.pw">dev.hikka.pw</a> for de
     <li><a href="https://github.com/beveiled">Hikariatama</a> for Hikka, which is the base of project</li>
     <li><a href="https://github.com/coddrago">Codrago</a> for Heroku <b>(Some patches were taken from Heroku v1.6.8)</b></li>
     <li><a href="https://t.me/GunyaKshin">Codwiz</a> for Ukrainian translation pack</li>
-    <li><a href="https://t.me/Admt_450">ɴᴇᴛ『s』ᴛᴀʟᴋ『2』『4』</a> for testing and finding bugs</li>
+    <li><a href="https://t.me/Admt_450">ɴᴇᴛ『s』ᴛᴀʟᴋ『2』『4』</a> for testing, finding bugs and Ukrainian translation</li>
     <li><a href="https://t.me/lonami">Lonami</a> for Telethon, which is the base of Legacy-TL-New</li>
 </ul>
