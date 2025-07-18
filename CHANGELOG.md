@@ -21,3 +21,6 @@
 - Fixed work in Docker
 - Backup logic updated
 - Forbid Constructors work has been restored
+- Added authorization via inline bot
+- Improved Ukrainian translation
+- Added module search via Limoka

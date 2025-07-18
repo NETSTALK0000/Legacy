@@ -835,11 +835,10 @@ class Legacy:
                 logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
                 "https://i.postimg.cc/13x4nnxm/41-9-D6-DF8-E.gif",
                 caption=(
-                    '🌙 <b>{} started!</b>\n'
+                    '🌙 <b>Legacy started!</b>\n'
                     '⚙ <b>GitHub commit SHA: <a href="https://github.com/Crayz310/Legacy/commit/{}">{}</a></b>\n'
                     '🔎 <b>Update status: {}</b>\n<b>{}</b>'
                     ).format(
-                        __version__,
                         build,
                         build[:7],
                         upd,
