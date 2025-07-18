@@ -34,7 +34,6 @@ import logging
 import os
 import random
 import signal
-import socket
 import sqlite3
 import sys
 import typing

@@ -6,7 +6,6 @@
 
 import logging
 import os
-from random import choice
 
 from .. import loader, translations, utils
 from ..inline.types import BotInlineCall

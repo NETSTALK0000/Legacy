@@ -8,7 +8,6 @@ import inspect
 import logging
 import os
 import random
-import subprocess
 import time
 import typing
 from io import BytesIO

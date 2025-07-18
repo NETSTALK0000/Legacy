@@ -7,10 +7,7 @@
 import git
 from legacytl.tl.types import Message
 from legacytl.utils import get_display_name
-import requests
-import os
 from .. import loader, utils, version
-from ..inline.types import InlineQuery
 import platform as lib_platform
 import getpass
 

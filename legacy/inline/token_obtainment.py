@@ -7,7 +7,6 @@
 import asyncio
 import logging
 import re
-import os
 
 from legacytl.errors.rpcerrorlist import YouBlockedUserError
 from legacytl.tl.functions.contacts import UnblockRequest
@@ -53,7 +52,7 @@ class TokenObtainment(InlineUnit):
                 username = f"@legacy_{uid}_bot"
 
             for msg in [
-                f"🌙 Legacy userbot"[:64],
+                "🌙 Legacy userbot"[:64],
                 username,
                 "/setuserpic",
                 username,

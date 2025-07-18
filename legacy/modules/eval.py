@@ -20,7 +20,7 @@ from legacytl.sessions import StringSession
 from legacytl.tl.types import Message
 from meval import meval
 
-from .. import loader, main, utils
+from .. import loader, utils
 from ..log import HikkaException
 
 
