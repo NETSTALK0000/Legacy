@@ -1,12 +1,13 @@
 ---
-name: Hikka bug report
-about: Report a bug related to Hikka userbot itself
-title: ""
-labels: bug, Hikka
-assignees: ""
+name: Legacy bug report
+about: Report a bug related to Legacy userbot itself
+title: ''
+labels: bug
+assignees: ''
+
 ---
 
-- [x] This bug **is related to Hikka userbot itself**. It **is not related to modules**.
+- [x] This bug **is related to Legacy userbot itself**. It **is not related to modules**.
 
 ---
 
@@ -31,12 +32,10 @@ If applicable, add screenshots to help explain your problem.
 
 - Platform:
 - [ ] 🕶️ Termux
-- [ ] ✌️ lavHost
-- [ ] ☁️ Okteto
 - [ ] 🐳 Docker
 - [ ] 🌺 Other platform
 
-- Hikka version:
+- Legacy version:
 
 **Additional context**
 Add any other context about the problem here.
