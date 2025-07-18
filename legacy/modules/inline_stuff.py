@@ -252,7 +252,7 @@ class InlineStuff(loader.Module):
                 self.reset_state(user_id)
             except ValueError:
                 await message.answer(self.strings("wrong_2fa"))
-            except Exception as e:
+            except Exception:
                 logger.error("Error on 2FA", exc_info=True)
                 self._temp_data.pop(user_id, None)
                 self.reset_state(user_id)
