@@ -510,9 +510,9 @@ eval:
 
 translate:
   no_args: "<emoji document_id=5210952531676504517>❌</emoji> <b>Немає аргументів</b>"
-  error: "<emoji document_id=5210952531676504517>❌</emoji> <b>Йосип драний, це ж помилка</b>"
+  error: "<emoji document_id=5210952531676504517>❌</emoji> <b>Помилка</b>"
   language: "uk"
-  _cls_doc: "Перекладає текст (ні блін, ядерку запускає)"
+  _cls_doc: "Перекладає текст"
   _cmd_doc_tr: "[мова] [текст] - Перекласти текст"
 
 quickstart:
