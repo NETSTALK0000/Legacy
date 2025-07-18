@@ -122,10 +122,34 @@ class InlineStuff(loader.Module):
         await utils.answer(message, self.strings("bot_updated"))
 
     @loader.command()
-    async def iauth(self, message: Message):
+    async def iauth(self, message: Message, force: bool = False):
+        args = utils.get_args_raw(message)
+        force = force or "-f" in args
+
+        if not force:
+            try:
+                if not await self.inline.form(
+                        self.strings("privacy_leak_nowarn").format(f"{self.get_prefix()}iauth -f"),
+                        message=message,
+                        reply_markup=[
+                            {
+                                "text": self.strings("btn_yes"),
+                                "callback": self.iauth,
+                                "args": (True,),
+                                },
+                            {"text": self.strings("btn_no"), "action": "close"},
+                            ],
+                        ):
+                    raise Exception
+            except Exception:
+                await utils.answer(message, self.strings("privacy_leak"))
+
+            return
+
         token = utils.rand(16)
         self._tokens.append(token)
-        await utils.answer(message, f"https://t.me/{self.inline.bot_username}?start=auth-{token}")
+        link = f"https://t.me/{self.inline.bot_username}?start=auth-{token}"
+        await utils.answer(message, self.strings("auth").format(link))
 
     async def aiogram_watcher(self, message: BotInlineMessage):
         user_id = message.from_user.id
