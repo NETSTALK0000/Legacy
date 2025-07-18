@@ -182,12 +182,12 @@ class InlineStuff(loader.Module):
                 self._temp_data[user_id] = {"phone": phone}
                 await message.answer(self.strings("received_code"))
                 self.inline.ss(user_id, "code")
-            except ValueError as e:
+            except ValueError:
                 logger.error(f"Error on sending code", exc_info=True)
                 self._auth_sessions.pop(user_id, None)
                 self.reset_state(user_id)
                 await message.answer(self.strings("wrong_number"))
-            except Exception as e:
+            except Exception:
                 logger.error(f"Error on sending code", exc_info=True)
                 await message.answer(self.strings("unknown_err"))
                 self._auth_sessions.pop(user_id, None)
@@ -221,10 +221,12 @@ class InlineStuff(loader.Module):
                     return
                 logger.error(f"Error on sign in", exc_info=True)
                 await message.answer(self.strings("unknown_err"))
+                self._temp_data.pop(user_id, None)
                 self.reset_state(user_id)
-            except Exception as e:
+            except Exception:
                 logger.error(f"Error on sign in", exc_info=True)
                 await message.answer(self.strings("unknown_err"))
+                self._temp_data.pop(user_id, None)
                 self.reset_state(user_id)
             return
 
@@ -252,5 +254,6 @@ class InlineStuff(loader.Module):
                 await message.answer(self.strings("wrong_2fa"))
             except Exception as e:
                 logger.error("Error on 2FA", exc_info=True)
+                self._temp_data.pop(user_id, None)
                 self.reset_state(user_id)
             return
