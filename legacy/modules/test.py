@@ -203,6 +203,32 @@ class TestMod(loader.Module):
             self.strings("debugging_enabled").format(instance.__class__.__name__),
         )
 
+    async def _inline_back(self, call):
+        await utils.answer(
+            call,
+            self.strings("choose_loglevel"),
+            reply_markup=utils.chunks(
+                [
+                    {
+                        "text": name,
+                        "callback": self.logs,
+                        "args": (False, level),
+                    }
+                    for name, level in [
+                        ("☢️ Critical", 50),
+                        ("🚫 Error", 40),
+                        ("⚠️ Warning", 30),
+                        ("ℹ️ Info", 20),
+                        ("🐞 Debug", 10),
+                        ("🧑‍💻 All", 0),
+                    ]
+                ],
+                2,
+            )
+            + [[{"text": self.strings("cancel"), "action": "close"}]],
+        )
+        await call.answer()
+
     @loader.command()
     async def logs(
         self,
@@ -284,6 +310,10 @@ class TestMod(loader.Module):
                     "text": self.strings("confidential").format(named_lvl),
                     "reply_markup": [
                         {
+                            "text": self.lookup("LegacyConfig").strings["back_btn"],
+                            "callback": self._inline_back,
+                        },
+                        {
                             "text": self.strings("send_anyway"),
                             "callback": self.logs,
                             "args": [True, lvl],
@@ -306,9 +336,26 @@ class TestMod(loader.Module):
 
         if len(logs) <= 2:
             if isinstance(message, Message):
-                await utils.answer(message, self.strings("no_logs").format(named_lvl))
+                await utils.answer(
+                    message,
+                    self.strings("no_logs").format(named_lvl),
+                    reply_markup=[
+                        {
+                            "text": self.lookup("LegacyConfig").strings["back_btn"],
+                            "callback": self._inline_back,
+                        }
+                    ],
+                )
             else:
-                await message.edit(self.strings("no_logs").format(named_lvl))
+                await message.edit(
+                    self.strings("no_logs").format(named_lvl),
+                    reply_markup=[
+                        {
+                            "text": self.lookup("LegacyConfig").strings["back_btn"],
+                            "callback": self._inline_back,
+                        }
+                    ],
+                )
                 await message.unload()
 
             return
@@ -374,7 +421,7 @@ class TestMod(loader.Module):
                 ),
                 hostname=lib_platform.node(),
                 user=getpass.getuser(),
-    ),
+            ),
         )
 
     async def client_ready(self):
