@@ -26,8 +26,6 @@ from ..log import HikkaException
 
 @loader.tds
 class Evaluator(loader.Module):
-    """Evaluates code in various languages"""
-
     strings = {"name": "Evaluator"}
 
     @loader.command(alias="eval")
@@ -79,10 +77,14 @@ class Evaluator(loader.Module):
                     utils.escape_html(utils.get_args_raw(message)),
                     "python",
                     utils.escape_html(self.censor(str(result))),
-                ) + (self.strings("output").format(
-                    "python",
-                    utils.escape_html(self.censor(printed_output))
-                ) if printed_output else ""),
+                )
+                + (
+                    self.strings("output").format(
+                        "python", utils.escape_html(self.censor(printed_output))
+                    )
+                    if printed_output
+                    else ""
+                ),
             )
 
     @loader.command()

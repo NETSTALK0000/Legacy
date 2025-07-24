@@ -1,5 +1,3 @@
-"""Loads and registers modules"""
-
 # ©️ Dan Gazizullin, 2021-2023
 # This file is a part of Hikka Userbot
 # 🌐 https://github.com/hikariatama/Hikka
@@ -55,8 +53,6 @@ MODULE_LOADING_SUCCESS = 1
 
 @loader.tds
 class LoaderMod(loader.Module):
-    """Loads modules"""
-
     strings = {"name": "Loader"}
 
     def __init__(self):
@@ -95,9 +91,7 @@ class LoaderMod(loader.Module):
     async def _async_init(self):
         modules = list(
             filter(
-                lambda x: not x.startswith(
-                    "https://mods.xdesai.org/"
-                ),
+                lambda x: not x.startswith("https://mods.xdesai.org/"),
                 utils.array_sum(
                     map(
                         lambda x: list(x.values()),
@@ -173,9 +167,7 @@ class LoaderMod(loader.Module):
         if args := utils.get_args(message):
             args = args[0]
 
-            await utils.answer(
-                message, self.strings("finding_module_in_repos")
-            )
+            await utils.answer(message, self.strings("finding_module_in_repos"))
 
             if (
                 await self.download_and_install(args, message, force_pm)
@@ -256,7 +248,7 @@ class LoaderMod(loader.Module):
     ) -> dict:
         return {
             repo: {
-                f"Mod/{repo_id}/{i}": f'{repo.strip("/")}/{link}.py'
+                f"Mod/{repo_id}/{i}": f"{repo.strip('/')}/{link}.py"
                 for i, link in enumerate(set(await self._get_repo(repo)))
             }
             for repo_id, repo in enumerate(
@@ -369,9 +361,7 @@ class LoaderMod(loader.Module):
             await utils.answer(message, self.strings("provide_module"))
             return
 
-        await utils.answer(
-            message, self.strings("loading_module_via_file")
-        )
+        await utils.answer(message, self.strings("loading_module_via_file"))
 
         path_ = None
         doc = await msg.download_media(bytes)
@@ -1175,14 +1165,11 @@ class LoaderMod(loader.Module):
 
     @loader.command()
     async def mlcmd(self, message: Message):
-        """| send module via file"""
         if not (args := utils.get_args_raw(message)):
             await utils.answer(message, self.strings("args"))
             return
 
-        await utils.answer(
-            message, self.strings("ml_load_module")
-        )
+        await utils.answer(message, self.strings("ml_load_module"))
 
         exact = True
         if not (
@@ -1241,7 +1228,7 @@ class LoaderMod(loader.Module):
             else (
                 f'📼 <b><a href="{link}">Link</a> for'
                 f" {utils.escape_html(class_name)}:</b>"
-                f' <code>{link}</code>\n\n{self.strings("not_exact") if not exact else ""}'
+                f" <code>{link}</code>\n\n{self.strings('not_exact') if not exact else ''}"
             )
         )
 

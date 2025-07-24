@@ -12,10 +12,9 @@ from ..inline.types import BotInlineCall
 
 logger = logging.getLogger(__name__)
 
+
 @loader.tds
 class Quickstart(loader.Module):
-    """Notifies user about userbot installation"""
-
     strings = {"name": "Quickstart"}
 
     async def client_ready(self):
@@ -40,12 +39,7 @@ class Quickstart(loader.Module):
         self.text = (
             lambda: self.strings("base")
             + (
-                "\n"
-                + (
-                    self.strings("railway")
-                    if "RAILWAY" in os.environ
-                    else ("")
-                )
+                "\n" + (self.strings("railway") if "RAILWAY" in os.environ else (""))
             ).rstrip()
         )
 

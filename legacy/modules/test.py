@@ -32,11 +32,7 @@ for mod in os.scandir(DEBUG_MODS_DIR):
 
 @loader.tds
 class TestMod(loader.Module):
-    """Perform operations based on userbot self-testing"""
-
-    strings = {
-        "name": "Tester",
-    }
+    strings = {"name": "Tester"}
 
     def __init__(self):
         self._memory = {}
@@ -152,7 +148,6 @@ class TestMod(loader.Module):
 
     @loader.command()
     async def debugmod(self, message: Message):
-        """| debug mod for your modules!"""
         args = utils.get_args_raw(message)
         instance = None
         for module in self.allmodules.modules:
@@ -407,7 +402,6 @@ class TestMod(loader.Module):
 
     @loader.command()
     async def ping(self, message: Message):
-        """- Find out your userbot ping"""
         start = time.perf_counter_ns()
         message = await utils.answer(message, self.config["ping_emoji"])
 

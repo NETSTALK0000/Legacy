@@ -240,10 +240,9 @@ class SudoMessageEditor(MessageEditor):
                 message.message.message.split("\n", 1)[0].encode() + b"\n"
             )
 
+
 @loader.tds
 class TerminalMod(loader.Module):
-    """Runs commands"""
-
     strings = {"name": "Terminal"}
 
     def __init__(self):

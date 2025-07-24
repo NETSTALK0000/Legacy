@@ -36,8 +36,6 @@ logger = logging.getLogger(__name__)
 
 @loader.tds
 class UpdaterMod(loader.Module):
-    """Updates itself"""
-
     strings = {"name": "Updater"}
 
     def __init__(self):
@@ -59,7 +57,7 @@ class UpdaterMod(loader.Module):
                 or not self.inline.init_complete
                 or not await self.inline.form(
                     message=message,
-                    text=self.strings("restart_confirm"),
+                    text=self.strings["restart_confirm"],
                     reply_markup=[
                         {
                             "text": self.strings("btn_restart"),

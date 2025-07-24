@@ -17,8 +17,6 @@ from ..types import Message
 
 @loader.tds
 class UpdateNotifier(loader.Module):
-    """Tracks latest Hikka releases, and notifies you, if update is required"""
-
     strings = {"name": "UpdateNotifier"}
 
     def __init__(self):
@@ -124,7 +122,6 @@ class UpdateNotifier(loader.Module):
 
     @loader.callback_handler()
     async def update(self, call: InlineCall):
-        """Process update buttons clicks"""
         if call.data not in {"legacy/update", "legacy/ignore_upd"}:
             return
 
@@ -142,10 +139,12 @@ class UpdateNotifier(loader.Module):
 
     @loader.command()
     async def changelog(self, message: Message):
-        """Shows the changelog of the last major update"""
-        with open('CHANGELOG.md', mode='r', encoding='utf-8') as f:
-            changelog = f.read().split('##')[1].strip()
+        with open("CHANGELOG.md", mode="r", encoding="utf-8") as f:
+            changelog = f.read().split("##")[1].strip()
         if (await self._client.get_me()).premium:
-            changelog.replace('🌑 Legacy', '<emoji document_id=5192765204898783881>🌘</emoji><emoji document_id=5195311729663286630>🌘</emoji><emoji document_id=5195045669324201904>🌘</emoji>')
+            changelog.replace(
+                "🌑 Legacy",
+                "<emoji document_id=5192765204898783881>🌘</emoji><emoji document_id=5195311729663286630>🌘</emoji><emoji document_id=5195045669324201904>🌘</emoji>",
+            )
 
-        await utils.answer(message, self.strings('changelog').format(changelog))
+        await utils.answer(message, self.strings("changelog").format(changelog))

@@ -19,8 +19,6 @@ logger = logging.getLogger(__name__)
 
 @loader.tds
 class Help(loader.Module):
-    """Shows help for modules and commands"""
-
     strings = {"name": "Help"}
 
     def __init__(self):

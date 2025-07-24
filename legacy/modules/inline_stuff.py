@@ -18,10 +18,9 @@ from ..auth_manager import AuthManager
 
 logger = logging.getLogger(__name__)
 
+
 @loader.tds
 class InlineStuff(loader.Module):
-    """Provides support for inline stuff"""
-
     strings = {"name": "InlineStuff"}
 
     async def client_ready(self, client, db):
@@ -128,17 +127,19 @@ class InlineStuff(loader.Module):
         if not force:
             try:
                 if not await self.inline.form(
-                        self.strings("privacy_leak_nowarn").format(f"{self.get_prefix()}iauth -f"),
-                        message=message,
-                        reply_markup=[
-                            {
-                                "text": self.strings("btn_yes"),
-                                "callback": self.iauth,
-                                "args": (True,),
-                                },
-                            {"text": self.strings("btn_no"), "action": "close"},
-                            ],
-                        ):
+                    self.strings("privacy_leak_nowarn").format(
+                        f"{self.get_prefix()}iauth -f"
+                    ),
+                    message=message,
+                    reply_markup=[
+                        {
+                            "text": self.strings("btn_yes"),
+                            "callback": self.iauth,
+                            "args": (True,),
+                        },
+                        {"text": self.strings("btn_no"), "action": "close"},
+                    ],
+                ):
                     raise Exception
             except Exception:
                 await utils.answer(message, self.strings("privacy_leak"))

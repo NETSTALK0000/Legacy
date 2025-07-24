@@ -16,8 +16,6 @@ logger = logging.getLogger(__name__)
 
 @loader.tds
 class Translations(loader.Module):
-    """Processes internal translations"""
-
     strings = {"name": "Translations"}
 
     async def _change_language(self, call: InlineCall, lang: str):

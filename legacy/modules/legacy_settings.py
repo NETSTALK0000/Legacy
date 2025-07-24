@@ -36,8 +36,6 @@ ALL_INVOKES = [
 
 @loader.tds
 class LegacySettingsMod(loader.Module):
-    """Advanced settings for Legacy Userbot"""
-
     strings = {"name": "LegacySettings"}
 
     def get_watchers(self) -> tuple:
@@ -463,9 +461,7 @@ class LegacySettingsMod(loader.Module):
     async def inline__setting(self, call: InlineCall, key: str, state: bool = False):
         if callable(key):
             key()
-            CUSTOM_EMOJIS = not main.get_config_key(
-                "disable_custom_emojis"
-            )
+            CUSTOM_EMOJIS = not main.get_config_key("disable_custom_emojis")
         else:
             self._db.set(main.__name__, key, state)
 
@@ -670,7 +666,9 @@ class LegacySettingsMod(loader.Module):
                     {
                         "text": self.strings("disable_debugger"),
                         "callback": self.inline__setting,
-                        "args": (lambda: self._db.set(log.__name__, "debugger", False),),
+                        "args": (
+                            lambda: self._db.set(log.__name__, "debugger", False),
+                        ),
                     }
                     if self._db.get(log.__name__, "debugger", False)
                     else {
@@ -758,18 +756,14 @@ class LegacySettingsMod(loader.Module):
             await form.edit(
                 self.strings("opening_tunnel"),
                 reply_markup={"text": "🕔 Wait...", "data": "empty"},
-                photo=(
-                    "https://i.postimg.cc/52yrpPLG/legacy-opening-tunnel.png"
-                ),
+                photo=("https://i.postimg.cc/52yrpPLG/legacy-opening-tunnel.png"),
             )
         else:
             form = await self.inline.form(
                 self.strings("opening_tunnel"),
                 message=message,
                 reply_markup={"text": "🕔 Wait...", "data": "empty"},
-                photo=(
-                    "https://i.postimg.cc/52yrpPLG/legacy-opening-tunnel.png"
-                ),
+                photo=("https://i.postimg.cc/52yrpPLG/legacy-opening-tunnel.png"),
             )
 
         url = await main.legacy.web.get_url(proxy_pass=True)
@@ -834,7 +828,9 @@ class LegacySettingsMod(loader.Module):
                 )
                 self._client._legacy_fullchannel_cache = {}
             elif method == "flush_perms_cache":
-                result = f"Dropped {len(self._client._legacy_perms_cache)} cache records"
+                result = (
+                    f"Dropped {len(self._client._legacy_perms_cache)} cache records"
+                )
                 self._client._legacy_perms_cache = {}
             elif method == "flush_loader_cache":
                 result = (

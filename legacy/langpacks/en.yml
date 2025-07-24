@@ -191,6 +191,7 @@ terminal:
   _cmd_doc_apt: "Shorthand for '.terminal apt'"
   _cmd_doc_terminal: "<command> - Execute bash command"
   _cmd_doc_terminate: "[-f to force kill] - Use in reply to send SIGTERM to a process"
+  _cmd_doc_pip: "Install and manage Python packages using pip"
   _cls_doc: "Runs commands"
 
 legacy_backup:
@@ -249,7 +250,7 @@ settings:
   _cmd_doc_setprefix: "<prefix> - Sets command prefix"
   _cmd_doc_unblacklist: "<chat_id> - Unblacklist the bot from operating somewhere"
   _cmd_doc_unblacklistuser: "[user_id] - Allow this user to run permitted commands"
-  _cfg_nonstandart_prefixes: "Allow non-standart prefixes like flags or more than one symbol"
+  _cmd_doc_installation: "Shows how to install the userbot"
   _cls_doc: "Control core userbot settings"
 
 legacy_config:
@@ -336,7 +337,6 @@ test:
   logs_cleared: "🗑 <b>Logs cleared</b>"
   _cmd_doc_clearlogs: "Clear logs"
   _cmd_doc_debugmod: "[module] - For developers: Open module for debugging\nYou will be able to track changes in real-time"
-  _cmd_doc_dump: "Use in reply to get a dump of a message"
   _cmd_doc_logs: "<level> - Dump logs"
   _cmd_doc_ping: "Test your userbot ping"
   _cmd_doc_suspend: "<time> - Suspends the bot for N seconds"
@@ -351,6 +351,7 @@ update_notifier:
   update: "🔄 Update"
   ignore: "🚫 Ignore"
   changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Changelog of the last update:</b><pre><code class="language-legacy">{}</code></pre>'
+  _cmd_doc_changelog: "Shows the changelog of the last major update"
   _cls_doc: "Tracks latest Legacy releases, and notifies you, if update is required"
 
 updater:
@@ -403,6 +404,7 @@ api_protection:
 
 help:
   name: "Help"
+  _cls_doc: "Shows help for modules and commands"
   undoc: "🦥 No docs"
   all_header: "<b>{} mods available, {} hidden, {} with no commands:</b>"
   no_mod: "🚫 <b>Specify module to hide</b>"
@@ -436,10 +438,9 @@ legacy_info:
   _cfg_cst_btn: "Custom button for info. Leave empty to remove button"
   _cfg_banner: "URL to image banner"
   desc: "<emoji document_id=5472164874886846699>✨</emoji> What is a Userbot?\n\n<emoji document_id=5474667187258006816>😎</emoji> A Userbot is a special program that connects to your account and uses the Telegram API to automate any tasks directly on your behalf.\n\nWith a userbot, you can simplify your work and save a lot of time. In a single chat, you can do almost everything without leaving it:\n<emoji document_id=5021905410089550576>✅</emoji> write and schedule messages\n<emoji document_id=5021905410089550576>✅</emoji> publish posts on Telegram, VKontakte, and other social networks (without leaving Telegram)\n<emoji document_id=5021905410089550576>✅</emoji> download and forward media files where it's normally restricted\n<emoji document_id=5021905410089550576>✅</emoji> manage subscriptions and mailing lists\n<emoji document_id=5021905410089550576>✅</emoji> post content to your Telegram channel without leaving a group or private chat\n<emoji document_id=5021905410089550576>✅</emoji> supports Python, C++, and other programming languages for creating custom scripts...\n<emoji document_id=5021905410089550576>✅</emoji> send animated actions (like hearts, etc.)\n<emoji document_id=5021905410089550576>✅</emoji> administer and enhance security — manage permissions, ban violators, filter spam, and log actions\n\nThis is just a small part of its functionality — everything listed above makes up about 1–5% of a userbot's capabilities.\n\n<emoji document_id=5424972470023104089>🔥</emoji> How is a Userbot different from a regular Telegram bot?\n\nUnlike standard bots, which only work through a separate bot account, a userbot runs from your personal profile. Thanks to this:\n\n<emoji document_id=5472164874886846699>✨</emoji> it has more rights and features\n<emoji document_id=5472164874886846699>✨</emoji> it can bypass many Telegram restrictions (e.g., forward messages from restricted chats, find private groups, and much more...)\n<emoji document_id=5472164874886846699>✨</emoji> allows for highly flexible automation tailored to any task\n\nWith a userbot, everything becomes easier. You manage your chats, channels, and content much faster — without unnecessary app switching."
-  _cmd_doc_hikkainfo: "Send info aka 'What is Legacy?'"
+  _cmd_doc_ubinfo: "Send info aka 'What is Legacy?'"
   _cmd_doc_info: "Send userbot info"
   _cmd_doc_setinfo: "<text> - Change text in .info"
-  _ihandle_doc_info: "Send userbot info"
   _cls_doc: "Show userbot info"
 
 loader:
@@ -517,6 +518,7 @@ loader:
   _cmd_doc_dlmod: "Install a module from the official module repo"
   _cmd_doc_loadmod: "Loads the module file"
   _cmd_doc_unloadmod: "Unload module by class name"
+  _cmd_doc_ml: "Send module as a file"
   _cls_doc: "Loads modules"
   basic_auth_doc: "Basic auth for module repo"
 
