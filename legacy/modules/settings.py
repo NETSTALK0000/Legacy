@@ -61,12 +61,7 @@ class CoreMod(loader.Module):
         module = self.allmodules.get_classname(module)
         return f"{str(chatid)}.{module}" if module else chatid
 
-    @loader.command(
-        ru_doc="Информация о Legacy",
-        en_doc="Information of Legacy",
-        ua_doc="Інформація про Хероку",
-        de_doc="Informationen über Legacy",
-    )
+    @loader.command()
     async def legacy(self, message: Message):
         await utils.answer_file(
             message,
