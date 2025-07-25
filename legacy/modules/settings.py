@@ -25,7 +25,7 @@ class CoreMod(loader.Module):
             ),
             loader.ConfigValue(
                 "alias_emoji",
-                "<emoji document_id=4974259868996207180>▪️</emoji>",
+                "<emoji document_id=5319211649138177073>📌</emoji>",
                 "just emoji in .aliases",
             ),
             loader.ConfigValue(
@@ -175,17 +175,20 @@ class CoreMod(loader.Module):
             await utils.answer(
                 message,
                 self.strings("aliases")
+                + "<blockquote>"
                 + "\n".join(
                     [
                         (self.config["alias_emoji"] + f" <code>{i}</code> &lt;- {y}")
                         for i, y in self.allmodules.aliases.items()
                     ]
-                ),
+                )
+                + "</blockquote>",
             )
         else:
             await utils.answer(
                 message,
                 self.strings("aliases")
+                + "<blockquote>"
                 + "\n".join(
                     [
                         (
@@ -195,7 +198,8 @@ class CoreMod(loader.Module):
                         )
                         for alias, cmd in self.allmodules.aliases.items()
                     ]
-                ),
+                )
+                + "</blockquote>",
             )
 
     @loader.command()
