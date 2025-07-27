@@ -926,6 +926,9 @@ def get_named_platform() -> str:
     if main.IS_AEZA:
         return "🛡 Aeza"
 
+    if main.IS_SHARKHOST:
+        return "🦈 Sharkhost"
+
     if main.IS_RAILWAY:
         return "🚂 Railway"
 
@@ -965,6 +968,9 @@ def get_platform_emoji() -> str:
 
     if main.IS_TERMUX:
         return BASE.format(5458485193595711943)
+
+    if main.IS_SHARKHOST:
+        return BASE.format(5204098532671256923)
 
     if main.IS_RAILWAY:
         return BASE.format(5456525163795344370)
