@@ -14,6 +14,7 @@ import os
 import re
 import string
 import time
+import socket
 
 import aiohttp_jinja2
 import requests
@@ -234,6 +235,9 @@ class Web:
         self._qr_login = True
 
     async def init_qr_login(self, request: web.Request) -> web.Response:
+        if self.client_data and "sharkhost" in socket.gethostname():
+            return web.Response(status=403, body="Forbidden by SharkHost EULA")
+
         if not self._check_session(request):
             return web.Response(status=401)
 
@@ -294,11 +298,17 @@ class Web:
         )
 
     async def can_add(self, request: web.Request) -> web.Response:
+        if self.client_data and "sharkhost" in socket.gethostname():
+            return web.Response(status=403, body="Forbidden by SharkHost EULA")
+
         return web.Response(status=200, body="Yes")
 
     async def send_tg_code(self, request: web.Request) -> web.Response:
         if not self._check_session(request):
             return web.Response(status=401, body="Authorization required")
+
+        if self.client_data and "sharkhost" in socket.gethostname():
+            return web.Response(status=403, body="Forbidden by SharkHost EULA")
 
         if self._pending_client:
             return web.Response(status=208, body="Already pending")

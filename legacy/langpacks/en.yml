@@ -302,6 +302,7 @@ inline_stuff:
   btn_yes: "🚸 Run anyway"
   btn_no: "🔻 Close"
   auth: "<emoji document_id=5472178859300363509>🏖</emoji> <b>Please authorize via </b><a href='{}'><b>bot</b></a>"
+  forbid: "<emoji document_id=5447190864126294225>☕️</emoji> <b>Forbidden by host EULA</b>"
   enter_phone: "📱 Enter your phone number:"
   wrong_number: "❌ Invalid phone number. Please try logging in again"
   no_phone: "⚠️ Phone number not found. Please try logging in again"

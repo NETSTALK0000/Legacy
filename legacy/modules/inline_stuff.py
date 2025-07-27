@@ -4,9 +4,11 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+from ctypes import util
 import re
 import string
 import logging
+import socket
 
 from legacytl.errors.rpcerrorlist import YouBlockedUserError
 from legacytl.tl.functions.contacts import UnblockRequest
@@ -121,6 +123,10 @@ class InlineStuff(loader.Module):
 
     @loader.command()
     async def iauth(self, message: Message, force: bool = False):
+        if "sharkhost" in socket.gethostname():
+            await utils.answer(message, self.strings("forbid"))
+            return
+
         args = utils.get_args_raw(message)
         force = force or "-f" in args
 
