@@ -123,7 +123,7 @@ class InlineStuff(loader.Module):
 
     @loader.command()
     async def iauth(self, message: Message, force: bool = False):
-        if "sharkhost" in socket.gethostname():
+        if "SHARKHOST" in os.environ:
             await utils.answer(message, self.strings("forbid"))
             return
 
