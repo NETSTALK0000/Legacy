@@ -298,7 +298,7 @@ class Web:
         )
 
     async def can_add(self, request: web.Request) -> web.Response:
-        if self.client_data and "sharkhost" in socket.gethostname():
+        if self.client_data and "SHARKHOST" in os.environ:
             return web.Response(status=403, body="Forbidden by SharkHost EULA")
 
         return web.Response(status=200, body="Yes")
