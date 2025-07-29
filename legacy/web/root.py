@@ -10,7 +10,6 @@ import asyncio
 import collections
 import functools
 import logging
-import os
 import re
 import string
 import time
