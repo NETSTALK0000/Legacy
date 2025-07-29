@@ -9,6 +9,7 @@ import re
 import string
 import logging
 import socket
+import os
 
 from legacytl.errors.rpcerrorlist import YouBlockedUserError
 from legacytl.tl.functions.contacts import UnblockRequest
