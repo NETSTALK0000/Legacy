@@ -13,6 +13,8 @@
 <hr>
 <h2><img src="https://img.icons8.com/?size=100&id=Jd0d5Iz2TZIb&format=png&color=000000" height="54" align="center" style="margin-right: 7px;">Installation</h2>
 
+<a href="https://t.me/SharkHostBot"><img src="https://i.postimg.cc/hjW6NZj0/install-sharkhost.png" height="40"></a>
+
 <b>⚙ Manual installation (no script):</b><br>
 ```bash
 apt update && apt install git python3 -y && git clone https://github.com/Crayz310/Legacy && cd Legacy && pip install -r requirements.txt && python3 -m legacy
