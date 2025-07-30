@@ -548,9 +548,11 @@ class Utils(InlineUnit):
     async def _delete_unit_message(
         self,
         call: typing.Optional[CallbackQuery] = None,
+        unit_id: typing.Optional[str] = None,
     ) -> bool:
         """Params `self`, `unit_id` are for internal use only, do not try to pass them"""
-        return await self._client.delete_messages(call._units.get(call.unit_id).get('chat'), call._units.get(call.unit_id).get('message_id'))
+        await self._client.delete_messages(call._units.get(unit_id).get('chat'), call._units.get(unit_id).get('message_id'))
+        return await call.answer("")
 
     async def _unload_unit(self, unit_id: str) -> bool:
         """Params `self`, `unit_id` are for internal use only, do not try to pass them"""

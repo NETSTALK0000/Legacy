@@ -5,7 +5,7 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import logging
-from typing import Optional
+from typing import Optional, Union
 
 from aiogram.types import CallbackQuery
 from aiogram.types import InlineQuery as AiogramInlineQuery
@@ -136,11 +136,17 @@ class InlineCall(CallbackQuery, InlineMessage):
             unit_id,
             call.inline_message_id,
         )
-    
+
+    async def delete(self):
+        await self._units.get(self.unit_id).get('message').client.delete_messages(
+            self._units.get(self.unit_id).get('chat'), self._units.get(self.unit_id).get('message_id')
+        )
+        return await self.original_call.answer("")
+
     async def answer(self, text: Optional[str] = None, *args, **kwargs):
         if text:
             text = utils.remove_html(text)
-        
+
         return await self.original_call.answer(
             text=text,
             *args,
@@ -179,11 +185,15 @@ class BotInlineCall(CallbackQuery, BotInlineMessage):
             call.message.chat.id,
             call.message.message_id,
         )
-    
+
+    async def delete(self):
+        await self.bot.delete_message(self.message.chat.id, self.message.message_id)
+        return await self.original_call.answer("")
+
     async def answer(self, text: Optional[str] = None, *args, **kwargs):
         if text:
             text = utils.remove_html(text)
-        
+
         return await self.original_call.answer(
             text=text,
             *args,
@@ -196,7 +206,6 @@ class InlineUnit:
 
     def __init__(self):
         """Made just for type specification"""
-
 
 class BotMessage(AiogramMessage):
     """Modified version of original Aiogram Message"""
