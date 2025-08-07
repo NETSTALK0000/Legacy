@@ -512,7 +512,8 @@ class Gallery(InlineUnit):
             return
 
         if page == "close":
-            return await self._client.delete_messages(self._units.get(unit_id).get('chat'), self._units.get(unit_id).get('message_id'))
+            return await self._delete_unit_message(call, unit_id)
+
 
         if page < 0:
             await call.answer("No way back")

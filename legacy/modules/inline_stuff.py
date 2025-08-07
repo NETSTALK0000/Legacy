@@ -4,8 +4,12 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+from ctypes import util
 import re
 import string
+import logging
+import socket
+import os
 
 from legacytl.errors.rpcerrorlist import YouBlockedUserError
 from legacytl.tl.functions.contacts import UnblockRequest
@@ -13,13 +17,22 @@ from legacytl.tl.types import Message
 
 from .. import loader, utils
 from ..inline.types import BotInlineMessage
+from ..auth_manager import AuthManager
+
+logger = logging.getLogger(__name__)
 
 
 @loader.tds
 class InlineStuff(loader.Module):
-    """Provides support for inline stuff"""
-
     strings = {"name": "InlineStuff"}
+
+    async def client_ready(self, client, db):
+        self._auth_sessions = {}
+        self._tokens = []
+        self._temp_data = {}
+
+    def reset_state(self, user_id):
+        self.inline.fsm.pop(str(user_id), None)
 
     @loader.watcher(
         "out",
@@ -109,11 +122,145 @@ class InlineStuff(loader.Module):
         self._db.set("legacy.inline", "bot_token", None)
         await utils.answer(message, self.strings("bot_updated"))
 
-    async def aiogram_watcher(self, message: BotInlineMessage):
-        if message.text != "/start":
+    @loader.command()
+    async def iauth(self, message: Message, force: bool = False):
+        if "SHARKHOST" in os.environ:
+            await utils.answer(message, self.strings("forbid"))
             return
 
-        await message.answer_photo(
-            "https://i.postimg.cc/bN4tXwwK/info.png",
-            caption=self.strings("this_is_legacy"),
-        )
+        args = utils.get_args_raw(message)
+        force = force or "-f" in args
+
+        if not force:
+            try:
+                if not await self.inline.form(
+                    self.strings("privacy_leak_nowarn").format(
+                        f"{self.get_prefix()}iauth -f"
+                    ),
+                    message=message,
+                    reply_markup=[
+                        {
+                            "text": self.strings("btn_yes"),
+                            "callback": self.iauth,
+                            "args": (True,),
+                        },
+                        {"text": self.strings("btn_no"), "action": "close"},
+                    ],
+                ):
+                    raise Exception
+            except Exception:
+                await utils.answer(message, self.strings("privacy_leak"))
+
+            return
+
+        token = utils.rand(16)
+        self._tokens.append(token)
+        link = f"https://t.me/{self.inline.bot_username}?start=auth-{token}"
+        await utils.answer(message, self.strings("auth").format(link))
+
+    async def aiogram_watcher(self, message: BotInlineMessage):
+        user_id = message.from_user.id
+        state = self.inline.gs(user_id)
+
+        if message.text == "/start":
+            await message.answer_photo(
+                "https://i.postimg.cc/bN4tXwwK/info.png",
+                caption=self.strings("this_is_legacy"),
+            )
+
+        if message.text.startswith("/start auth-"):
+            token = re.search(r"auth-([a-zA-Z0-9]+)", message.text)
+            token = token.group(1) if token else None
+
+            if not token or token not in self._tokens:
+                return
+
+            self._auth_sessions[user_id] = AuthManager()
+            self._tokens.remove(token)
+            await message.answer(self.strings("enter_phone"))
+            self.inline.ss(user_id, "phone")
+            return
+
+        if state == "phone":
+            phone = message.text
+
+            try:
+                await self._auth_sessions[user_id].send_tg_code(phone)
+                self._temp_data[user_id] = {"phone": phone}
+                await message.answer(self.strings("received_code"))
+                self.inline.ss(user_id, "code")
+            except ValueError:
+                logger.error("Error on sending code", exc_info=True)
+                self._auth_sessions.pop(user_id, None)
+                self.reset_state(user_id)
+                await message.answer(self.strings("wrong_number"))
+            except Exception:
+                logger.error("Error on sending code", exc_info=True)
+                await message.answer(self.strings("unknown_err"))
+                self._auth_sessions.pop(user_id, None)
+                self._temp_data.pop(user_id, None)
+                self.reset_state(user_id)
+            return
+
+        if state == "code":
+            code = message.text
+            phone = self._temp_data.get(user_id, {}).get("phone")
+
+            if not phone:
+                await message.answer(self.strings("no_phone"))
+                self.reset_state(user_id)
+                return
+
+            try:
+                await self._auth_sessions[user_id].sign_in(phone, code)
+                await self._auth_sessions[user_id].finish_auth()
+                await message.answer(self.strings("success_auth"))
+                self.reset_state(user_id)
+            except ValueError as e:
+                if "Invalid code" in str(e):
+                    await message.answer(self.strings("wrong_code"))
+                    return
+
+                if "2FA" in str(e):
+                    self._temp_data[user_id].update({"code": code})
+                    await message.answer(self.strings("enter_2fa"))
+                    self.inline.ss(user_id, "2fa")
+                    return
+                logger.error("Error on sign in", exc_info=True)
+                await message.answer(self.strings("unknown_err"))
+                self._temp_data.pop(user_id, None)
+                self.reset_state(user_id)
+            except Exception:
+                logger.error("Error on sign in", exc_info=True)
+                await message.answer(self.strings("unknown_err"))
+                self._temp_data.pop(user_id, None)
+                self.reset_state(user_id)
+            return
+
+        if state == "2fa":
+            password = message.text
+            phone = self._temp_data.get(user_id, {}).get("phone")
+            code = self._temp_data.get(user_id, {}).get("code")
+
+            if not phone:
+                await message.answer(self.strings("no_phone"))
+                self.reset_state(user_id)
+                return
+
+            if not code:
+                await message.answer(self.strings("no_code"))
+                self.reset_state(user_id)
+                return
+
+            try:
+                await self._auth_sessions[user_id].sign_in(phone, code, password)
+                await message.answer(self.strings("success_auth"))
+                await self._auth_sessions[user_id].finish_auth()
+                self.reset_state(user_id)
+            except ValueError:
+                await message.answer(self.strings("wrong_2fa"))
+            except Exception:
+                logger.error("Error on 2FA", exc_info=True)
+                self._temp_data.pop(user_id, None)
+                self.reset_state(user_id)
+            return

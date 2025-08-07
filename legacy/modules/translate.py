@@ -17,8 +17,6 @@ logger = logging.getLogger(__name__)
 
 @loader.tds
 class Translator(loader.Module):
-    """Translates text (obviously)"""
-
     strings = {"name": "Translator"}
 
     @loader.command()

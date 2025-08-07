@@ -8,7 +8,6 @@ import inspect
 import logging
 import os
 import random
-import subprocess
 import time
 import typing
 from io import BytesIO
@@ -33,11 +32,7 @@ for mod in os.scandir(DEBUG_MODS_DIR):
 
 @loader.tds
 class TestMod(loader.Module):
-    """Perform operations based on userbot self-testing"""
-
-    strings = {
-        "name": "Tester",
-    }
+    strings = {"name": "Tester"}
 
     def __init__(self):
         self._memory = {}
@@ -153,7 +148,6 @@ class TestMod(loader.Module):
 
     @loader.command()
     async def debugmod(self, message: Message):
-        """| debug mod for your modules!"""
         args = utils.get_args_raw(message)
         instance = None
         for module in self.allmodules.modules:
@@ -203,6 +197,32 @@ class TestMod(loader.Module):
             message,
             self.strings("debugging_enabled").format(instance.__class__.__name__),
         )
+
+    async def _inline_back(self, call):
+        await utils.answer(
+            call,
+            self.strings("choose_loglevel"),
+            reply_markup=utils.chunks(
+                [
+                    {
+                        "text": name,
+                        "callback": self.logs,
+                        "args": (False, level),
+                    }
+                    for name, level in [
+                        ("☢️ Critical", 50),
+                        ("🚫 Error", 40),
+                        ("⚠️ Warning", 30),
+                        ("ℹ️ Info", 20),
+                        ("🐞 Debug", 10),
+                        ("🧑‍💻 All", 0),
+                    ]
+                ],
+                2,
+            )
+            + [[{"text": self.strings("cancel"), "action": "close"}]],
+        )
+        await call.answer()
 
     @loader.command()
     async def logs(
@@ -285,6 +305,10 @@ class TestMod(loader.Module):
                     "text": self.strings("confidential").format(named_lvl),
                     "reply_markup": [
                         {
+                            "text": self.lookup("LegacyConfig").strings["back_btn"],
+                            "callback": self._inline_back,
+                        },
+                        {
                             "text": self.strings("send_anyway"),
                             "callback": self.logs,
                             "args": [True, lvl],
@@ -307,9 +331,26 @@ class TestMod(loader.Module):
 
         if len(logs) <= 2:
             if isinstance(message, Message):
-                await utils.answer(message, self.strings("no_logs").format(named_lvl))
+                await utils.answer(
+                    message,
+                    self.strings("no_logs").format(named_lvl),
+                    reply_markup=[
+                        {
+                            "text": self.lookup("LegacyConfig").strings["back_btn"],
+                            "callback": self._inline_back,
+                        }
+                    ],
+                )
             else:
-                await message.edit(self.strings("no_logs").format(named_lvl))
+                await message.edit(
+                    self.strings("no_logs").format(named_lvl),
+                    reply_markup=[
+                        {
+                            "text": self.lookup("LegacyConfig").strings["back_btn"],
+                            "callback": self._inline_back,
+                        }
+                    ],
+                )
                 await message.unload()
 
             return
@@ -361,7 +402,6 @@ class TestMod(loader.Module):
 
     @loader.command()
     async def ping(self, message: Message):
-        """- Find out your userbot ping"""
         start = time.perf_counter_ns()
         message = await utils.answer(message, self.config["ping_emoji"])
 
@@ -375,7 +415,7 @@ class TestMod(loader.Module):
                 ),
                 hostname=lib_platform.node(),
                 user=getpass.getuser(),
-    ),
+            ),
         )
 
     async def client_ready(self):

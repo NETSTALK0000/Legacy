@@ -27,8 +27,6 @@ NUM_ROWS = 5
 
 @loader.tds
 class LegacyConfigMod(loader.Module):
-    """Interactive configurator for Hikka Userbot"""
-
     strings = {"name": "LegacyConfig"}
 
     @staticmethod
@@ -936,7 +934,8 @@ class LegacyConfigMod(loader.Module):
                     "args": (btn,),
                     "kwargs": {"obj_type": obj_type},
                 }
-                for btn in mod_row if self.lookup(btn) is not False
+                for btn in mod_row
+                if self.lookup(btn) is not False
             ]
             kb += [row]
 

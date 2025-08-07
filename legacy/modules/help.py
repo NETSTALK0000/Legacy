@@ -19,8 +19,6 @@ logger = logging.getLogger(__name__)
 
 @loader.tds
 class Help(loader.Module):
-    """Shows help for modules and commands"""
-
     strings = {"name": "Help"}
 
     def __init__(self):
@@ -334,7 +332,7 @@ class Help(loader.Module):
             if only_hidden
             else core_ + plain_
         )
-        if len("".join(full_list)) >= 4096:
+        if len(utils.remove_html("".join(full_list))) >= 4096:
             await utils.answer(
                 message,
                 (self.config["desc_icon"] + " {}\n {}{}").format(

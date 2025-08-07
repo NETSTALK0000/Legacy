@@ -25,8 +25,6 @@ logger = logging.getLogger(__name__)
 
 @loader.tds
 class LegacyBackupMod(loader.Module):
-    """Handles database and modules backups"""
-
     strings = {"name": "LegacyBackup"}
 
     async def client_ready(self):
@@ -85,7 +83,6 @@ class LegacyBackupMod(loader.Module):
 
     @loader.command()
     async def set_backup_period(self, message: Message):
-        """[time] | set your backup bd period"""
         if (
             not (args := utils.get_args_raw(message))
             or not args.isdigit()
@@ -217,7 +214,6 @@ class LegacyBackupMod(loader.Module):
 
     @loader.command()
     async def backup(self, message: Message):
-        """| Backup your data"""
         db_dump = json.dumps(self._db).encode()
 
         result = io.BytesIO()
@@ -259,7 +255,6 @@ class LegacyBackupMod(loader.Module):
 
     @loader.command()
     async def restore(self, message: Message):
-        """[reply] | Restore your data"""
         if not (reply := await message.get_reply_message()) or not reply.media:
             await utils.answer(message, self.strings("reply_to_file"))
             return
@@ -300,4 +295,3 @@ class LegacyBackupMod(loader.Module):
 
         await utils.answer(message, self.strings("backup_restored"))
         await self.invoke("restart", "-f", peer=message.peer_id)
-

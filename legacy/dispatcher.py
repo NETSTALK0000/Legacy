@@ -33,7 +33,6 @@ import sys
 import traceback
 import typing
 
-import requests
 from legacytl import events
 from legacytl.errors import FloodWaitError, RPCError
 from legacytl.tl.types import Message

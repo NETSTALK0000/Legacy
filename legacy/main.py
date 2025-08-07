@@ -34,7 +34,6 @@ import logging
 import os
 import random
 import signal
-import socket
 import sqlite3
 import sys
 import typing
@@ -95,6 +94,7 @@ IS_DOCKER = "DOCKER" in os.environ
 IS_RAILWAY = "RAILWAY" in os.environ
 IS_HIKKAHOST = "HIKKAHOST" in os.environ
 IS_AEZA = "aeza" in socket.gethostname()
+IS_SHARKHOST = "SHARKHOST" in os.environ
 IS_USERLAND = "userland" in os.environ
 IS_SKIRIHOST = "SKIRIHOST" in os.environ
 IS_ORACLE = False
@@ -807,6 +807,12 @@ class Legacy:
             upd = "Update required" if diff else "Up-to-date"
 
             logo = (
+                "   __\n"
+                "  / /  ___  __ _  __ _  ___ _   _\n"
+                " / /  / _ \\/ _` |/ _` |/ __| | | |\n"
+                "/ /__|  __/ (_| | (_| | (__| |_| |\n"
+                "\\____/\\___|\\__, |\\__,_|\\___|\\__, |\n"
+                "           |___/            |___/\n\n"
                 f"• Build: {build[:7]}\n"
                 f"• Version: {__version__}\n"
                 f"• {upd}\n"
@@ -829,11 +835,10 @@ class Legacy:
                 logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
                 "https://i.postimg.cc/13x4nnxm/41-9-D6-DF8-E.gif",
                 caption=(
-                    '🌙 <b>{} started!</b>\n'
+                    '🌙 <b>Legacy started!</b>\n'
                     '⚙ <b>GitHub commit SHA: <a href="https://github.com/Crayz310/Legacy/commit/{}">{}</a></b>\n'
                     '🔎 <b>Update status: {}</b>\n<b>{}</b>'
                     ).format(
-                        __version__,
                         build,
                         build[:7],
                         upd,

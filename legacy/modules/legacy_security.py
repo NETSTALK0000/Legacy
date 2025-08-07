@@ -34,8 +34,6 @@ from ..security import (
 
 @loader.tds
 class LegacySecurityMod(loader.Module):
-    """Control security settings"""
-
     strings = {"name": "LegacySecurity"}
 
     async def client_ready(self):

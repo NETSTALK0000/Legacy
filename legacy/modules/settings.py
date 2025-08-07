@@ -13,8 +13,6 @@ from ..inline.types import InlineCall
 
 @loader.tds
 class CoreMod(loader.Module):
-    """Control core userbot settings"""
-
     strings = {"name": "Settings"}
 
     def __init__(self):
@@ -27,15 +25,15 @@ class CoreMod(loader.Module):
             ),
             loader.ConfigValue(
                 "alias_emoji",
-                "<emoji document_id=4974259868996207180>▪️</emoji>",
+                "<emoji document_id=5319211649138177073>📌</emoji>",
                 "just emoji in .aliases",
             ),
             loader.ConfigValue(
                 "alias_view",
                 None,
                 "Set up view for aliases list.\nKeywords:\n{emoji} - alias emoji\n{alias} - alias\n{cmd} - command",
-                validator=loader.validators.String()
-            )
+                validator=loader.validators.String(),
+            ),
         )
 
     async def blacklistcommon(self, message: Message):
@@ -63,7 +61,7 @@ class CoreMod(loader.Module):
         module = self.allmodules.get_classname(module)
         return f"{str(chatid)}.{module}" if module else chatid
 
-    @loader.command(ru_doc="Информация о Legacy", en_doc="Information of Legacy", ua_doc="Інформація про Хероку", de_doc="Informationen über Legacy")
+    @loader.command()
     async def legacy(self, message: Message):
         await utils.answer_file(
             message,
@@ -74,7 +72,7 @@ class CoreMod(loader.Module):
                     if self._client.legacy_me.premium and CUSTOM_EMOJIS
                     else "🌙 <b>Legacy userbot</b>"
                 ),
-            )
+            ),
         )
 
     @loader.command()
@@ -173,27 +171,35 @@ class CoreMod(loader.Module):
 
     @loader.command()
     async def aliases(self, message: Message):
-        if not self.config['alias_view']:
+        if not self.config["alias_view"]:
             await utils.answer(
                 message,
                 self.strings("aliases")
+                + "<blockquote>"
                 + "\n".join(
                     [
                         (self.config["alias_emoji"] + f" <code>{i}</code> &lt;- {y}")
                         for i, y in self.allmodules.aliases.items()
                     ]
-                ),
+                )
+                + "</blockquote>",
             )
         else:
             await utils.answer(
                 message,
                 self.strings("aliases")
+                + "<blockquote>"
                 + "\n".join(
-                        [
-                            (self.config['alias_view'].format(alias=alias, cmd=cmd, emoji=self.config["alias_emoji"]))
-                            for alias, cmd in self.allmodules.aliases.items()
-                        ]
-                    )
+                    [
+                        (
+                            self.config["alias_view"].format(
+                                alias=alias, cmd=cmd, emoji=self.config["alias_emoji"]
+                            )
+                        )
+                        for alias, cmd in self.allmodules.aliases.items()
+                    ]
+                )
+                + "</blockquote>",
             )
 
     @loader.command()
@@ -270,39 +276,50 @@ class CoreMod(loader.Module):
 
     async def _main_installation(self, call: InlineCall):
         reply_markup = [
-            [{"text": self.strings("vds"), "callback": self._vds_installation}, {"text": self.strings("termux"), "callback": self._termux_installation}],
-            [{"text": self.strings("railway"), "callback": self._railway_installation}],
-            [{"text": self.strings("close_btn"), "action": "close"}]
+            [
+                {"text": self.strings("vds"), "callback": self._vds_installation},
+                {"text": self.strings("termux"), "callback": self._termux_installation},
+            ],
+            [
+                {"text": self.strings("railway"), "callback": self._railway_installation},
+                {"text": self.strings("sharkhost"), "callback": self._sharkhost_installation},
+            ],
+            [{"text": self.strings("close_btn"), "action": "close"}],
         ]
-        await utils.answer(call, self.strings("choose_installation"), reply_markup=reply_markup)
+        await utils.answer(
+            call, self.strings("choose_installation"), reply_markup=reply_markup
+        )
 
     async def _termux_installation(self, call: InlineCall):
         reply_markup = [
-            [{
-                "text": self.strings("main_menu"), "callback": self._main_installation
-            }]
+            [{"text": self.strings("main_menu"), "callback": self._main_installation}]
         ]
-        await utils.answer(call, self.strings("termux_install"), reply_markup=reply_markup)
+        await utils.answer(
+            call, self.strings("termux_install"), reply_markup=reply_markup
+        )
 
     async def _vds_installation(self, call: InlineCall):
         reply_markup = [
-            [{
-                "text": self.strings("main_menu"), "callback": self._main_installation
-            }]
+            [{"text": self.strings("main_menu"), "callback": self._main_installation}]
         ]
         await utils.answer(call, self.strings("vds_install"), reply_markup=reply_markup)
 
     async def _railway_installation(self, call: InlineCall):
         reply_markup = [
-            [{
-                "text": self.strings("main_menu"), "callback": self._main_installation
-            }]
+            [{"text": self.strings("main_menu"), "callback": self._main_installation}]
         ]
-        await utils.answer(call, self.strings("railway_install"), reply_markup=reply_markup)
+        await utils.answer(
+            call, self.strings("railway_install"), reply_markup=reply_markup
+        )
+
+    async def _sharkhost_installation(self, call: InlineCall):
+        reply_markup = [
+            [{"text": self.strings("main_menu"), "callback": self._main_installation}]
+        ]
+        await utils.answer(call, self.strings("sharkhost_install"), reply_markup=reply_markup)
 
     @loader.command()
     async def installation(self, message: Message):
-        """| Guide of installation"""
         args = utils.get_args(message)
         if "-t" in args or "--termux" in args:
             return await utils.answer(message, self.strings("termux_install"))
@@ -310,18 +327,33 @@ class CoreMod(loader.Module):
             return await utils.answer(message, self.strings("vds_install"))
         elif "-r" in args or "--railway" in args:
             return await utils.answer(message, self.strings("railway_install"))
+        elif "-sh" in args or "--sharkhost" in args:
+            return await utils.answer(message, self.strings("sharkhost_install"))
         else:
             reply_markup = [
-                [{"text": self.strings("vds"), "callback": self._vds_installation}, {"text": self.strings("termux"), "callback": self._termux_installation}],
-                [{"text": self.strings("railway"), "callback": self._railway_installation}],
-                [{"text": self.strings("close_btn"), "action": "close"}]
+                [
+                    {"text": self.strings("vds"), "callback": self._vds_installation},
+                    {
+                        "text": self.strings("termux"),
+                        "callback": self._termux_installation,
+                    },
+                ],
+                [
+                    {
+                        "text": self.strings("railway"),
+                        "callback": self._railway_installation,
+                    },
+                    {
+                        "text": self.strings("sharkhost"),
+                        "callback": self._sharkhost_installation,
+                    }
+                ],
+                [{"text": self.strings("close_btn"), "action": "close"}],
             ]
             await message.delete()
             await self.inline.form(
                 message=message,
                 text=self.strings("choose_installation"),
                 reply_markup=reply_markup,
-                **(
-                    {"photo": "https://i.postimg.cc/NfKrrv54/41-2807-ED0.gif"}
-                ),
+                **({"photo": "https://i.postimg.cc/NfKrrv54/41-2807-ED0.gif"}),
             )

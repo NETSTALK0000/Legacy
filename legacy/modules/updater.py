@@ -27,7 +27,7 @@ from legacytl.tl.types import (
     DialogFilterDefault,
 )
 
-from .. import loader, main, utils, version
+from .. import loader, inline, main, utils, version
 from .._internal import restart
 from ..inline.types import InlineCall
 
@@ -36,8 +36,6 @@ logger = logging.getLogger(__name__)
 
 @loader.tds
 class UpdaterMod(loader.Module):
-    """Updates itself"""
-
     strings = {"name": "Updater"}
 
     def __init__(self):
@@ -59,7 +57,7 @@ class UpdaterMod(loader.Module):
                 or not self.inline.init_complete
                 or not await self.inline.form(
                     message=message,
-                    text=self.strings("restart_confirm"),
+                    text=self.strings["restart_confirm"],
                     reply_markup=[
                         {
                             "text": self.strings("btn_restart"),
@@ -244,22 +242,65 @@ class UpdaterMod(loader.Module):
             self.strings("source").format(self.config["GIT_ORIGIN_URL"]),
         )
 
+    def _get_recent_commits(self, count=3) -> typing.List:
+        repo = Repo()
+
+        commits = list(repo.iter_commits('HEAD', max_count=count))
+
+        return commits
+        
+    def _rollback_to_commit(self, commit) -> bool:
+        repo = Repo()
+
+        try:
+            repo.git.reset('--hard', commit)
+            return True
+        except Exception:
+            return False
+
+    async def _cb_rollback(self, call: InlineCall, args):
+        res = self._rollback_to_commit(args)
+
+        if res:
+            await utils.answer(call, self.strings("rollback_ok"))
+            await self.invoke("restart", "-f", peer=self.inline.bot.id)
+        else:
+            await utils.answer(call, self.strings("rollback_err"))
+
     @loader.command()
     async def rollback(self, message: Message):
         args = utils.get_args_raw(message)
 
         if not args:
-            await utils.answer(message, self.strings("rollback_no_args"))
+            commits = self._get_recent_commits(4)
+            commits.pop(0)
+
+            await self.inline.form(
+                text=self.strings("rollback_no_args"),
+                message=message,
+                reply_markup=[
+                    [
+                        {
+                            "text": c.message.split("\n", 1)[0],
+                            "callback": self._cb_rollback,
+                            "args": [c.hexsha]
+                        }
+                    ]
+                    for c in commits
+                ] + [
+                    [
+                        {"text": self.strings("cancel"), "action": "close"}
+                    ]
+                ]
+            )
             return
 
-        try:
-            subprocess.run(
-                ["git", "reset", "--hard", f"{args}"],
-                cwd=f"{os.getcwd()}",
-            )
+        res = self._rollback_to_commit(args)
+
+        if res:
             await utils.answer(message, self.strings("rollback_ok"))
             await self.invoke("restart", "-f", peer=message.peer_id)
-        except subprocess.CalledProcessError:
+        else:
             await utils.answer(message, self.strings("rollback_err"))
 
     async def client_ready(self):
@@ -342,7 +383,7 @@ class UpdaterMod(loader.Module):
                             )
                             or dialog.entity.id in [2577311568]  # official legacy chat
                         ],
-                        emoticon="🐱",
+                        emoticon="⭐️",
                         exclude_peers=[],
                         contacts=False,
                         non_contacts=False,

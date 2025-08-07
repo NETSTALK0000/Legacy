@@ -66,8 +66,6 @@ for group in GROUPS:
 
 @loader.tds
 class APIRatelimiterMod(loader.Module):
-    """Helps userbot avoid spamming Telegram API"""
-
     strings = {"name": "APILimiter"}
 
     def __init__(self):
@@ -132,12 +130,12 @@ class APIRatelimiterMod(loader.Module):
     async def client_ready(self):
         asyncio.ensure_future(self._install_protection())
         self._client.forbid_constructors(
-             list(
-                  map(
-                       lambda x: CONSTRUCTORS.get(x.lower(), None),
-                       self.config["forbidden_methods"],
-                  ),
-             ),
+            list(
+                map(
+                    lambda x: CONSTRUCTORS.get(x.lower(), None),
+                    self.config["forbidden_methods"],
+                ),
+            ),
         )
 
     async def _install_protection(self):
