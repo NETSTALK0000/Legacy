@@ -242,25 +242,29 @@ class UpdaterMod(loader.Module):
             self.strings("source").format(self.config["GIT_ORIGIN_URL"]),
         )
 
-    def _get_recent_commits(self, count=3):
+    def _get_recent_commits(self, count=3) -> typing.List:
         repo = Repo()
 
         commits = list(repo.iter_commits('HEAD', max_count=count))
 
         return commits
         
-    def _rollback_to_commit(self, commit):
-        subprocess.run(
-            ["git", "reset", "--hard", f"{commit}"],
-            cwd=f"{os.getcwd()}",
-        )
+    def _rollback_to_commit(self, commit) -> bool:
+        repo = Repo()
+
+        try:
+            repo.git.reset('--hard', commit)
+            return True
+        except Exception:
+            return False
 
     async def _cb_rollback(self, call: InlineCall, args):
-        try:
-            self._rollback_to_commit(args)
+        res = self._rollback_to_commit(args)
+
+        if res:
             await utils.answer(call, self.strings("rollback_ok"))
-            await self.invoke("restart", "-f", peer=self.tg_id)
-        except subprocess.CalledProcessError:
+            await self.invoke("restart", "-f", peer=self.inline.bot.id)
+        else:
             await utils.answer(call, self.strings("rollback_err"))
 
     @loader.command()
@@ -268,7 +272,8 @@ class UpdaterMod(loader.Module):
         args = utils.get_args_raw(message)
 
         if not args:
-            commits = self._get_recent_commits()
+            commits = self._get_recent_commits(4)
+            commits.pop(0)
 
             await self.inline.form(
                 text=self.strings("rollback_no_args"),
@@ -290,11 +295,12 @@ class UpdaterMod(loader.Module):
             )
             return
 
-        try:
-            self._rollback_to_commit(args)
+        res = self._rollback_to_commit(args)
+
+        if res:
             await utils.answer(message, self.strings("rollback_ok"))
             await self.invoke("restart", "-f", peer=message.peer_id)
-        except subprocess.CalledProcessError:
+        else:
             await utils.answer(message, self.strings("rollback_err"))
 
     async def client_ready(self):
