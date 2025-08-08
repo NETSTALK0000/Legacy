@@ -47,6 +47,7 @@ class Help(loader.Module):
                 "expandable",
                 True,
                 lambda: "If the blockquote will be expandable",
+                validator=loader.validators.Boolean(),
             ),
         )
 
