@@ -43,6 +43,12 @@ class Help(loader.Module):
                 "<emoji document_id=5253521692008917018>🌙</emoji>",
                 lambda: "Desc emoji",
             ),
+            loader.ConfigValue(
+                "expandable",
+                True,
+                lambda: "If the blockquote will be expandable",
+                validator=loader.validators.Boolean(),
+            ),
         )
 
     @loader.command()
@@ -341,7 +347,7 @@ class Help(loader.Module):
                     (
                         ""
                         if self.lookup("Loader").fully_loaded
-                        else f"\n\n{self.strings('partial_load')}"
+                        else f"\n\n{self.strings['partial_load']}"
                     ),
                 ),
             )
@@ -350,11 +356,11 @@ class Help(loader.Module):
                 message,
                 (self.config["desc_icon"] + " {}\n {}{}").format(
                     reply,
-                    f"<blockquote expandable>{''.join(full_list)}</blockquote>",
+                    f"<blockquote {'expandable' if self.config['expandable'] else ''}>{''.join(full_list)}</blockquote>",
                     (
                         ""
                         if self.lookup("Loader").fully_loaded
-                        else f"\n\n{self.strings('partial_load')}"
+                        else f"\n\n{self.strings['partial_load']}"
                     ),
                 ),
             )
@@ -363,7 +369,7 @@ class Help(loader.Module):
     async def support(self, message):
         await utils.answer(
             message,
-            self.strings("support").format(
+            self.strings["support"].format(
                 (
                     utils.get_platform_emoji()
                     if self._client.legacy_me.premium and CUSTOM_EMOJIS
