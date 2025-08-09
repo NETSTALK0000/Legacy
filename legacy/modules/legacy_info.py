@@ -82,6 +82,7 @@ class LegacyInfoMod(loader.Module):
                 user=getpass.getuser(),
                 kernel=lib_platform.uname().release,
                 os=lib_platform.system(),
+                label=utils.get_platform_emoji() if self._client.legacy_me.premium else "🌙 <b>Legacy</b>"
             )
             if self.config["custom_message"] and "-d" not in args
             else (
