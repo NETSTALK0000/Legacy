@@ -407,12 +407,19 @@ async def answer_file(
         kwargs.setdefault("reply_to", topic)
 
     try:
-        response = await message.client.send_file(
-            message.peer_id,
-            file,
-            caption=caption,
-            **kwargs,
-        )
+        if message.out:
+            response = await message.edit(
+                text=caption,
+                file=file,
+                **kwargs,
+            )
+        else:
+            response = await message.client.send_file(
+                message.peer_id,
+                file,
+                caption=caption,
+                **kwargs,
+            )
     except Exception:
         if caption:
             logger.warning(
@@ -421,9 +428,6 @@ async def answer_file(
             return await answer(message, caption, **kwargs)
 
         raise
-
-    with contextlib.suppress(Exception):
-        await message.delete()
 
     return response
 
@@ -506,12 +510,12 @@ async def answer(
     if isinstance(response, str) and not kwargs.pop("asfile", False):
         text, entities = parse_mode.parse(response)
 
-        if len(text) >= 4071 and not hasattr(message, "legacy_grepped"):
+        if len(remove_html(text)) >= 4096 and not hasattr(message, "legacy_grepped"):
             try:
                 if not message.client.loader.inline.init_complete:
                     raise
 
-                strings = list(smart_split(text, entities, 4071))
+                strings = list(smart_split(text, entities, 4096))
 
                 if len(strings) > 10:
                     raise
@@ -529,17 +533,22 @@ async def answer(
                 file = io.BytesIO(text.encode("utf-8"))
                 file.name = "command_result.txt"
 
-                result = await message.client.send_file(
-                    message.peer_id,
-                    file,
-                    caption=message.client.loader.lookup("translations").strings(
-                        "too_long"
-                    ),
-                    reply_to=kwargs.get("reply_to") or get_topic(message),
-                )
-
-                if message.out:
-                    await message.delete()
+                if not edit:
+                    result = await message.client.send_file(
+                        message.peer_id,
+                        file,
+                        caption=message.client.loader.lookup("translations").strings(
+                            "too_long"
+                        ),
+                        reply_to=kwargs.get("reply_to") or get_topic(message),
+                    )
+                else:
+                    result = await message.edit(
+                        file=file,
+                        text=message.client.loader.lookup("translations").strings(
+                            "too_long"
+                        ),
+                    )
 
                 return result
 
