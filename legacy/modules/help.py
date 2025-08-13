@@ -338,32 +338,18 @@ class Help(loader.Module):
             if only_hidden
             else core_ + plain_
         )
-        if len(utils.remove_html("".join(full_list))) >= 4096:
-            await utils.answer(
-                message,
-                (self.config["desc_icon"] + " {}\n {}{}").format(
-                    reply,
-                    "".join(full_list),
-                    (
-                        ""
-                        if self.lookup("Loader").fully_loaded
-                        else f"\n\n{self.strings['partial_load']}"
-                    ),
+        await utils.answer(
+            message,
+            (self.config["desc_icon"] + " {}\n {}{}").format(
+                reply,
+                f"<blockquote {'expandable' if self.config['expandable'] else ''}>{''.join(full_list)}</blockquote>",
+                (
+                    ""
+                    if self.lookup("Loader").fully_loaded
+                    else f"\n\n{self.strings['partial_load']}"
                 ),
-            )
-        else:
-            await utils.answer(
-                message,
-                (self.config["desc_icon"] + " {}\n {}{}").format(
-                    reply,
-                    f"<blockquote {'expandable' if self.config['expandable'] else ''}>{''.join(full_list)}</blockquote>",
-                    (
-                        ""
-                        if self.lookup("Loader").fully_loaded
-                        else f"\n\n{self.strings['partial_load']}"
-                    ),
-                ),
-            )
+            ),
+        )
 
     @loader.command()
     async def support(self, message):
