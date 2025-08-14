@@ -7,6 +7,8 @@
 
 import asyncio
 import contextlib
+import aiofile
+import re
 
 import git
 
@@ -139,12 +141,15 @@ class UpdateNotifier(loader.Module):
 
     @loader.command()
     async def changelog(self, message: Message):
-        with open("CHANGELOG.md", mode="r", encoding="utf-8") as f:
-            changelog = f.read().split("##")[1].strip()
-        if (await self._client.get_me()).premium:
-            changelog.replace(
-                "🌑 Legacy",
-                "<emoji document_id=5192765204898783881>🌘</emoji><emoji document_id=5195311729663286630>🌘</emoji><emoji document_id=5195045669324201904>🌘</emoji>",
-            )
+        async with aiofile.AIOFile("CHANGELOG.md", mode="r", encoding="utf-8") as f:
+            content = await f.read()
+
+        last_header = content.rfind("## 🌙 Legacy")
+        if not last_header:
+            return
+
+        content_after_header = content[last_header:]
+
+        changelog = re.sub(r'^\s*#+\s*', '', content_after_header, flags=re.MULTILINE).strip()
 
         await utils.answer(message, self.strings("changelog").format(changelog))
