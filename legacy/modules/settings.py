@@ -6,6 +6,7 @@
 
 from legacytl.extensions.html import CUSTOM_EMOJIS
 from legacytl.tl.types import Message
+import legacytl
 
 from .. import loader, main, utils
 from ..inline.types import InlineCall
@@ -72,6 +73,7 @@ class CoreMod(loader.Module):
                     if self._client.legacy_me.premium and CUSTOM_EMOJIS
                     else "🌙 <b>Legacy userbot</b>"
                 ),
+                (legacytl.__version__)
             ),
         )
 
