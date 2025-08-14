@@ -849,7 +849,7 @@ class Legacy:
                         build,
                         build[:7],
                         upd,
-                        self.web.url if self.web else ""
+                        f'🔗 Web url: {self.web.url}' if self.web else ''
                     )
             )
 
