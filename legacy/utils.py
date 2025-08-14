@@ -403,8 +403,6 @@ async def answer_file(
     if isinstance(message, (InlineCall, InlineMessage)):
         message = message.form["caller"]
 
-    if topic := get_topic(message):
-        kwargs.setdefault("reply_to", topic)
 
     try:
         if message.out:
@@ -414,6 +412,8 @@ async def answer_file(
                 **kwargs,
             )
         else:
+            if topic := get_topic(message):
+                kwargs.setdefault("reply_to", topic)
             response = await message.client.send_file(
                 message.peer_id,
                 file,
