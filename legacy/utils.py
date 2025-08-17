@@ -510,10 +510,12 @@ async def answer(
     if isinstance(response, str) and not kwargs.pop("asfile", False):
         text, entities = parse_mode.parse(response)
 
-        if len(remove_html(text)) >= 4096 and not hasattr(message, "legacy_grepped"):
+        if len(text) >= 4096 and not hasattr(message, "legacy_grepped"):
             try:
                 if not message.client.loader.inline.init_complete:
                     raise
+                
+                entities = [e for e in entities if not isinstance(e, legacytl.tl.types.MessageEntityBlockquote)]
 
                 strings = list(smart_split(text, entities, 4096))
 
@@ -533,22 +535,13 @@ async def answer(
                 file = io.BytesIO(text.encode("utf-8"))
                 file.name = "command_result.txt"
 
-                if not edit:
-                    result = await message.client.send_file(
-                        message.peer_id,
-                        file,
-                        caption=message.client.loader.lookup("translations").strings(
-                            "too_long"
-                        ),
-                        reply_to=kwargs.get("reply_to") or get_topic(message),
+                result = await answer_file(
+                    message,
+                    file,
+                    message.client.loader.lookup("translations").strings(
+                        "too_long"
                     )
-                else:
-                    result = await message.edit(
-                        file=file,
-                        text=message.client.loader.lookup("translations").strings(
-                            "too_long"
-                        ),
-                    )
+                )
 
                 return result
 
