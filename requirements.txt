@@ -14,5 +14,6 @@ ruamel.yaml==0.17.21
 aiopsutil
 GitPython
 whoosh==2.7.4
+distro==1.9.0
 
 # Python 3.8+
