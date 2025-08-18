@@ -381,7 +381,7 @@ def relocate_entities(
 async def answer_file(
     message: typing.Union[Message, InlineCall, InlineMessage],
     file: typing.Union[str, bytes, io.IOBase, InputDocument],
-    caption: typing.Optional[str] = None,
+    caption: typing.Optional[str] = "",
     **kwargs,
 ):
     """
