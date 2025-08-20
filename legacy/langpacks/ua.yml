@@ -527,7 +527,8 @@ translations:
   _cmd_doc_setlang: "[мови] - Змінити стандартну мову"
 
 eval:
-  eval: "<emoji document_id={}>💻</emoji><b> Код:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<emoji document_id=5197688912457245639>✅</emoji><b> Результат:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  eval: "<emoji document_id={}>💻</emoji><b> Код:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  result: "\n\n<emoji document_id=5197688912457245639>✅</emoji><b> Результат:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   output: "\n\n<emoji document_id=5472111548572900003>⌨️</emoji> <b>Вивід:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   err: "<emoji document_id={}>💻</emoji><b> Код:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<emoji document_id=5210952531676504517>🚫</emoji> <b>Помилка:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   _cls_doc: "Виконує код різними мовами програмування"

@@ -548,7 +548,8 @@ translations:
 
 eval:
   name: "Evaluator"
-  eval: "<emoji document_id={}>💻</emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<emoji document_id=5197688912457245639>✅</emoji><b> Result:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  eval: "<emoji document_id={}>💻</emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  result: "\n\n<emoji document_id=5197688912457245639>✅</emoji><b> Result:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   output: "\n\n<emoji document_id=5472111548572900003>⌨️</emoji> <b>Output:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   err: "<emoji document_id={}>💻</emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<emoji document_id=5210952531676504517>🚫</emoji> <b>Error:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   compiling: "<emoji document_id=5325787248363314644>🫥</emoji> <b>Compiling code...</b>"
