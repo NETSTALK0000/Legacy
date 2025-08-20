@@ -629,17 +629,10 @@ class LoaderMod(loader.Module):
 
                 if rc != 0:
                     if message is not None:
-                        if "com.termux" in os.environ.get("PREFIX", ""):
-                            await utils.answer(
-                                message,
-                                self.strings("requirements_failed_termux"),
-                            )
-                        else:
-                            await utils.answer(
-                                message,
-                                self.strings("requirements_failed"),
-                            )
-
+                        await utils.answer(
+                            message,
+                            self.strings("requirements_failed"),
+                        )
                     return
 
                 importlib.invalidate_caches()

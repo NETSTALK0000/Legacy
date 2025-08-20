@@ -403,7 +403,6 @@ async def answer_file(
     if isinstance(message, (InlineCall, InlineMessage)):
         message = message.form["caller"]
 
-
     try:
         if message.out:
             response = await message.edit(
@@ -514,8 +513,12 @@ async def answer(
             try:
                 if not message.client.loader.inline.init_complete:
                     raise
-                
-                entities = [e for e in entities if not isinstance(e, legacytl.tl.types.MessageEntityBlockquote)]
+
+                entities = [
+                    e
+                    for e in entities
+                    if not isinstance(e, legacytl.tl.types.MessageEntityBlockquote)
+                ]
 
                 strings = list(smart_split(text, entities, 4096))
 
@@ -538,9 +541,7 @@ async def answer(
                 result = await answer_file(
                     message,
                     file,
-                    message.client.loader.lookup("translations").strings(
-                        "too_long"
-                    )
+                    message.client.loader.lookup("translations").strings("too_long"),
                 )
 
                 return result
@@ -943,7 +944,7 @@ def get_named_platform() -> str:
     if main.IS_DOCKER:
         return "🐳 Docker"
 
-    return "🕶 Termux" if main.IS_TERMUX else "💎 VDS"
+    return "💎 VDS"
 
 
 def get_platform_emoji() -> str:
@@ -967,9 +968,6 @@ def get_platform_emoji() -> str:
 
     if main.IS_USERLAND:
         return BASE.format(5458508523858062696)
-
-    if main.IS_TERMUX:
-        return BASE.format(5458485193595711943)
 
     if main.IS_SHARKHOST:
         return BASE.format(5204098532671256923)
