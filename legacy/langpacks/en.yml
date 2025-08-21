@@ -435,7 +435,7 @@ legacy_info:
   send_info: "Send userbot info"
   description: "ℹ This will not compromise any sensitive info"
   up-to-date: "<emoji document_id=5370699111492229743>😌</emoji> <b>Up-to-date</b>"
-  update_required: "<emoji document_id=5424728541650494040>😕</emoji> <b>Update required</b> <code>.update</code>"
+  update_required: "<emoji document_id=5424728541650494040>😕</emoji> <b>Update required</b> <code>{}update</code>"
   setinfo_no_args: "<emoji document_id=5370881342659631698>😢</emoji> <b>You need to specify text to change info to</b>"
   setinfo_success: "<emoji document_id=5436040291507247633>🎉</emoji> <b>Info changed successfully</b>"
   _cfg_cst_msg: "Custom message for info. May contain {me}, {version}, {build}, {prefix}, {platform}, {upd}, {uptime}, {cpu_usage}, {ram_usage}, {branch}, {kernel}, {os}, {label} keywords"
