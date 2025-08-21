@@ -119,6 +119,7 @@ inline_everyone = security.inline_everyone
 async def stop_placeholder() -> bool:
     return True
 
+
 VALID_PIP_PACKAGES = re.compile(
     r"^\s*# ?requires:(?: ?)((?:{url} )*(?:{url}))\s*$".format(
         url=r"[-[\]_.~:/?#@!$&'()*+,;%<=>a-zA-Z0-9]+"
@@ -564,18 +565,15 @@ class Modules:
                 )
             ]
 
-            external_mods = (
-                [
-                    (LOADED_MODULES_PATH / mod).resolve()
-                    for mod in filter(
-                        lambda x: (
-                            x.endswith(f"{self.client.tg_id}.py")
-                            and not x.startswith("_")
-                        ),
-                        os.listdir(LOADED_MODULES_DIR),
-                    )
-                ]
-            )
+            external_mods = [
+                (LOADED_MODULES_PATH / mod).resolve()
+                for mod in filter(
+                    lambda x: (
+                        x.endswith(f"{self.client.tg_id}.py") and not x.startswith("_")
+                    ),
+                    os.listdir(LOADED_MODULES_DIR),
+                )
+            ]
 
         loaded = []
         loaded += await self._register_modules(mods)
@@ -831,9 +829,6 @@ class Modules:
 
     async def complete_registration(self, instance: Module):
         """Complete registration of instance"""
-        with contextlib.suppress(AttributeError):
-            _legacy_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
-
         instance.allmodules = self
         instance.internal_init()
 
@@ -916,9 +911,6 @@ class Modules:
 
     def send_config_one(self, mod: Module, skip_hook: bool = False):
         """Send config to single instance"""
-        with contextlib.suppress(AttributeError):
-            _legacy_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
-
         if hasattr(mod, "config"):
             modcfg = self._db.get(
                 mod.__class__.__name__,
@@ -982,9 +974,6 @@ class Modules:
         no_self_unload: bool = False,
         from_dlmod: bool = False,
     ):
-        with contextlib.suppress(AttributeError):
-            _legacy_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
-
         if from_dlmod:
             try:
                 if len(inspect.signature(mod.on_dlmod).parameters) == 2:
@@ -1052,10 +1041,6 @@ class Modules:
     async def unload_module(self, classname: str) -> typing.List[str]:
         """Remove module and all stuff from it"""
         worked = []
-
-        with contextlib.suppress(AttributeError):
-            _legacy_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
-
         for module in self.modules:
             if classname.lower() in (
                 module.name.lower(),

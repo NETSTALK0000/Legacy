@@ -35,7 +35,9 @@ class LegacyInfoMod(loader.Module):
             repo = git.Repo(search_parent_directories=True)
             diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
             upd = (
-                self.strings("update_required") if diff else self.strings("up-to-date")
+                self.strings("update_required").format(self._client.loader.get_prefix())
+                if diff
+                else self.strings("up-to-date")
             )
         except Exception:
             upd = ""
@@ -83,7 +85,9 @@ class LegacyInfoMod(loader.Module):
                 user=getpass.getuser(),
                 kernel=lib_platform.uname().release,
                 os=distro.name(pretty=True),
-                label=utils.get_platform_emoji() if self._client.legacy_me.premium else "🌙 <b>Legacy</b>"
+                label=utils.get_platform_emoji()
+                if self._client.legacy_me.premium
+                else "🌙 <b>Legacy</b>",
             )
             if self.config["custom_message"] and "-d" not in args
             else (
