@@ -106,7 +106,7 @@ class BotInlineMessage:
         )
 
 
-class InlineCall(CallbackQuery, InlineMessage):
+class InlineCall(InlineMessage):
     """Modified version of classic aiogram `CallbackQuery`"""
 
     def __init__(
@@ -115,43 +115,38 @@ class InlineCall(CallbackQuery, InlineMessage):
         inline_manager: "InlineManager",  # type: ignore  # noqa: F821
         unit_id: str,
     ):
-        CallbackQuery.__init__(self)
-
-        for attr in {
-            "id",
-            "from_user",
-            "message",
-            "inline_message_id",
-            "chat_instance",
-            "data",
-            "game_short_name",
-        }:
-            setattr(self, attr, getattr(call, attr, None))
-
         self.original_call = call
 
-        InlineMessage.__init__(
-            self,
+        self.id = call.id
+        self.from_user = call.from_user
+        self.message = call.message
+        self.inline_message_id = call.inline_message_id
+        self.chat_instance = call.chat_instance
+        self.data = call.data
+        self.game_short_name = call.game_short_name
+
+        super().__init__(
             inline_manager,
             unit_id,
             call.inline_message_id,
         )
 
     async def delete(self):
-        await self._units.get(self.unit_id).get('message').client.delete_messages(
-            self._units.get(self.unit_id).get('chat'), self._units.get(self.unit_id).get('message_id')
-        )
+        unit = self._units.get(self.unit_id)
+        if not unit:
+            return await self.original_call.answer("Message not found", show_alert=True)
+
+        chat_id = unit.get("chat")
+        message_id = unit.get("message_id")
+
+        await self.inline_manager._client.delete_messages(chat_id, message_id)
         return await self.original_call.answer("")
 
     async def answer(self, text: Optional[str] = None, *args, **kwargs):
         if text:
             text = utils.remove_html(text)
 
-        return await self.original_call.answer(
-            text=text,
-            *args,
-            **kwargs
-        )
+        return await self.original_call.answer(text=text, *args, **kwargs)
 
 
 class BotInlineCall(CallbackQuery, BotInlineMessage):
@@ -194,11 +189,7 @@ class BotInlineCall(CallbackQuery, BotInlineMessage):
         if text:
             text = utils.remove_html(text)
 
-        return await self.original_call.answer(
-            text=text,
-            *args,
-            **kwargs
-        )
+        return await self.original_call.answer(text=text, *args, **kwargs)
 
 
 class InlineUnit:
@@ -206,6 +197,7 @@ class InlineUnit:
 
     def __init__(self):
         """Made just for type specification"""
+
 
 class BotMessage(AiogramMessage):
     """Modified version of original Aiogram Message"""
