@@ -84,7 +84,7 @@ class Database(dict):
         """Read database and stores it in self"""
         try:
             self.update(**ujson.loads(self._db_file.read_text()))
-        except ujson.decoder.JSONDecodeError:
+        except ValueError:
             logger.warning("Database read failed! Creating new one...")
         except FileNotFoundError:
             logger.debug("Database file not found, creating new one...")

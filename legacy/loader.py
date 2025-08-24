@@ -127,7 +127,11 @@ VALID_PIP_PACKAGES = re.compile(
     re.MULTILINE,
 )
 
-USER_INSTALL = "PIP_TARGET" not in os.environ and "VIRTUAL_ENV" not in os.environ
+USER_INSTALL = not (
+    hasattr(sys, "real_prefix")
+    or (hasattr(sys, "base_prefix") and sys.base_prefix != sys.prefix)
+    or "VIRTUAL_ENV" in os.environ
+)
 
 native_import = builtins.__import__
 
