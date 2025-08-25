@@ -175,8 +175,8 @@ class InlineStuff(loader.Module):
         state = self.inline.gs(user_id)
 
         if message.text == "/start":
-            await message.answer_photo(
-                "https://i.postimg.cc/bN4tXwwK/info.png",
+            await message.answer_animation(
+                "https://i.postimg.cc/90QXwWJN/legacy-userbot.gif",
                 caption=self.strings("this_is_legacy"),
             )
 

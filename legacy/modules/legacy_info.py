@@ -25,7 +25,7 @@ class LegacyInfoMod(loader.Module):
             ),
             loader.ConfigValue(
                 "banner_url",
-                "https://i.postimg.cc/NfKrrv54/41-2807-ED0.gif",
+                "https://i.postimg.cc/9MTZgB2j/legacy-info.gif",
                 lambda: self.strings("_cfg_banner"),
             ),
         )

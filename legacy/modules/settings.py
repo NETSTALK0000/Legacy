@@ -66,7 +66,7 @@ class CoreMod(loader.Module):
     async def legacy(self, message: Message):
         await utils.answer_file(
             message,
-            "https://i.postimg.cc/VsxbMHnP/41-368214-A.gif",
+            "https://i.postimg.cc/90QXwWJN/legacy-userbot.gif",
             self.strings["legacy"].format(
                 (
                     utils.get_platform_emoji()
@@ -361,7 +361,7 @@ class CoreMod(loader.Module):
             ]
             await utils.answer(
                 message,
-                gif="https://i.postimg.cc/NfKrrv54/41-2807-ED0.gif",
+                gif="https://i.postimg.cc/6pkQbxpy/legacy-install.gif",
                 response=self.strings["choose_installation"],
                 reply_markup=reply_markup,
                 disable_security=True,
