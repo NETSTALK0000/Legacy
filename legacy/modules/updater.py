@@ -133,7 +133,7 @@ class UpdaterMod(loader.Module):
         try:
             repo = Repo(os.path.dirname(utils.get_base_dir()))
             origin = repo.remote("origin")
-            r = origin.pull()
+            r = origin.pull(rebase=True)
             new_commit = repo.head.commit
             for info in r:
                 if info.old_commit:
