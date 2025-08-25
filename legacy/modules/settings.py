@@ -11,6 +11,7 @@ import legacytl
 from .. import loader, main, utils
 from ..inline.types import InlineCall
 
+import sys
 
 @loader.tds
 class CoreMod(loader.Module):
@@ -64,6 +65,7 @@ class CoreMod(loader.Module):
 
     @loader.command()
     async def legacy(self, message: Message):
+        py_ver = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
         await utils.answer_file(
             message,
             "https://i.postimg.cc/90QXwWJN/legacy-userbot.gif",
@@ -74,6 +76,7 @@ class CoreMod(loader.Module):
                     else "🌙 <b>Legacy userbot</b>"
                 ),
                 (legacytl.__version__),
+                (py_ver),
             ),
         )
 
