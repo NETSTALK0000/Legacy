@@ -39,7 +39,7 @@ from legacytl.tl.types import Message
 
 from . import main, security, utils
 from .database import Database
-from .loader import Modules, get_prefix
+from .loader import Modules
 from .tl_cache import CustomTelegramClient
 
 logger = logging.getLogger(__name__)
@@ -274,7 +274,15 @@ class CommandDispatcher:
         if not hasattr(event, "message") or not hasattr(event.message, "message"):
             return False
 
-        prefix = get_prefix()
+        key = main.__name__
+        default = "."
+        prefix = self._db.get(key, "command_prefix", None)
+        if prefix:
+            if isinstance(prefix, str):
+                self._db.set(key, "command_prefix", {f"{self.client.tg_id}": prefix})
+
+
+        prefix = self._db.get(key, "command_prefix", {}).get(f"{self.client.tg_id}", default)
         change = str.maketrans(ru_keys + en_keys, en_keys + ru_keys)
         message = utils.censor(event.message)
 
