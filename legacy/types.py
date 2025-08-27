@@ -162,7 +162,7 @@ class Module:
         if not message and not peer:
             raise ValueError("Either peer or message must be specified")
 
-        cmd = f"{self.get_prefix()}{command} {args or ''}".strip()
+        cmd = f"{self.get_prefix(message.sender_id)}{command} {args or ''}".strip()
 
         message = (
             (await self._client.send_message(peer, cmd))

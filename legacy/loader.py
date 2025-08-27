@@ -822,14 +822,20 @@ class Modules:
     def get_approved_channel(self):
         return self.__approve.pop(0) if self.__approve else None
 
-    def get_prefix(self) -> str:
+    def get_prefix(self, owner_id=None) -> str:
         """Get command prefix"""
         from . import main
 
         key = main.__name__
         default = "."
+        prefix = self._db.get(key, "command_prefix", None)
+        if prefix:
+            if isinstance(prefix, str):
+                self._db.set(key, "command_prefix", {f"{self.client.tg_id}": prefix})
 
-        return self._db.get(key, "command_prefix", default)
+        return self._db.get(key, "command_prefix", {}).get(
+            f"{owner_id}" if owner_id else f"{self.client.tg_id}", default
+        )
 
     async def complete_registration(self, instance: Module):
         """Complete registration of instance"""

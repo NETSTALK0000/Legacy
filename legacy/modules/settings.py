@@ -13,6 +13,7 @@ from ..inline.types import InlineCall
 
 import sys
 
+
 @loader.tds
 class CoreMod(loader.Module):
     strings = {"name": "Settings"}
@@ -154,23 +155,20 @@ class CoreMod(loader.Module):
             await utils.answer(message, self.strings["prefix_incorrect"])
             return
 
-        if args == "s":
-            await utils.answer(message, self.strings["prefix_incorrect"])
-            return
-
-        oldprefix = utils.escape_html(self.get_prefix())
+        oldprefixes = self._db.get(main.__name__, "command_prefix", {})
+        oldprefixes[f"{message.sender_id}"] = args
 
         self._db.set(
             main.__name__,
             "command_prefix",
-            args,
+            oldprefixes,
         )
         await utils.answer(
             message,
             self.strings["prefix_set"].format(
                 "<emoji document_id=5197474765387864959>👍</emoji>",
                 newprefix=utils.escape_html(args),
-                oldprefix=utils.escape_html(oldprefix),
+                oldprefix=utils.escape_html(oldprefixes),
             ),
         )
 

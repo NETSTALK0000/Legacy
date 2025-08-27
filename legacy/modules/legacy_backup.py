@@ -71,14 +71,20 @@ class LegacyBackupMod(loader.Module):
     async def _set_backup_period(self, call: BotInlineCall, value: int):
         if not value:
             self.set("period", "disabled")
-            await call.answer(self.strings("never").format(self.get_prefix()), show_alert=True)
+            await call.answer(
+                self.strings["never"].format(self.get_prefix()),
+                show_alert=True,
+            )
             await call.delete()
             return
 
         self.set("period", value * 60 * 60)
         self.set("last_backup", round(time.time()))
 
-        await call.answer(self.strings("saved").format(self.get_prefix()), show_alert=True)
+        await call.answer(
+            self.strings("saved").format(self.get_prefix()),
+            show_alert=True,
+        )
         await call.delete()
 
     @loader.command()
@@ -93,13 +99,18 @@ class LegacyBackupMod(loader.Module):
 
         if not int(args):
             self.set("period", "disabled")
-            await utils.answer(message, self.strings("never").format(self.get_prefix()))
+            await utils.answer(
+                message,
+                self.strings("never").format(self.get_prefix(message.sender_id)),
+            )
             return
 
         period = int(args) * 60 * 60
         self.set("period", period)
         self.set("last_backup", round(time.time()))
-        await utils.answer(message, self.strings("saved").format(self.get_prefix()))
+        await utils.answer(
+            message, self.strings("saved").format(self.get_prefix(message.sender_id))
+        )
 
     @loader.loop(interval=1, autostart=True)
     async def handler(self):
@@ -233,7 +244,9 @@ class LegacyBackupMod(loader.Module):
         backup_msg = await self.inline.bot.send_document(
             int(f"-100{self._backup_channel.id}"),
             outfile,
-            caption=self.strings("backup_caption").format(prefix=self.get_prefix()),
+            caption=self.strings("backup_caption").format(
+                prefix=self.get_prefix(message.sender_id)
+            ),
             reply_markup=self.inline.generate_markup(
                 [
                     [

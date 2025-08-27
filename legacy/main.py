@@ -844,7 +844,10 @@ class Legacy:
             logging.debug(
                 "· Started for %s · Prefix: «%s» ·",
                 client.tg_id,
-                client.legacy_db.get(__name__, "command_prefix", False) or ".",
+                client.legacy_db.get(__name__, "command_prefix", {}).get(
+                    client.tg_id, False
+                )
+                or ".",
             )
         except Exception:
             logging.exception("Badge error")

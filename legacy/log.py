@@ -76,7 +76,9 @@ def override_text(exception: Exception) -> typing.Optional[str]:
             "🕓 <b>Telegram translation service timed out. Please try again later.</b>"
         )
     if isinstance(exception, ModuleNotFoundError):
-        return f"📦 {traceback.format_exception_only(type(exception), exception)[0].split(':')[1].strip()}"
+        return f"📦 <b>{traceback.format_exception_only(type(exception), exception)[0].split(':')[1].strip()}</b>"
+    if isinstance(exception, asyncio.InvalidStateError):
+        return "🔄 <b>Internal task was in invalid state.</b>"
     return None
 
 

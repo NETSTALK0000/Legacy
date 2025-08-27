@@ -96,7 +96,7 @@ class Help(loader.Module):
         exact = True
         if not (module := self.lookup(args)):
             if method := self.allmodules.dispatch(
-                args.lower().strip(self.get_prefix())
+                args.lower().strip(self.get_prefix(message.sender_id))
             )[1]:
                 module = method.__self__
             else:
@@ -173,13 +173,15 @@ class Help(loader.Module):
             reply += (
                 "\n<emoji document_id=5197195523794157505>▫️</emoji>"
                 " <code>{}{}</code>{} {}".format(
-                    utils.escape_html(self.get_prefix()),
+                    utils.escape_html(self.get_prefix(message.sender_id)),
                     name,
                     (
                         " ({})".format(
                             ", ".join(
                                 "<code>{}{}</code>".format(
-                                    utils.escape_html(self.get_prefix()),
+                                    utils.escape_html(
+                                        self.get_prefix(message.sender_id)
+                                    ),
                                     alias,
                                 )
                                 for alias in self.find_aliases(name)
@@ -350,7 +352,6 @@ class Help(loader.Module):
                 ),
             ),
         )
-            
 
     @loader.command()
     async def support(self, message):

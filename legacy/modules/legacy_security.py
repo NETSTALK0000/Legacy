@@ -460,7 +460,9 @@ class LegacySecurityMod(loader.Module):
             return
 
         await self.inline.form(
-            self.strings("permissions").format(self.get_prefix(), args),
+            self.strings("permissions").format(
+                self.get_prefix(message.sender_id), args
+            ),
             reply_markup=self._build_markup(self.allmodules.commands[args]),
             message=message,
             ttl=5 * 60,
@@ -611,6 +613,7 @@ class LegacySecurityMod(loader.Module):
 
         if user.id in self._client.dispatcher.security.owner:
             self._client.dispatcher.security.owner.remove(user.id)
+        self._db.get(main.__name__, "command_prefix", {}).pop(f"{user.id}")
 
         await utils.answer(
             message,

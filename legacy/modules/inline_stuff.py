@@ -147,7 +147,7 @@ class InlineStuff(loader.Module):
             try:
                 if not await self.inline.form(
                     self.strings("privacy_leak_nowarn").format(
-                        f"{self.get_prefix()}iauth -f"
+                        f"{self.get_prefix(message.sender_id)}iauth -f"
                     ),
                     message=message,
                     reply_markup=[

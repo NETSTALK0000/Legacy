@@ -129,6 +129,7 @@ class UpdateNotifier(loader.Module):
 
         if call.data == "legacy/ignore_upd":
             self.set("ignore_permanent", self.get_latest())
+            await call.delete()
             await call.answer(self.strings("latest_disabled"))
             return
 
@@ -150,6 +151,8 @@ class UpdateNotifier(loader.Module):
 
         content_after_header = content[last_header:]
 
-        changelog = re.sub(r'^\s*#+\s*', '', content_after_header, flags=re.MULTILINE).strip()
+        changelog = re.sub(
+            r"^\s*#+\s*", "", content_after_header, flags=re.MULTILINE
+        ).strip()
 
         await utils.answer(message, self.strings("changelog").format(changelog))
