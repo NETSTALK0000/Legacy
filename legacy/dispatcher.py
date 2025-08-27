@@ -282,7 +282,7 @@ class CommandDispatcher:
                 self._db.set(key, "command_prefix", {f"{self.client.tg_id}": prefix})
 
 
-        prefix = self._db.get(key, "command_prefix", {}).get(f"{self.client.tg_id}", default)
+        prefix = self._db.get(key, "command_prefix", {}).get(f"{event.sender_id}", default)
         change = str.maketrans(ru_keys + en_keys, en_keys + ru_keys)
         message = utils.censor(event.message)
 
