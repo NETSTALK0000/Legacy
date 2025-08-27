@@ -274,7 +274,12 @@ class CommandDispatcher:
         if not hasattr(event, "message") or not hasattr(event.message, "message"):
             return False
 
-        prefix = self._db.get(main.__name__, "command_prefix", False) or "."
+        prefix = (
+            self._db.get(main.__name__, "command_prefix", {}).get(
+                f"{event.message.sender_id}"
+            )
+            or "."
+        )
         change = str.maketrans(ru_keys + en_keys, en_keys + ru_keys)
         message = utils.censor(event.message)
 
@@ -294,7 +299,7 @@ class CommandDispatcher:
             # Allow escaping commands using .'s
             if not watcher:
                 await message.edit(
-                    message.message[len(prefix):],
+                    message.message[len(prefix) :],
                     parse_mode=lambda s: (
                         s,
                         utils.relocate_entities(message.entities, -1, message.message)
@@ -344,12 +349,15 @@ class CommandDispatcher:
 
         initiator = getattr(event, "sender_id", 0)
 
-        command = message.message[len(prefix):].strip().split(maxsplit=1)[0]
+        command = message.message[len(prefix) :].strip().split(maxsplit=1)[0]
         tag = command.split("@", maxsplit=1)
 
         if len(tag) == 2:
             if tag[1] == "me":
                 if not message.out:
+                    return False
+            elif tag[1].isdigit():
+                if int(tag[1]) != self._me:
                     return False
             elif tag[1].lower() not in self._cached_usernames:
                 return False

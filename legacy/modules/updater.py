@@ -27,7 +27,7 @@ from legacytl.tl.types import (
     DialogFilterDefault,
 )
 
-from .. import loader, inline, main, utils, version
+from .. import loader, main, utils, version
 from .._internal import restart
 from ..inline.types import InlineCall
 
@@ -245,15 +245,15 @@ class UpdaterMod(loader.Module):
     def _get_recent_commits(self, count=3) -> typing.List:
         repo = Repo()
 
-        commits = list(repo.iter_commits('HEAD', max_count=count))
+        commits = list(repo.iter_commits("HEAD", max_count=count))
 
         return commits
-        
+
     def _rollback_to_commit(self, commit) -> bool:
         repo = Repo()
 
         try:
-            repo.git.reset('--hard', commit)
+            repo.git.reset("--hard", commit)
             return True
         except Exception:
             return False
@@ -283,15 +283,12 @@ class UpdaterMod(loader.Module):
                         {
                             "text": c.message.split("\n", 1)[0],
                             "callback": self._cb_rollback,
-                            "args": [c.hexsha]
+                            "args": [c.hexsha],
                         }
                     ]
                     for c in commits
-                ] + [
-                    [
-                        {"text": self.strings("cancel"), "action": "close"}
-                    ]
                 ]
+                + [[{"text": self.strings("cancel"), "action": "close"}]],
             )
             return
 

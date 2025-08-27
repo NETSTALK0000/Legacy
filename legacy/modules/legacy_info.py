@@ -35,7 +35,7 @@ class LegacyInfoMod(loader.Module):
             repo = git.Repo(search_parent_directories=True)
             diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
             upd = (
-                self.strings("update_required").format(self._client.loader.get_prefix())
+                self.strings("update_required").format(self.get_prefix())
                 if diff
                 else self.strings("up-to-date")
             )
