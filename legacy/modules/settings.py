@@ -155,20 +155,21 @@ class CoreMod(loader.Module):
             await utils.answer(message, self.strings["prefix_incorrect"])
             return
 
-        oldprefixes = self._db.get(main.__name__, "command_prefix", {})
-        oldprefixes[f"{message.sender_id}"] = args
+        prefixes = self._db.get(main.__name__, "command_prefix", {})
+        oldprefix = self.get_prefix(message.sender_id)
+        prefixes[f"{message.sender_id}"] = args
 
         self._db.set(
             main.__name__,
             "command_prefix",
-            oldprefixes,
+            prefixes,
         )
         await utils.answer(
             message,
             self.strings["prefix_set"].format(
                 "<emoji document_id=5197474765387864959>👍</emoji>",
                 newprefix=utils.escape_html(args),
-                oldprefix=utils.escape_html(oldprefixes),
+                oldprefix=utils.escape_html(oldprefix),
             ),
         )
 
