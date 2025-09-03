@@ -29,7 +29,7 @@ import socket
 import collections
 import contextlib
 import importlib
-import json
+import ujson
 import logging
 import os
 import random
@@ -89,7 +89,6 @@ LOGS_PATH = "https://raw.githubusercontent.com/Crayz310/Legacy/refs/heads/master
 AVATAR_PATH = os.path.join(os.getcwd(), "assets", "legacy-pfp.png")
 CONFIG_PATH = BASE_PATH / "config.json"
 
-IS_TERMUX = "com.termux" in os.environ.get("PREFIX", "")
 IS_DOCKER = "DOCKER" in os.environ
 IS_RAILWAY = "RAILWAY" in os.environ
 IS_HIKKAHOST = "HIKKAHOST" in os.environ
@@ -205,7 +204,7 @@ def run_config():
     """Load configurator.py"""
     from . import configurator
 
-    return configurator.api_config(IS_TERMUX or None)
+    return configurator.api_config(None)
 
 
 def get_config_key(key: str) -> typing.Union[str, bool]:
@@ -215,7 +214,7 @@ def get_config_key(key: str) -> typing.Union[str, bool]:
     :return: Value of config key or `False`, if it doesn't exist
     """
     try:
-        return json.loads(CONFIG_PATH.read_text()).get(key, False)
+        return ujson.loads(CONFIG_PATH.read_text()).get(key, False)
     except FileNotFoundError:
         return False
 
@@ -229,7 +228,7 @@ def save_config_key(key: str, value: str) -> bool:
     """
     try:
         # Try to open our newly created json config
-        config = json.loads(CONFIG_PATH.read_text())
+        config = ujson.loads(CONFIG_PATH.read_text())
     except FileNotFoundError:
         # If it doesn't exist, just default config to none
         # It won't cause problems, bc after new save
@@ -239,7 +238,7 @@ def save_config_key(key: str, value: str) -> bool:
     # Assign config value
     config[key] = value
     # And save config
-    CONFIG_PATH.write_text(json.dumps(config, indent=4))
+    CONFIG_PATH.write_text(ujson.dumps(config, indent=4))
     return True
 
 
@@ -340,6 +339,14 @@ def parse_arguments() -> dict:
         action="store_false",
         default=True,
         help="Do not print colorful output using ANSI escapes",
+    )
+    parser.add_argument(
+        "--bot-token",
+        "-bt",
+        dest="bot_token",
+        action="store",
+        type=str,
+        help="Your inline bot token",
     )
     arguments = parser.parse_args()
     logging.debug(arguments)
@@ -481,11 +488,7 @@ class Legacy:
 
     def _init_web(self):
         """Initialize web"""
-        if (
-            not web_available
-            or getattr(self.arguments, "disable_web", False)
-            or IS_TERMUX
-        ):
+        if not web_available or getattr(self.arguments, "disable_web", False):
             self.web = None
             return
 
@@ -527,8 +530,6 @@ class Legacy:
             client._tg_id = telegram_id
             client.tg_id = telegram_id
             client.legacy_me = me
-            client.heroku_me = me #Compatibility with Heroku client
-            client.hikka_me = me #Compatibility with Hikka client
 
         session = SQLiteSession(
             os.path.join(
@@ -585,9 +586,7 @@ class Legacy:
 
     async def _phone_login(self, client: CustomTelegramClient) -> bool:
         phone = input(
-            "\033[0;96mEnter phone: \033[0m"
-            if IS_TERMUX or self.arguments.tty
-            else "Enter phone: "
+            "\033[0;96mEnter phone: \033[0m" if self.arguments.tty else "Enter phone: "
         )
 
         await client.start(phone)
@@ -618,9 +617,7 @@ class Legacy:
             await client.connect()
 
             print(
-                (
-                    "\033[0;96m{}\033[0m" if IS_TERMUX or self.arguments.tty else "{}"
-                ).format(
+                ("\033[0;96m{}\033[0m" if self.arguments.tty else "{}").format(
                     "You can use QR-code to login from another device (your friend's"
                     " phone, for example)."
                 )
@@ -629,7 +626,7 @@ class Legacy:
             if (
                 input(
                     "\033[0;96mUse QR code? [y/N]: \033[0m"
-                    if IS_TERMUX or self.arguments.tty
+                    if self.arguments.tty
                     else "Use QR code? [y/N]: "
                 ).lower()
                 != "y"
@@ -675,7 +672,7 @@ class Legacy:
                 while True:
                     _2fa = getpass(
                         f"\033[0;96mEnter 2FA password ({password.hint}): \033[0m"
-                        if IS_TERMUX or self.arguments.tty
+                        if self.arguments.tty
                         else f"Enter 2FA password ({password.hint}): "
                     )
                     try:
@@ -790,8 +787,6 @@ class Legacy:
             client._tg_id = me.id
             client.tg_id = me.id
             client.legacy_me = me
-            client.heroku_me = me
-            client.hikka_me = me
             while await self.amain(first, client):
                 first = False
 
@@ -835,21 +830,24 @@ class Legacy:
                 logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
                 "https://i.postimg.cc/13x4nnxm/41-9-D6-DF8-E.gif",
                 caption=(
-                    '🌙 <b>Legacy started!</b>\n'
+                    "🌙 <b>Legacy started!</b>\n"
                     '⚙ <b>GitHub commit SHA: <a href="https://github.com/Crayz310/Legacy/commit/{}">{}</a></b>\n'
-                    '🔎 <b>Update status: {}</b>\n<b>{}</b>'
-                    ).format(
-                        build,
-                        build[:7],
-                        upd,
-                        self.web.url if self.web else ""
-                    )
+                    "🔎 <b>Update status: {}</b>\n<b>{}</b>"
+                ).format(
+                    build,
+                    build[:7],
+                    upd,
+                    f"🔗 Web url: {self.web.url}" if self.web else "",
+                ),
             )
 
             logging.debug(
                 "· Started for %s · Prefix: «%s» ·",
                 client.tg_id,
-                client.legacy_db.get(__name__, "command_prefix", False) or ".",
+                client.legacy_db.get(__name__, "command_prefix", {}).get(
+                    client.tg_id, False
+                )
+                or ".",
             )
         except Exception:
             logging.exception("Badge error")

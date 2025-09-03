@@ -6,9 +6,12 @@
 
 from legacytl.extensions.html import CUSTOM_EMOJIS
 from legacytl.tl.types import Message
+import legacytl
 
 from .. import loader, main, utils
 from ..inline.types import InlineCall
+
+import sys
 
 
 @loader.tds
@@ -40,7 +43,7 @@ class CoreMod(loader.Module):
         args = utils.get_args(message)
 
         if len(args) > 2:
-            await utils.answer(message, self.strings("too_many_args"))
+            await utils.answer(message, self.strings["too_many_args"])
             return
 
         chatid = None
@@ -63,15 +66,18 @@ class CoreMod(loader.Module):
 
     @loader.command()
     async def legacy(self, message: Message):
+        py_ver = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
         await utils.answer_file(
             message,
-            "https://i.postimg.cc/VsxbMHnP/41-368214-A.gif",
-            self.strings("legacy").format(
+            "https://i.postimg.cc/90QXwWJN/legacy-userbot.gif",
+            self.strings["legacy"].format(
                 (
                     utils.get_platform_emoji()
                     if self._client.legacy_me.premium and CUSTOM_EMOJIS
                     else "🌙 <b>Legacy userbot</b>"
                 ),
+                (legacytl.__version__),
+                (py_ver),
             ),
         )
 
@@ -85,7 +91,7 @@ class CoreMod(loader.Module):
             self._db.get(main.__name__, "blacklist_chats", []) + [chatid],
         )
 
-        await utils.answer(message, self.strings("blacklisted").format(chatid))
+        await utils.answer(message, self.strings["blacklisted"].format(chatid))
 
     @loader.command()
     async def unblacklist(self, message: Message):
@@ -97,7 +103,7 @@ class CoreMod(loader.Module):
             list(set(self._db.get(main.__name__, "blacklist_chats", [])) - {chatid}),
         )
 
-        await utils.answer(message, self.strings("unblacklisted").format(chatid))
+        await utils.answer(message, self.strings["unblacklisted"].format(chatid))
 
     async def getuser(self, message: Message):
         try:
@@ -111,7 +117,7 @@ class CoreMod(loader.Module):
     @loader.command()
     async def blacklistuser(self, message: Message):
         if not (user := await self.getuser(message)):
-            await utils.answer(message, self.strings("who_to_blacklist"))
+            await utils.answer(message, self.strings["who_to_blacklist"])
             return
 
         self._db.set(
@@ -120,12 +126,12 @@ class CoreMod(loader.Module):
             self._db.get(main.__name__, "blacklist_users", []) + [user],
         )
 
-        await utils.answer(message, self.strings("user_blacklisted").format(user))
+        await utils.answer(message, self.strings["user_blacklisted"].format(user))
 
     @loader.command()
     async def unblacklistuser(self, message: Message):
         if not (user := await self.getuser(message)):
-            await utils.answer(message, self.strings("who_to_unblacklist"))
+            await utils.answer(message, self.strings["who_to_unblacklist"])
             return
 
         self._db.set(
@@ -136,33 +142,31 @@ class CoreMod(loader.Module):
 
         await utils.answer(
             message,
-            self.strings("user_unblacklisted").format(user),
+            self.strings["user_unblacklisted"].format(user),
         )
 
     @loader.command()
     async def setprefix(self, message: Message):
         if not (args := utils.get_args_raw(message)):
-            await utils.answer(message, self.strings("what_prefix"))
+            await utils.answer(message, self.strings["what_prefix"])
             return
 
         if len(args) != 1 and self.config.get("allow_nonstandart_prefixes") is False:
-            await utils.answer(message, self.strings("prefix_incorrect"))
+            await utils.answer(message, self.strings["prefix_incorrect"])
             return
 
-        if args == "s":
-            await utils.answer(message, self.strings("prefix_incorrect"))
-            return
-
-        oldprefix = utils.escape_html(self.get_prefix())
+        prefixes = self._db.get(main.__name__, "command_prefix", {})
+        oldprefix = self.get_prefix(message.sender_id)
+        prefixes[f"{message.sender_id}"] = args
 
         self._db.set(
             main.__name__,
             "command_prefix",
-            args,
+            prefixes,
         )
         await utils.answer(
             message,
-            self.strings("prefix_set").format(
+            self.strings["prefix_set"].format(
                 "<emoji document_id=5197474765387864959>👍</emoji>",
                 newprefix=utils.escape_html(args),
                 oldprefix=utils.escape_html(oldprefix),
@@ -174,7 +178,7 @@ class CoreMod(loader.Module):
         if not self.config["alias_view"]:
             await utils.answer(
                 message,
-                self.strings("aliases")
+                self.strings["aliases"]
                 + "<blockquote>"
                 + "\n".join(
                     [
@@ -187,7 +191,7 @@ class CoreMod(loader.Module):
         else:
             await utils.answer(
                 message,
-                self.strings("aliases")
+                self.strings["aliases"]
                 + "<blockquote>"
                 + "\n".join(
                     [
@@ -205,7 +209,7 @@ class CoreMod(loader.Module):
     @loader.command()
     async def addalias(self, message: Message):
         if len(args := utils.get_args(message)) != 2:
-            await utils.answer(message, self.strings("alias_args"))
+            await utils.answer(message, self.strings["alias_args"])
             return
 
         alias, cmd = args
@@ -219,12 +223,12 @@ class CoreMod(loader.Module):
             )
             await utils.answer(
                 message,
-                self.strings("alias_created").format(utils.escape_html(alias.lower())),
+                self.strings["alias_created"].format(utils.escape_html(alias.lower())),
             )
         else:
             await utils.answer(
                 message,
-                self.strings("no_command").format(utils.escape_html(cmd)),
+                self.strings["no_command"].format(utils.escape_html(cmd)),
             )
 
     @loader.command()
@@ -232,7 +236,7 @@ class CoreMod(loader.Module):
         args = utils.get_args(message)
 
         if len(args) != 1:
-            await utils.answer(message, self.strings("delalias_args"))
+            await utils.answer(message, self.strings["delalias_args"])
             return
 
         alias = args[0]
@@ -240,7 +244,7 @@ class CoreMod(loader.Module):
         if not self.allmodules.remove_alias(alias):
             await utils.answer(
                 message,
-                self.strings("no_alias").format(utils.escape_html(alias)),
+                self.strings["no_alias"].format(utils.escape_html(alias)),
             )
             return
 
@@ -249,21 +253,21 @@ class CoreMod(loader.Module):
         self.set("aliases", current)
         await utils.answer(
             message,
-            self.strings("alias_removed").format(utils.escape_html(alias)),
+            self.strings["alias_removed"].format(utils.escape_html(alias)),
         )
 
     @loader.command()
     async def cleardb(self, message: Message):
         await self.inline.form(
-            self.strings("confirm_cleardb"),
+            self.strings["confirm_cleardb"],
             message,
             reply_markup=[
                 {
-                    "text": self.strings("cleardb_confirm"),
+                    "text": self.strings["cleardb_confirm"],
                     "callback": self._inline__cleardb,
                 },
                 {
-                    "text": self.strings("cancel"),
+                    "text": self.strings["cancel"],
                     "action": "close",
                 },
             ],
@@ -272,88 +276,95 @@ class CoreMod(loader.Module):
     async def _inline__cleardb(self, call: InlineCall):
         self._db.clear()
         self._db.save()
-        await utils.answer(call, self.strings("db_cleared"))
+        await utils.answer(call, self.strings["db_cleared"])
 
     async def _main_installation(self, call: InlineCall):
         reply_markup = [
             [
-                {"text": self.strings("vds"), "callback": self._vds_installation},
-                {"text": self.strings("termux"), "callback": self._termux_installation},
+                {"text": self.strings["vds"], "callback": self._vds_installation},
+                {"text": self.strings["docker"], "callback": self._docker_installation},
             ],
             [
-                {"text": self.strings("railway"), "callback": self._railway_installation},
-                {"text": self.strings("sharkhost"), "callback": self._sharkhost_installation},
+                {
+                    "text": self.strings["railway"],
+                    "callback": self._railway_installation,
+                },
+                {
+                    "text": self.strings["sharkhost"],
+                    "callback": self._sharkhost_installation,
+                },
             ],
-            [{"text": self.strings("close_btn"), "action": "close"}],
+            [{"text": self.strings["close_btn"], "action": "close"}],
         ]
         await utils.answer(
-            call, self.strings("choose_installation"), reply_markup=reply_markup
+            call,
+            self.strings["choose_installation"],
+            reply_markup=reply_markup,
+            disable_security=True,
         )
 
-    async def _termux_installation(self, call: InlineCall):
+    async def _installation_handler(self, call: InlineCall, install_type: str):
         reply_markup = [
-            [{"text": self.strings("main_menu"), "callback": self._main_installation}]
+            [{"text": self.strings["main_menu"], "callback": self._main_installation}]
         ]
         await utils.answer(
-            call, self.strings("termux_install"), reply_markup=reply_markup
+            call,
+            self.strings[f"{install_type}_install"],
+            reply_markup=reply_markup,
+            disable_security=True,
         )
 
     async def _vds_installation(self, call: InlineCall):
-        reply_markup = [
-            [{"text": self.strings("main_menu"), "callback": self._main_installation}]
-        ]
-        await utils.answer(call, self.strings("vds_install"), reply_markup=reply_markup)
+        await self._installation_handler(call, "vds")
+
+    async def _docker_installation(self, call: InlineCall):
+        await self._installation_handler(call, "docker")
 
     async def _railway_installation(self, call: InlineCall):
-        reply_markup = [
-            [{"text": self.strings("main_menu"), "callback": self._main_installation}]
-        ]
-        await utils.answer(
-            call, self.strings("railway_install"), reply_markup=reply_markup
-        )
+        await self._installation_handler(call, "railway")
 
     async def _sharkhost_installation(self, call: InlineCall):
-        reply_markup = [
-            [{"text": self.strings("main_menu"), "callback": self._main_installation}]
-        ]
-        await utils.answer(call, self.strings("sharkhost_install"), reply_markup=reply_markup)
+        await self._installation_handler(call, "sharkhost")
 
     @loader.command()
     async def installation(self, message: Message):
         args = utils.get_args(message)
-        if "-t" in args or "--termux" in args:
-            return await utils.answer(message, self.strings("termux_install"))
-        elif "-v" in args or "--vds" in args:
-            return await utils.answer(message, self.strings("vds_install"))
-        elif "-r" in args or "--railway" in args:
-            return await utils.answer(message, self.strings("railway_install"))
-        elif "-sh" in args or "--sharkhost" in args:
-            return await utils.answer(message, self.strings("sharkhost_install"))
-        else:
-            reply_markup = [
-                [
-                    {"text": self.strings("vds"), "callback": self._vds_installation},
-                    {
-                        "text": self.strings("termux"),
-                        "callback": self._termux_installation,
-                    },
-                ],
-                [
-                    {
-                        "text": self.strings("railway"),
-                        "callback": self._railway_installation,
-                    },
-                    {
-                        "text": self.strings("sharkhost"),
-                        "callback": self._sharkhost_installation,
-                    }
-                ],
-                [{"text": self.strings("close_btn"), "action": "close"}],
-            ]
-            await message.delete()
-            await self.inline.form(
-                message=message,
-                text=self.strings("choose_installation"),
-                reply_markup=reply_markup,
-                **({"photo": "https://i.postimg.cc/NfKrrv54/41-2807-ED0.gif"}),
-            )
+        arg_mapping = {
+            "-v": "vds_install",
+            "--vds": "vds_install",
+            "-r": "railway_install",
+            "--railway": "railway_install",
+            "-sh": "sharkhost_install",
+            "--sharkhost": "sharkhost_install",
+            "-d": "docker_install",
+            "--docker": "docker_install",
+        }
+        for arg, response_key in arg_mapping.items():
+            if arg in args:
+                return await utils.answer(message, self.strings[response_key])
+
+        reply_markup = [
+            [
+                {"text": self.strings["vds"], "callback": self._vds_installation},
+                {"text": self.strings["docker"], "callback": self._docker_installation},
+            ],
+            [
+                {
+                    "text": self.strings["railway"],
+                    "callback": self._railway_installation,
+                },
+                {
+                    "text": self.strings["sharkhost"],
+                    "callback": self._sharkhost_installation,
+                },
+            ],
+            [{"text": self.strings["close_btn"], "action": "close"}],
+        ]
+
+        return await utils.answer(
+            message,
+            gif="https://i.postimg.cc/6pkQbxpy/legacy-install.gif",
+            response=self.strings["choose_installation"],
+            reply_markup=reply_markup,
+            disable_security=True,
+        )

@@ -123,6 +123,18 @@ class InlineStuff(loader.Module):
         await utils.answer(message, self.strings("bot_updated"))
 
     @loader.command()
+    async def ch_bot_token(self, message: Message):
+        args = utils.get_args_raw(message)
+
+        if not args:
+            await utils.answer(message, self.strings("token_not_provided"))
+            return
+
+        self._db.set("legacy.inline", "bot_token", args)
+
+        await utils.answer(message, "token_changed")
+
+    @loader.command()
     async def iauth(self, message: Message, force: bool = False):
         if "SHARKHOST" in os.environ:
             await utils.answer(message, self.strings("forbid"))
@@ -135,7 +147,7 @@ class InlineStuff(loader.Module):
             try:
                 if not await self.inline.form(
                     self.strings("privacy_leak_nowarn").format(
-                        f"{self.get_prefix()}iauth -f"
+                        f"{self.get_prefix(message.sender_id)}iauth -f"
                     ),
                     message=message,
                     reply_markup=[
@@ -163,8 +175,8 @@ class InlineStuff(loader.Module):
         state = self.inline.gs(user_id)
 
         if message.text == "/start":
-            await message.answer_photo(
-                "https://i.postimg.cc/bN4tXwwK/info.png",
+            await message.answer_animation(
+                "https://i.postimg.cc/90QXwWJN/legacy-userbot.gif",
                 caption=self.strings("this_is_legacy"),
             )
 

@@ -18,15 +18,26 @@ import legacytl
 from legacytl.errors.rpcerrorlist import MessageIdInvalidError
 from legacytl.sessions import StringSession
 from legacytl.tl.types import Message
+from legacytl.tl.types.messages import AffectedMessages
 from meval import meval
 
 from .. import loader, utils
-from ..log import HikkaException
+from ..log import LegacyException
 
 
 @loader.tds
 class Evaluator(loader.Module):
     strings = {"name": "Evaluator"}
+
+    def __init__(self):
+        self.config = loader.ModuleConfig(
+            loader.ConfigValue(
+                "hide_telethon_results",
+                False,
+                lambda: "Suppress the output of Telethon API method return values (e.g., Message, AffectedMessages) in the result",
+                validator=loader.validators.Boolean(),
+            )
+        )
 
     @loader.command(alias="eval")
     async def e(self, message: Message):
@@ -42,7 +53,7 @@ class Evaluator(loader.Module):
 
             printed_output = output_buffer.getvalue()
         except Exception:
-            item = HikkaException.from_exc_info(*sys.exc_info())
+            item = LegacyException.from_exc_info(*sys.exc_info())
 
             await utils.answer(
                 message,
@@ -64,6 +75,20 @@ class Evaluator(loader.Module):
 
             return
 
+        def contains_message(obj):
+            if isinstance(obj, (Message, AffectedMessages)):
+                return True
+            if isinstance(obj, (list, tuple, set)):
+                return any(contains_message(i) for i in obj)
+            if isinstance(obj, dict):
+                return any(
+                    contains_message(k) or contains_message(v) for k, v in obj.items()
+                )
+            return False
+
+        if self.config["hide_telethon_results"] and contains_message(result):
+            result = None
+
         if callable(getattr(result, "stringify", None)):
             with contextlib.suppress(Exception):
                 result = str(result.stringify())
@@ -71,15 +96,20 @@ class Evaluator(loader.Module):
         with contextlib.suppress(MessageIdInvalidError):
             await utils.answer(
                 message,
-                self.strings("eval").format(
+                self.strings["eval"].format(
                     "4985626654563894116",
                     "python",
                     utils.escape_html(utils.get_args_raw(message)),
-                    "python",
-                    utils.escape_html(self.censor(str(result))),
                 )
                 + (
-                    self.strings("output").format(
+                    self.strings["result"].format(
+                        "python", f"{utils.escape_html(self.censor(str(result)))}"
+                    )
+                    if result
+                    else ""
+                )
+                + (
+                    self.strings["output"].format(
                         "python", utils.escape_html(self.censor(printed_output))
                     )
                     if printed_output

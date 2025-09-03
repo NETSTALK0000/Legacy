@@ -82,17 +82,8 @@ class Web:
     def _platform_emoji(self) -> str:
         return {
             "vds": "https://github.com/iamcal/emoji-data/raw/master/img-apple-64/1fa90.png",
-            "termux": "https://github.com/hikariatama/assets/raw/master/smiling-face-with-sunglasses_1f60e.png",
             "docker": "https://github.com/hikariatama/assets/raw/master/spouting-whale_1f433.png",
-        }[
-            (
-                "termux"
-                if "com.termux" in os.environ.get("PREFIX", "")
-                else "docker"
-                if "DOCKER" in os.environ
-                else "vds"
-            )
-        ]
+        }[("docker" if "DOCKER" in os.environ else "vds")]
 
     @aiohttp_jinja2.template("root.jinja2")
     async def root(self, _):

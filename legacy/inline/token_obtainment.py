@@ -7,9 +7,11 @@
 import asyncio
 import logging
 import re
+import aiohttp
 
 from legacytl.errors.rpcerrorlist import YouBlockedUserError
 from legacytl.tl.functions.contacts import UnblockRequest
+
 
 from .. import utils
 from .._internal import fw_protect
@@ -97,6 +99,34 @@ class TokenObtainment(InlineUnit):
         create_new_if_needed: bool = True,
         revoke_token: bool = False,
     ) -> bool:
+        from ..main import parse_arguments
+
+        arguments = parse_arguments()
+        passed_token = getattr(arguments, "bot_token", None)
+        url = f"https://api.telegram.org/bot{passed_token}/getMe"
+
+        if passed_token:
+            logger.info("Token was found in CLI arguments. Validating token...")
+
+            async with aiohttp.ClientSession() as session:
+                try:
+                    async with session.get(url) as response:
+                        if response.status == 200:
+                            data = await response.json()
+
+                            if data.get("ok"):
+                                logger.info("Token validation successful. It will be used for inline bot")
+                                self._token = passed_token
+                                self._db.set("legacy.inline", "bot_token", self._token)
+
+                                return True
+
+                        logger.error("Token validation failed!")
+                except aiohttp.ClientConnectionError as e:
+                    logger.error(f"Connection error during token validation: {e}")
+                except Exception as e:
+                    logger.error(f"An unexpected error occurred during token validation: {e}")
+
         if self._token:
             return True
 

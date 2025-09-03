@@ -89,7 +89,7 @@ class Web(root.Web):
             # вырезана проверка на докер
             platform = utils.get_named_platform()
 
-            if any(keyword in platform for keyword in ["WSL", "UserLand", "Termux"]):
+            if any(keyword in platform for keyword in ["WSL", "UserLand"]):
                 ip = "127.0.0.1"
             else:
                 try:
