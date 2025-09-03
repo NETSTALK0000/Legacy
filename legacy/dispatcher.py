@@ -282,7 +282,7 @@ class CommandDispatcher:
                 self._db.set(key, "command_prefix", {f"{self.client.tg_id}": prefix})
         set_default_prefix = (
             self._db.get(key, "command_prefix").get(f"{self.client.tg_id}")
-            if self._db.get(key, "command_prefix").get(f"{self.client.tg_id}")
+            if event.out
             else default
         )
         prefix = self._db.get(key, "command_prefix", {}).get(
