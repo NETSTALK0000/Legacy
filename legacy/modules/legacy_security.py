@@ -460,7 +460,9 @@ class LegacySecurityMod(loader.Module):
             return
 
         await self.inline.form(
-            self.strings("permissions").format(self.get_prefix(), args),
+            self.strings("permissions").format(
+                self.get_prefix(message.sender_id), args
+            ),
             reply_markup=self._build_markup(self.allmodules.commands[args]),
             message=message,
             ttl=5 * 60,
@@ -611,6 +613,10 @@ class LegacySecurityMod(loader.Module):
 
         if user.id in self._client.dispatcher.security.owner:
             self._client.dispatcher.security.owner.remove(user.id)
+        try:
+            self._db.get(main.__name__, "command_prefix", {}).pop(f"{user.id}")
+        except KeyError:
+            pass
 
         await utils.answer(
             message,
@@ -628,16 +634,21 @@ class LegacySecurityMod(loader.Module):
                 _resolved_users += [await self._client.get_entity(user, exp=0)]
 
         if not _resolved_users:
-            await utils.answer(message, self.strings("no_owner"))
+            await utils.answer(message, self.strings["no_owner"])
             return
 
         await utils.answer(
             message,
-            self.strings("owner_list").format(
+            self.strings["owner_list"].format(
                 "\n".join(
                     [
-                        self.strings("li").format(
-                            i.id, utils.escape_html(get_display_name(i))
+                        self.strings["li"].format(
+                            i.id,
+                            utils.escape_html(get_display_name(i)),
+                            self._db.get(main.__name__, "command_prefix", {}).get(
+                                f"{i.id}"
+                            )
+                            or ".",
                         )
                         for i in _resolved_users
                     ]

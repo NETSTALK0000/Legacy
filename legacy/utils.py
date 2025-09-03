@@ -28,7 +28,7 @@ import contextlib
 import functools
 import inspect
 import io
-import json
+import ujson
 import logging
 import os
 import random
@@ -99,7 +99,7 @@ from legacytl.tl.types import (
 from ._internal import fw_protect
 from .inline.types import BotInlineCall, InlineCall, InlineMessage
 from .tl_cache import CustomTelegramClient
-from .types import HikkaReplyMarkup, ListLike, Module
+from .types import LegacyReplyMarkup, ListLike, Module
 
 FormattingEntity = typing.Union[
     MessageEntityUnknown,
@@ -381,7 +381,7 @@ def relocate_entities(
 async def answer_file(
     message: typing.Union[Message, InlineCall, InlineMessage],
     file: typing.Union[str, bytes, io.IOBase, InputDocument],
-    caption: typing.Optional[str] = None,
+    caption: typing.Optional[str] = "",
     **kwargs,
 ):
     """
@@ -403,16 +403,22 @@ async def answer_file(
     if isinstance(message, (InlineCall, InlineMessage)):
         message = message.form["caller"]
 
-    if topic := get_topic(message):
-        kwargs.setdefault("reply_to", topic)
-
     try:
-        response = await message.client.send_file(
-            message.peer_id,
-            file,
-            caption=caption,
-            **kwargs,
-        )
+        if message.out:
+            response = await message.edit(
+                text=caption,
+                file=file,
+                **kwargs,
+            )
+        else:
+            if topic := get_topic(message):
+                kwargs.setdefault("reply_to", topic)
+            response = await message.client.send_file(
+                message.peer_id,
+                file,
+                caption=caption,
+                **kwargs,
+            )
     except Exception:
         if caption:
             logger.warning(
@@ -422,9 +428,6 @@ async def answer_file(
 
         raise
 
-    with contextlib.suppress(Exception):
-        await message.delete()
-
     return response
 
 
@@ -432,7 +435,7 @@ async def answer(
     message: typing.Union[Message, InlineCall, InlineMessage],
     response: str,
     *,
-    reply_markup: typing.Optional[HikkaReplyMarkup] = None,
+    reply_markup: typing.Optional[LegacyReplyMarkup] = None,
     **kwargs,
 ) -> typing.Union[InlineCall, InlineMessage, Message]:
     """
@@ -506,12 +509,18 @@ async def answer(
     if isinstance(response, str) and not kwargs.pop("asfile", False):
         text, entities = parse_mode.parse(response)
 
-        if len(text) >= 4071 and not hasattr(message, "legacy_grepped"):
+        if len(text) >= 4096 and not hasattr(message, "legacy_grepped"):
             try:
                 if not message.client.loader.inline.init_complete:
                     raise
 
-                strings = list(smart_split(text, entities, 4071))
+                entities = [
+                    e
+                    for e in entities
+                    if not isinstance(e, legacytl.tl.types.MessageEntityBlockquote)
+                ]
+
+                strings = list(smart_split(text, entities, 4096))
 
                 if len(strings) > 10:
                     raise
@@ -529,17 +538,11 @@ async def answer(
                 file = io.BytesIO(text.encode("utf-8"))
                 file.name = "command_result.txt"
 
-                result = await message.client.send_file(
-                    message.peer_id,
+                result = await answer_file(
+                    message,
                     file,
-                    caption=message.client.loader.lookup("translations").strings(
-                        "too_long"
-                    ),
-                    reply_to=kwargs.get("reply_to") or get_topic(message),
+                    message.client.loader.lookup("translations").strings("too_long"),
                 )
-
-                if message.out:
-                    await message.delete()
 
                 return result
 
@@ -941,7 +944,7 @@ def get_named_platform() -> str:
     if main.IS_DOCKER:
         return "🐳 Docker"
 
-    return "🕶 Termux" if main.IS_TERMUX else "💎 VDS"
+    return "💎 VDS"
 
 
 def get_platform_emoji() -> str:
@@ -965,9 +968,6 @@ def get_platform_emoji() -> str:
 
     if main.IS_USERLAND:
         return BASE.format(5458508523858062696)
-
-    if main.IS_TERMUX:
-        return BASE.format(5458485193595711943)
 
     if main.IS_SHARKHOST:
         return BASE.format(5204098532671256923)
@@ -1328,7 +1328,7 @@ def is_serializable(x: typing.Any, /) -> bool:
     :return: True if object is JSON-serializable, False otherwise
     """
     try:
-        json.dumps(x)
+        ujson.dumps(x)
         return True
     except Exception:
         return False
@@ -1422,9 +1422,9 @@ def remove_html(text: str, escape: bool = False, keep_emojis: bool = False) -> s
     return (escape_html if escape else str)(
         re.sub(
             (
-                r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code>|<\/?strike>|<\/?del>|<\/?pre.*?>)"
+                r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?blockquote.*?>)"
                 if keep_emojis
-                else r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?emoji.*?>)"
+                else r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?emoji.*?>|<\/?blockquote.*?>)"
             ),
             "",
             text,

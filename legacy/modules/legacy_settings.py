@@ -287,7 +287,7 @@ class LegacySettingsMod(loader.Module):
     @loader.command()
     async def nonickuser(self, message: Message):
         if not (reply := await message.get_reply_message()):
-            await utils.answer(message, self.strings("reply_required"))
+            await utils.answer(message, self.strings["reply_required"])
             return
 
         u = reply.sender_id
@@ -298,10 +298,10 @@ class LegacySettingsMod(loader.Module):
         if u not in nn:
             nn += [u]
             nn = list(set(nn))  # skipcq: PTC-W0018
-            await utils.answer(message, self.strings("user_nn").format("on"))
+            await utils.answer(message, self.strings["user_nn"].format("on"))
         else:
             nn = list(set(nn) - {u})
-            await utils.answer(message, self.strings("user_nn").format("off"))
+            await utils.answer(message, self.strings["user_nn"].format("off"))
 
         self._db.set(main.__name__, "nonickusers", nn)
 

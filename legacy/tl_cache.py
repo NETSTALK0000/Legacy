@@ -11,11 +11,8 @@ import time
 import typing
 
 from legacytl import TelegramClient
-from legacytl import __name__ as __base_name__
 from legacytl import helpers
 from legacytl._updates import ChannelState, Entity, EntityType, SessionState
-from legacytl.errors import RPCError
-from legacytl.errors.rpcerrorlist import TopicDeletedError
 from legacytl.hints import EntityLike
 from legacytl.network import MTProtoSender
 from legacytl.tl import functions
@@ -26,7 +23,6 @@ from legacytl.tl.tlobject import TLRequest
 from legacytl.tl.types import (
     ChannelFull,
     Message,
-    Pong,
     Updates,
     UpdatesCombined,
     UpdateShort,
