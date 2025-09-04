@@ -26,12 +26,6 @@ from aiogram.utils.exceptions import NetworkError
 from . import utils
 from .tl_cache import CustomTelegramClient
 from .types import BotInlineCall, Module
-from .web.debugger import WebDebugger
-
-# Monkeypatch linecache to make interactive line debugger available
-# in werkzeug web debugger
-# This is weird, but the only adequate approach
-# https://github.com/pallets/werkzeug/blob/3115aa6a6276939f5fd6efa46282e0256ff21f1a/src/werkzeug/debug/tbtools.py#L382-L416
 
 old = linecache.getlines
 
@@ -40,10 +34,6 @@ def getlines(filename: str, module_globals=None) -> str:
     """
     Get the lines for a Python source file from the cache.
     Update the cache if it doesn't contain an entry for this file already.
-
-    Modified version of original `linecache.getlines`, which returns the
-    source code of Legacy modules properly. This is needed for
-    interactive line debugger in werkzeug web debugger.
     """
 
     try:
@@ -94,7 +84,6 @@ class LegacyException:
         self.message = message
         self.full_stack = full_stack
         self.sysinfo = sysinfo
-        self.debug_url = None
 
     @classmethod
     def from_exc_info(
@@ -229,7 +218,6 @@ class TelegramLogsHandler(logging.Handler):
         self.force_send_all = False
         self.tg_level = 20
         self.ignore_common = False
-        self.web_debugger = None
         self.targets = targets
         self.capacity = capacity
         self.lvl = logging.NOTSET
@@ -240,9 +228,6 @@ class TelegramLogsHandler(logging.Handler):
             self._task.cancel()
 
         self._mods[mod.tg_id] = mod
-
-        if mod.db.get(__name__, "debugger", False):
-            self.web_debugger = WebDebugger()
 
         self._task = asyncio.ensure_future(self.queue_poller())
 
@@ -272,6 +257,46 @@ class TelegramLogsHandler(logging.Handler):
             and (not record.legacy_caller or client_id == record.legacy_caller)
         ]
 
+    async def _install_pylib(self, call: BotInlineCall, bot: "aiogram.Bot", lib: str):
+        if lib == "PIL":
+            lib = "pillow"
+
+        try:
+            process = await asyncio.create_subprocess_exec(
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "--upgrade",
+                "-q",
+                "--disable-pip-version-check",
+                "--no-warn-script-location",
+                lib,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+
+            stdout, stderr = await process.communicate()
+
+            if process.returncode == 0:
+                return await call.answer(
+                    f"✅ <b>Library {lib} installed successfully!</b>"
+                )
+            else:
+                error_msg = stderr.decode().strip() if stderr else "Unknown error"
+                await bot.send_message(
+                    chat_id=call.chat_id,
+                    text=f"❌ <b>Failed to install <code>{lib}</code>:</b>\n<code>{error_msg}</code>",
+                )
+                return await call.answer()
+
+        except Exception as e:
+            await bot.send_message(
+                chat_id=call.chat_id,
+                text=f"❌ <b>Exception during installation of <code>{lib}</code>:</b>\n<code>{str(e)}<code>",
+            )
+            return await call.answer()
+
     async def _show_full_trace(
         self,
         call: BotInlineCall,
@@ -284,63 +309,10 @@ class TelegramLogsHandler(logging.Handler):
 
         await call.edit(
             chunks[0],
-            reply_markup=self._gen_web_debug_button(item),
         )
 
         for chunk in chunks[1:]:
             await bot.send_message(chat_id=call.chat_id, text=chunk)
-
-    def _gen_web_debug_button(self, item: LegacyException) -> list:
-        if not item.sysinfo:
-            return []
-
-        if not (url := item.debug_url):
-            try:
-                url = self.web_debugger.feed(*item.sysinfo)
-            except Exception:
-                url = None
-
-            item.debug_url = url
-
-        return [
-            (
-                {
-                    "text": "🐞 Web debugger",
-                    "url": url,
-                }
-                if self.web_debugger
-                else {
-                    "text": "🪲 Start debugger",
-                    "callback": self._start_debugger,
-                    "args": (item,),
-                }
-            )
-        ]
-
-    async def _start_debugger(
-        self,
-        call: "InlineCall",  # type: ignore  # noqa: F821
-        item: LegacyException,
-    ):
-        if not self.web_debugger:
-            self.web_debugger = WebDebugger()
-            await self.web_debugger.proxy_ready.wait()
-
-        url = self.web_debugger.feed(*item.sysinfo)
-        item.debug_url = url
-
-        await call.edit(
-            item.message,
-            reply_markup=self._gen_web_debug_button(item),
-        )
-
-        await call.answer(
-            (
-                "Web debugger started. You can get PIN using .debugger command. \n⚠️"
-                " !DO NOT GIVE IT TO ANYONE! ⚠️"
-            ),
-            show_alert=True,
-        )
 
     def get_logid_by_client(self, client_id: int) -> int:
         return self._mods[client_id].logchat
@@ -372,22 +344,33 @@ class TelegramLogsHandler(logging.Handler):
                     if isinstance(item[0], LegacyException) and (
                         not item[1] or item[1] == client_id or self.force_send_all
                     ):
+                        reply_markup_btns = [
+                            {
+                                "text": "🌙 Full traceback",
+                                "callback": self._show_full_trace,
+                                "args": (
+                                    self._mods[client_id].inline.bot,
+                                    item[0],
+                                ),
+                                "disable_security": True,
+                            },
+                        ]
+                        if "No module named" in item[0].message:
+                            match = re.search(r"'([^']+)'", item[0].message)
+                            if match:
+                                lib = match.group(1)
+                                reply_markup_btns.append(
+                                    {
+                                        "text": "⬇️ Install",
+                                        "callback": self._install_pylib,
+                                        "args": (self._mods[client_id].inline.bot, lib),
+                                    }
+                                )
                         await self._mods[client_id].inline.bot.send_message(
                             self._mods[client_id].logchat,
                             item[0].message,
                             reply_markup=self._mods[client_id].inline.generate_markup(
-                                [
-                                    {
-                                        "text": "🌙 Full traceback",
-                                        "callback": self._show_full_trace,
-                                        "args": (
-                                            self._mods[client_id].inline.bot,
-                                            item[0],
-                                        ),
-                                        "disable_security": True,
-                                    },
-                                    *self._gen_web_debug_button(item[0]),
-                                ]
+                                reply_markup_btns
                             ),
                         )
 

@@ -63,7 +63,7 @@ class LoaderMod(loader.Module):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "MODULES_REPO",
-                "https://mods.xdesai.org/",
+                "https://mods.xdesai.top/",
                 lambda: self.strings("repo_config_doc"),
                 validator=loader.validators.Link(),
             ),

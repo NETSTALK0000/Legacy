@@ -293,6 +293,12 @@ class LegacySecurityMod(loader.Module):
                                             await self._client.get_entity(user, exp=0)
                                         )
                                     ),
+                                    (
+                                        self._db.get(
+                                            main.__name__, "command_prefix", {}
+                                        ).get(f"{user}")
+                                        or "."
+                                    ),
                                 )
                                 for user in group.users
                             ]

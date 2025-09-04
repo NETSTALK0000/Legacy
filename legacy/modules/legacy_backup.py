@@ -245,7 +245,8 @@ class LegacyBackupMod(loader.Module):
             int(f"-100{self._backup_channel.id}"),
             outfile,
             caption=self.strings("backup_caption").format(
-                prefix=self.get_prefix(message.sender_id)
+                prefix=self.get_prefix(message.sender_id),
+                num_of_modules=f"{len(self.allmodules.modules)}",
             ),
             reply_markup=self.inline.generate_markup(
                 [
