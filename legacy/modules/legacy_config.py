@@ -10,6 +10,7 @@ import functools
 import typing
 from math import ceil
 
+import legacytl
 from legacytl.tl.types import Message
 
 from .. import loader, translations, utils
@@ -21,45 +22,88 @@ from ..inline.types import InlineCall
 # `obj_type` of library = "library"
 
 
-ROW_SIZE = 3
-NUM_ROWS = 5
-
-
 @loader.tds
 class LegacyConfigMod(loader.Module):
     strings = {"name": "LegacyConfig"}
 
     @staticmethod
-    def prep_value(value: typing.Any) -> typing.Any:
+    def prep_value(value: typing.Any, _cut: bool = False) -> typing.Any:
         if isinstance(value, str):
-            return f"</b><code>{utils.escape_html(value.strip())}</code><b>"
+            val = (
+                "..."
+                if _cut and len(value) > 0
+                else utils.escape_html(value.strip()) if value else ""
+            )
+            return f"</b><code>{val}</code><b>"
 
         if isinstance(value, list) and value:
-            return (
-                "</b><code>[</code>\n    "
-                + "\n    ".join(
-                    [f"<code>{utils.escape_html(str(item))}</code>" for item in value]
+            val = [
+                (
+                    f"<code>{'...'}</code>"
+                    if _cut and len(value) > 0
+                    else utils.escape_html(item.strip())
                 )
-                + "\n<code>]</code><b>"
-            )
+                for item in value
+            ]
+            return "</b><code>[</code>" + ", ".join(val) + "<code>]</code><b>"
 
-        return f"</b><code>{utils.escape_html(value)}</code><b>"
+        return f"</b><code>{'...' if _cut and value else utils.escape_html(f'{value}') if value else ''}</code><b>"
 
     def hide_value(self, value: typing.Any) -> str:
         if isinstance(value, list) and value:
-            return self.prep_value(["*" * len(str(i)) for i in value])
+            return self.prep_value(["*" * len(str(i)) for i in value], True)
 
-        return self.prep_value("*" * len(str(value)))
+        return self.prep_value("*" * len(str(value)), True)
 
     def _get_value(self, mod: str, option: str) -> str:
         return (
-            self.prep_value(self.lookup(mod).config[option])
+            self.prep_value(self.lookup(mod).config[option], True)
             if (
                 not self.lookup(mod).config._config[option].validator
                 or self.lookup(mod).config._config[option].validator.internal_id
                 != "Hidden"
             )
             else self.hide_value(self.lookup(mod).config[option])
+        )
+
+    def _split_long_config(
+        self, text: str, page: int = 0
+    ) -> typing.Tuple[str, int, bool]:
+        parse_mode = legacytl.utils.sanitize_parse_mode("html")
+        _txt, entities = parse_mode.parse(text)
+        entities = [
+            e
+            for e in entities
+            if not isinstance(e, legacytl.tl.types.MessageEntityBlockquote)
+        ]
+        pages = list(utils.smart_split(_txt, entities, 2048))
+        total_pages = len(pages)
+        has_pagination = total_pages > 1
+
+        if page >= total_pages:
+            page = total_pages - 1
+        elif page < 0:
+            page = 0
+
+        current_text = pages[page]
+
+        if has_pagination:
+            current_text += self.strings["page_num"].format(page + 1, total_pages)
+
+        return current_text, total_pages, has_pagination
+
+    async def inline__config_page(
+        self,
+        call: InlineCall,
+        page: int,
+        mod: str,
+        option: str,
+        obj_type: typing.Union[bool, str] = False,
+        force_hidden: bool = False,
+    ):
+        """Обработчик переключения страниц конфига"""
+        await self.inline__configure_option(
+            call, mod, option, force_hidden, obj_type, page
         )
 
     async def inline__set_config(
@@ -150,9 +194,9 @@ class LegacyConfigMod(loader.Module):
             self.lookup(mod).config[option] = value
         except loader.validators.ValidationError as e:
             await call.edit(
-                self.strings("validation_error").format(e.args[0]),
+                self.strings["validation_error"].format(e.args[0]),
                 reply_markup={
-                    "text": self.strings("try_again"),
+                    "text": self.strings["try_again"],
                     "callback": self.inline__configure_option,
                     "args": (mod, option),
                     "kwargs": {"obj_type": obj_type},
@@ -174,31 +218,55 @@ class LegacyConfigMod(loader.Module):
             )
         )
 
-        await call.edit(
-            self.strings(
+        config_text = self.strings[
+            (
                 "configuring_option"
                 if isinstance(obj_type, bool)
                 else "configuring_option_lib"
-            ).format(
-                utils.escape_html(option),
-                utils.escape_html(mod),
-                utils.escape_html(self.lookup(mod).config.getdoc(option)),
-                self.prep_value(self.lookup(mod).config.getdef(option)),
-                (
-                    self.prep_value(self.lookup(mod).config[option])
-                    if not validator or validator.internal_id != "Hidden"
-                    else self.hide_value(self.lookup(mod).config[option])
-                ),
-                (
-                    self.strings("typehint").format(
-                        doc,
-                        eng_art="n" if doc.lower().startswith(tuple("euioay")) else "",
-                    )
-                    if doc
-                    else ""
-                ),
+            )
+        ].format(
+            utils.escape_html(option),
+            utils.escape_html(mod),
+            utils.escape_html(self.lookup(mod).config.getdoc(option)),
+            self.prep_value(self.lookup(mod).config.getdef(option)),
+            (
+                self.prep_value(self.lookup(mod).config[option])
+                if not validator or validator.internal_id != "Hidden"
+                else self.hide_value(self.lookup(mod).config[option])
             ),
-            reply_markup=self._generate_bool_markup(mod, option, obj_type),
+            (
+                self.strings["typehint"].format(
+                    doc,
+                    eng_art="n" if doc.lower().startswith(tuple("euioay")) else "",
+                )
+                if doc
+                else ""
+            ),
+        )
+
+        formatted_text, total_pages, has_pagination = self._split_long_config(
+            config_text
+        )
+
+        markup = self._generate_bool_markup(mod, option, obj_type)
+
+        if has_pagination:
+            pagination_row = self.inline.build_pagination(
+                callback=functools.partial(
+                    self.inline__config_page,
+                    mod=mod,
+                    option=option,
+                    obj_type=obj_type,
+                    force_hidden=(validator and validator.internal_id == "Hidden"),
+                ),
+                total_pages=total_pages,
+                current_page=1,
+            )
+            markup = pagination_row + markup
+
+        await call.edit(
+            formatted_text,
+            reply_markup=markup,
         )
 
         await call.answer("✅")
@@ -664,6 +732,7 @@ class LegacyConfigMod(loader.Module):
         config_opt: str,
         force_hidden: bool = False,
         obj_type: typing.Union[bool, str] = False,
+        page: int = 0,
     ):
         module = self.lookup(mod)
         args = [
@@ -690,8 +759,7 @@ class LegacyConfigMod(loader.Module):
                         {
                             "text": self.strings("hide_value"),
                             "callback": self.inline__configure_option,
-                            "args": (mod, config_opt, False),
-                            "kwargs": {"obj_type": obj_type},
+                            "args": (mod, config_opt, False, obj_type, page),
                         }
                     ]
                 ]
@@ -701,8 +769,7 @@ class LegacyConfigMod(loader.Module):
                         {
                             "text": self.strings("show_hidden"),
                             "callback": self.inline__configure_option,
-                            "args": (mod, config_opt, True),
-                            "kwargs": {"obj_type": obj_type},
+                            "args": (mod, config_opt, True, obj_type, page),
                         }
                     ]
                 ]
@@ -735,64 +802,64 @@ class LegacyConfigMod(loader.Module):
                     eng_art="n" if doc.lower().startswith(tuple("euioay")) else "",
                 )
             ]
+
+        config_text = self.strings(
+            "configuring_option"
+            if isinstance(obj_type, bool)
+            else "configuring_option_lib"
+        ).format(*args)
+
+        formatted_text, total_pages, has_pagination = self._split_long_config(
+            config_text, page
+        )
+
+        main_markup = []
+        if validator:
             if validator.internal_id == "Boolean":
-                await call.edit(
-                    self.strings(
-                        "configuring_option"
-                        if isinstance(obj_type, bool)
-                        else "configuring_option_lib"
-                    ).format(*args),
-                    reply_markup=additonal_button_row
-                    + self._generate_bool_markup(mod, config_opt, obj_type),
+                main_markup = self._generate_bool_markup(mod, config_opt, obj_type)
+            elif validator.internal_id == "Series":
+                main_markup = self._generate_series_markup(
+                    call, mod, config_opt, obj_type
                 )
-                return
-
-            if validator.internal_id == "Series":
-                await call.edit(
-                    self.strings(
-                        "configuring_option"
-                        if isinstance(obj_type, bool)
-                        else "configuring_option_lib"
-                    ).format(*args),
-                    reply_markup=additonal_button_row
-                    + self._generate_series_markup(call, mod, config_opt, obj_type),
+            elif validator.internal_id == "Choice":
+                main_markup = self._generate_choice_markup(
+                    call, mod, config_opt, obj_type
                 )
-                return
-
-            if validator.internal_id == "Choice":
-                await call.edit(
-                    self.strings(
-                        "configuring_option"
-                        if isinstance(obj_type, bool)
-                        else "configuring_option_lib"
-                    ).format(*args),
-                    reply_markup=additonal_button_row
-                    + self._generate_choice_markup(call, mod, config_opt, obj_type),
+            elif validator.internal_id == "MultiChoice":
+                main_markup = self._generate_multi_choice_markup(
+                    call, mod, config_opt, obj_type
                 )
-                return
-
-            if validator.internal_id == "MultiChoice":
-                await call.edit(
-                    self.strings(
-                        "configuring_option"
-                        if isinstance(obj_type, bool)
-                        else "configuring_option_lib"
-                    ).format(*args),
-                    reply_markup=additonal_button_row
-                    + self._generate_multi_choice_markup(
-                        call, mod, config_opt, obj_type
-                    ),
-                )
-                return
-
-        await call.edit(
-            self.strings(
-                "configuring_option"
-                if isinstance(obj_type, bool)
-                else "configuring_option_lib"
-            ).format(*args),
-            reply_markup=additonal_button_row
-            + [
+            else:
+                main_markup = [
+                    [
+                        {
+                            "text": self.strings("enter_value_btn"),
+                            "input": self.strings("enter_value_desc"),
+                            "handler": self.inline__set_config,
+                            "args": (mod, config_opt, call.inline_message_id),
+                            "kwargs": {"obj_type": obj_type},
+                        }
+                    ],
+                    [
+                        {
+                            "text": self.strings("set_default_btn"),
+                            "callback": self.inline__reset_default,
+                            "args": (mod, config_opt),
+                            "kwargs": {"obj_type": obj_type},
+                        }
+                    ],
+                    [
+                        {
+                            "text": self.strings("back_btn"),
+                            "callback": self.inline__configure,
+                            "args": (mod,),
+                            "kwargs": {"obj_type": obj_type},
+                        },
+                        {"text": self.strings("close_btn"), "action": "close"},
+                    ],
+                ]
+        else:
+            main_markup = [
                 [
                     {
                         "text": self.strings("enter_value_btn"),
@@ -819,7 +886,25 @@ class LegacyConfigMod(loader.Module):
                     },
                     {"text": self.strings("close_btn"), "action": "close"},
                 ],
-            ],
+            ]
+
+        if has_pagination:
+            pagination_row = self.inline.build_pagination(
+                callback=functools.partial(
+                    self.inline__config_page,
+                    mod=mod,
+                    option=config_opt,
+                    obj_type=obj_type,
+                    force_hidden=force_hidden,
+                ),
+                total_pages=total_pages,
+                current_page=page + 1,
+            )
+            main_markup = pagination_row + main_markup
+
+        await call.edit(
+            formatted_text,
+            reply_markup=additonal_button_row + main_markup,
         )
 
     async def inline__configure(
@@ -924,7 +1009,7 @@ class LegacyConfigMod(loader.Module):
 
         kb = []
         for mod_row in utils.chunks(
-            to_config[page * NUM_ROWS * ROW_SIZE : (page + 1) * NUM_ROWS * ROW_SIZE],
+            to_config[page * 5 * 3 : (page + 1) * 5 * 3],
             3,
         ):
             row = [
@@ -939,12 +1024,12 @@ class LegacyConfigMod(loader.Module):
             ]
             kb += [row]
 
-        if len(to_config) > NUM_ROWS * ROW_SIZE:
+        if len(to_config) > 5 * 3:
             kb += self.inline.build_pagination(
                 callback=functools.partial(
                     self.inline__global_config, obj_type=obj_type
                 ),
-                total_pages=ceil(len(to_config) / (NUM_ROWS * ROW_SIZE)),
+                total_pages=ceil(len(to_config) / (5 * 3)),
                 current_page=page + 1,
             )
 

@@ -21,7 +21,7 @@ from logging.handlers import RotatingFileHandler
 
 import legacytl
 from legacytl.errors.rpcbaseerrors import ServerError, RPCError
-from aiogram.utils.exceptions import NetworkError
+from aiogram.utils.exceptions import NetworkError, RetryAfter
 
 from . import utils
 from .tl_cache import CustomTelegramClient
@@ -65,6 +65,8 @@ def override_text(exception: Exception) -> typing.Optional[str]:
         return (
             "🕓 <b>Telegram translation service timed out. Please try again later.</b>"
         )
+    if isinstance(exception, RetryAfter):
+        return f"🕓 <b>{traceback.format_exception_only(type(exception), exception)[0].split(':')[1].strip()}</b>"
     if isinstance(exception, ModuleNotFoundError):
         return f"📦 <b>{traceback.format_exception_only(type(exception), exception)[0].split(':')[1].strip()}</b>"
     if isinstance(exception, asyncio.InvalidStateError):

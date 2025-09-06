@@ -272,6 +272,7 @@ legacy_config:
   try_again: "🔁 Try again"
   typehint: "🕵️ <b>Must be a{eng_art} {}</b>"
   set: "set"
+  page_num: "\n\n<i>Page {}/{}</i>"
   set_default_btn: "♻️ Reset default"
   enter_value_btn: "✍️ Enter value"
   enter_value_desc: "✍️ Enter new configuration value for this option"
