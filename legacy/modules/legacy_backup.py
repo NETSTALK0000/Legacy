@@ -203,7 +203,7 @@ class LegacyBackupMod(loader.Module):
             await self._client.get_messages(
                 self._backup_channel, ids=call.message.message_id
             )
-        )[0].download_media(bytes)
+        ).download_media(bytes)
 
         try:
             file = io.BytesIO(file)
