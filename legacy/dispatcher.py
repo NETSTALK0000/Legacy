@@ -276,7 +276,7 @@ class CommandDispatcher:
 
         key = main.__name__
         default = "."
-        prefix = self._db.get(key, "command_prefix", None)
+        prefix = self._db.get(key, "command_prefix", default)
         if prefix:
             if isinstance(prefix, str):
                 self._db.set(key, "command_prefix", {f"{self.client.tg_id}": prefix})

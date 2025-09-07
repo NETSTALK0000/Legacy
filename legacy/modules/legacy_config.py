@@ -101,7 +101,6 @@ class LegacyConfigMod(loader.Module):
         obj_type: typing.Union[bool, str] = False,
         force_hidden: bool = False,
     ):
-        """Обработчик переключения страниц конфига"""
         await self.inline__configure_option(
             call, mod, option, force_hidden, obj_type, page
         )
