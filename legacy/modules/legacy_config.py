@@ -70,11 +70,11 @@ class LegacyConfigMod(loader.Module):
         self, text: str, page: int = 0
     ) -> typing.Tuple[str, int, bool]:
         parse_mode = legacytl.utils.sanitize_parse_mode("html")
-        _txt, entities = parse_mode.parse(text)
+        _txt, entities = parse_mode.parse(text)  # type: ignore
         entities = [
             e
             for e in entities
-            if not isinstance(e, legacytl.tl.types.MessageEntityBlockquote)
+            if not isinstance(e, legacytl.tl.types.MessageEntityBlockquote)  # type: ignore
         ]
         pages = list(utils.smart_split(_txt, entities, 2048))
         total_pages = len(pages)
@@ -118,9 +118,9 @@ class LegacyConfigMod(loader.Module):
             self.lookup(mod).config[option] = query
         except loader.validators.ValidationError as e:
             await call.edit(
-                self.strings("validation_error").format(e.args[0]),
+                self.strings["validation_error"].format(e.args[0]),
                 reply_markup={
-                    "text": self.strings("try_again"),
+                    "text": self.strings["try_again"],
                     "callback": self.inline__configure_option,
                     "args": (mod, option),
                     "kwargs": {"obj_type": obj_type},
@@ -129,9 +129,9 @@ class LegacyConfigMod(loader.Module):
             return
 
         await call.edit(
-            self.strings(
+            self.strings[
                 "option_saved" if isinstance(obj_type, bool) else "option_saved_lib"
-            ).format(
+            ].format(
                 utils.escape_html(option),
                 utils.escape_html(mod),
                 self._get_value(mod, option),
@@ -139,12 +139,12 @@ class LegacyConfigMod(loader.Module):
             reply_markup=[
                 [
                     {
-                        "text": self.strings("back_btn"),
+                        "text": self.strings["back_btn"],
                         "callback": self.inline__configure,
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {"text": self.strings["close_btn"], "action": "close"},
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -161,9 +161,9 @@ class LegacyConfigMod(loader.Module):
         mod_instance.config[option] = mod_instance.config.getdef(option)
 
         await call.edit(
-            self.strings(
+            self.strings[
                 "option_reset" if isinstance(obj_type, bool) else "option_reset_lib"
-            ).format(
+            ].format(
                 utils.escape_html(option),
                 utils.escape_html(mod),
                 self._get_value(mod, option),
@@ -171,12 +171,12 @@ class LegacyConfigMod(loader.Module):
             reply_markup=[
                 [
                     {
-                        "text": self.strings("back_btn"),
+                        "text": self.strings["back_btn"],
                         "callback": self.inline__configure,
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {"text": self.strings["close_btn"], "action": "close"},
                 ]
             ],
         )
@@ -281,7 +281,7 @@ class LegacyConfigMod(loader.Module):
                 *(
                     [
                         {
-                            "text": f"❌ {self.strings('set')} `False`",
+                            "text": f"❌ {self.strings['set']} `False`",
                             "callback": self.inline__set_bool,
                             "args": (mod, option, False),
                             "kwargs": {"obj_type": obj_type},
@@ -290,7 +290,7 @@ class LegacyConfigMod(loader.Module):
                     if self.lookup(mod).config[option]
                     else [
                         {
-                            "text": f"✅ {self.strings('set')} `True`",
+                            "text": f"✅ {self.strings['set']} `True`",
                             "callback": self.inline__set_bool,
                             "args": (mod, option, True),
                             "kwargs": {"obj_type": obj_type},
@@ -302,7 +302,7 @@ class LegacyConfigMod(loader.Module):
                 *(
                     [
                         {
-                            "text": self.strings("set_default_btn"),
+                            "text": self.strings["set_default_btn"],
                             "callback": self.inline__reset_default,
                             "args": (mod, option),
                             "kwargs": {"obj_type": obj_type},
@@ -315,12 +315,12 @@ class LegacyConfigMod(loader.Module):
             ],
             [
                 {
-                    "text": self.strings("back_btn"),
+                    "text": self.strings["back_btn"],
                     "callback": self.inline__configure,
                     "args": (mod,),
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {"text": self.strings["close_btn"], "action": "close"},
             ],
         ]
 
@@ -338,17 +338,17 @@ class LegacyConfigMod(loader.Module):
                 query = ast.literal_eval(query)
 
             if isinstance(query, (set, tuple)):
-                query = list(query)
+                query = list(query)  # type: ignore
 
             if not isinstance(query, list):
-                query = [query]
+                query = [query]  # type: ignore
 
             self.lookup(mod).config[option] = self.lookup(mod).config[option] + query
         except loader.validators.ValidationError as e:
             await call.edit(
-                self.strings("validation_error").format(e.args[0]),
+                self.strings["validation_error"].format(e.args[0]),
                 reply_markup={
-                    "text": self.strings("try_again"),
+                    "text": self.strings["try_again"],
                     "callback": self.inline__configure_option,
                     "args": (mod, option),
                     "kwargs": {"obj_type": obj_type},
@@ -357,9 +357,9 @@ class LegacyConfigMod(loader.Module):
             return
 
         await call.edit(
-            self.strings(
+            self.strings[
                 "option_saved" if isinstance(obj_type, bool) else "option_saved_lib"
-            ).format(
+            ].format(
                 utils.escape_html(option),
                 utils.escape_html(mod),
                 self._get_value(mod, option),
@@ -367,12 +367,12 @@ class LegacyConfigMod(loader.Module):
             reply_markup=[
                 [
                     {
-                        "text": self.strings("back_btn"),
+                        "text": self.strings["back_btn"],
                         "callback": self.inline__configure,
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {"text": self.strings["close_btn"], "action": "close"},
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -392,12 +392,12 @@ class LegacyConfigMod(loader.Module):
                 query = ast.literal_eval(query)
 
             if isinstance(query, (set, tuple)):
-                query = list(query)
+                query = list(query)  # type: ignore
 
             if not isinstance(query, list):
-                query = [query]
+                query = [query]  # type: ignore
 
-            query = list(map(str, query))
+            query = list(map(str, query))  # type: ignore
 
             old_config_len = len(self.lookup(mod).config[option])
 
@@ -412,9 +412,9 @@ class LegacyConfigMod(loader.Module):
                 )
         except loader.validators.ValidationError as e:
             await call.edit(
-                self.strings("validation_error").format(e.args[0]),
+                self.strings["validation_error"].format(e.args[0]),
                 reply_markup={
-                    "text": self.strings("try_again"),
+                    "text": self.strings["try_again"],
                     "callback": self.inline__configure_option,
                     "args": (mod, option),
                     "kwargs": {"obj_type": obj_type},
@@ -423,9 +423,9 @@ class LegacyConfigMod(loader.Module):
             return
 
         await call.edit(
-            self.strings(
+            self.strings[
                 "option_saved" if isinstance(obj_type, bool) else "option_saved_lib"
-            ).format(
+            ].format(
                 utils.escape_html(option),
                 utils.escape_html(mod),
                 self._get_value(mod, option),
@@ -433,12 +433,12 @@ class LegacyConfigMod(loader.Module):
             reply_markup=[
                 [
                     {
-                        "text": self.strings("back_btn"),
+                        "text": self.strings["back_btn"],
                         "callback": self.inline__configure,
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {"text": self.strings["close_btn"], "action": "close"},
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -454,8 +454,8 @@ class LegacyConfigMod(loader.Module):
         return [
             [
                 {
-                    "text": self.strings("enter_value_btn"),
-                    "input": self.strings("enter_value_desc"),
+                    "text": self.strings["enter_value_btn"],
+                    "input": self.strings["enter_value_desc"],
                     "handler": self.inline__set_config,
                     "args": (mod, option, call.inline_message_id),
                     "kwargs": {"obj_type": obj_type},
@@ -465,15 +465,15 @@ class LegacyConfigMod(loader.Module):
                 *(
                     [
                         {
-                            "text": self.strings("remove_item_btn"),
-                            "input": self.strings("remove_item_desc"),
+                            "text": self.strings["remove_item_btn"],
+                            "input": self.strings["remove_item_desc"],
                             "handler": self.inline__remove_item,
                             "args": (mod, option, call.inline_message_id),
                             "kwargs": {"obj_type": obj_type},
                         },
                         {
-                            "text": self.strings("add_item_btn"),
-                            "input": self.strings("add_item_desc"),
+                            "text": self.strings["add_item_btn"],
+                            "input": self.strings["add_item_desc"],
                             "handler": self.inline__add_item,
                             "args": (mod, option, call.inline_message_id),
                             "kwargs": {"obj_type": obj_type},
@@ -487,7 +487,7 @@ class LegacyConfigMod(loader.Module):
                 *(
                     [
                         {
-                            "text": self.strings("set_default_btn"),
+                            "text": self.strings["set_default_btn"],
                             "callback": self.inline__reset_default,
                             "args": (mod, option),
                             "kwargs": {"obj_type": obj_type},
@@ -500,12 +500,12 @@ class LegacyConfigMod(loader.Module):
             ],
             [
                 {
-                    "text": self.strings("back_btn"),
+                    "text": self.strings["back_btn"],
                     "callback": self.inline__configure,
                     "args": (mod,),
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {"text": self.strings["close_btn"], "action": "close"},
             ],
         ]
 
@@ -521,9 +521,9 @@ class LegacyConfigMod(loader.Module):
             self.lookup(mod).config[option] = value
         except loader.validators.ValidationError as e:
             await call.edit(
-                self.strings("validation_error").format(e.args[0]),
+                self.strings["validation_error"].format(e.args[0]),
                 reply_markup={
-                    "text": self.strings("try_again"),
+                    "text": self.strings["try_again"],
                     "callback": self.inline__configure_option,
                     "args": (mod, option),
                     "kwargs": {"obj_type": obj_type},
@@ -532,9 +532,9 @@ class LegacyConfigMod(loader.Module):
             return
 
         await call.edit(
-            self.strings(
+            self.strings[
                 "option_saved" if isinstance(obj_type, bool) else "option_saved_lib"
-            ).format(
+            ].format(
                 utils.escape_html(option),
                 utils.escape_html(mod),
                 self._get_value(mod, option),
@@ -542,12 +542,12 @@ class LegacyConfigMod(loader.Module):
             reply_markup=[
                 [
                     {
-                        "text": self.strings("back_btn"),
+                        "text": self.strings["back_btn"],
                         "callback": self.inline__configure,
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {"text": self.strings["close_btn"], "action": "close"},
                 ]
             ],
         )
@@ -573,9 +573,9 @@ class LegacyConfigMod(loader.Module):
             self.lookup(mod).config.reload()
         except loader.validators.ValidationError as e:
             await call.edit(
-                self.strings("validation_error").format(e.args[0]),
+                self.strings["validation_error"].format(e.args[0]),
                 reply_markup={
-                    "text": self.strings("try_again"),
+                    "text": self.strings["try_again"],
                     "callback": self.inline__configure_option,
                     "args": (mod, option),
                     "kwargs": {"obj_type": obj_type},
@@ -601,8 +601,8 @@ class LegacyConfigMod(loader.Module):
         return [
             [
                 {
-                    "text": self.strings("enter_value_btn"),
-                    "input": self.strings("enter_value_desc"),
+                    "text": self.strings["enter_value_btn"],
+                    "input": self.strings["enter_value_desc"],
                     "handler": self.inline__set_config,
                     "args": (mod, option, call.inline_message_id),
                     "kwargs": {"obj_type": obj_type},
@@ -633,7 +633,7 @@ class LegacyConfigMod(loader.Module):
                 *(
                     [
                         {
-                            "text": self.strings("set_default_btn"),
+                            "text": self.strings["set_default_btn"],
                             "callback": self.inline__reset_default,
                             "args": (mod, option),
                             "kwargs": {"obj_type": obj_type},
@@ -646,12 +646,12 @@ class LegacyConfigMod(loader.Module):
             ],
             [
                 {
-                    "text": self.strings("back_btn"),
+                    "text": self.strings["back_btn"],
                     "callback": self.inline__configure,
                     "args": (mod,),
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {"text": self.strings["close_btn"], "action": "close"},
             ],
         ]
 
@@ -670,8 +670,8 @@ class LegacyConfigMod(loader.Module):
         return [
             [
                 {
-                    "text": self.strings("enter_value_btn"),
-                    "input": self.strings("enter_value_desc"),
+                    "text": self.strings["enter_value_btn"],
+                    "input": self.strings["enter_value_desc"],
                     "handler": self.inline__set_config,
                     "args": (mod, option, call.inline_message_id),
                     "kwargs": {"obj_type": obj_type},
@@ -702,7 +702,7 @@ class LegacyConfigMod(loader.Module):
                 *(
                     [
                         {
-                            "text": self.strings("set_default_btn"),
+                            "text": self.strings["set_default_btn"],
                             "callback": self.inline__reset_default,
                             "args": (mod, option),
                             "kwargs": {"obj_type": obj_type},
@@ -715,12 +715,12 @@ class LegacyConfigMod(loader.Module):
             ],
             [
                 {
-                    "text": self.strings("back_btn"),
+                    "text": self.strings["back_btn"],
                     "callback": self.inline__configure,
                     "args": (mod,),
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {"text": self.strings["close_btn"], "action": "close"},
             ],
         ]
 
@@ -756,7 +756,7 @@ class LegacyConfigMod(loader.Module):
                 [
                     [
                         {
-                            "text": self.strings("hide_value"),
+                            "text": self.strings["hide_value"],
                             "callback": self.inline__configure_option,
                             "args": (mod, config_opt, False, obj_type, page),
                         }
@@ -766,7 +766,7 @@ class LegacyConfigMod(loader.Module):
                 else [
                     [
                         {
-                            "text": self.strings("show_hidden"),
+                            "text": self.strings["show_hidden"],
                             "callback": self.inline__configure_option,
                             "args": (mod, config_opt, True, obj_type, page),
                         }
@@ -796,17 +796,19 @@ class LegacyConfigMod(loader.Module):
             args += [""]
         else:
             args += [
-                self.strings("typehint").format(
+                self.strings["typehint"].format(
                     doc,
                     eng_art="n" if doc.lower().startswith(tuple("euioay")) else "",
                 )
             ]
 
-        config_text = self.strings(
-            "configuring_option"
-            if isinstance(obj_type, bool)
-            else "configuring_option_lib"
-        ).format(*args)
+        config_text = self.strings[
+            (
+                "configuring_option"
+                if isinstance(obj_type, bool)
+                else "configuring_option_lib"
+            )
+        ].format(*args)
 
         formatted_text, total_pages, has_pagination = self._split_long_config(
             config_text, page
@@ -832,8 +834,8 @@ class LegacyConfigMod(loader.Module):
                 main_markup = [
                     [
                         {
-                            "text": self.strings("enter_value_btn"),
-                            "input": self.strings("enter_value_desc"),
+                            "text": self.strings["enter_value_btn"],
+                            "input": self.strings["enter_value_desc"],
                             "handler": self.inline__set_config,
                             "args": (mod, config_opt, call.inline_message_id),
                             "kwargs": {"obj_type": obj_type},
@@ -841,7 +843,7 @@ class LegacyConfigMod(loader.Module):
                     ],
                     [
                         {
-                            "text": self.strings("set_default_btn"),
+                            "text": self.strings["set_default_btn"],
                             "callback": self.inline__reset_default,
                             "args": (mod, config_opt),
                             "kwargs": {"obj_type": obj_type},
@@ -849,20 +851,20 @@ class LegacyConfigMod(loader.Module):
                     ],
                     [
                         {
-                            "text": self.strings("back_btn"),
+                            "text": self.strings["back_btn"],
                             "callback": self.inline__configure,
                             "args": (mod,),
                             "kwargs": {"obj_type": obj_type},
                         },
-                        {"text": self.strings("close_btn"), "action": "close"},
+                        {"text": self.strings["close_btn"], "action": "close"},
                     ],
                 ]
         else:
             main_markup = [
                 [
                     {
-                        "text": self.strings("enter_value_btn"),
-                        "input": self.strings("enter_value_desc"),
+                        "text": self.strings["enter_value_btn"],
+                        "input": self.strings["enter_value_desc"],
                         "handler": self.inline__set_config,
                         "args": (mod, config_opt, call.inline_message_id),
                         "kwargs": {"obj_type": obj_type},
@@ -870,7 +872,7 @@ class LegacyConfigMod(loader.Module):
                 ],
                 [
                     {
-                        "text": self.strings("set_default_btn"),
+                        "text": self.strings["set_default_btn"],
                         "callback": self.inline__reset_default,
                         "args": (mod, config_opt),
                         "kwargs": {"obj_type": obj_type},
@@ -878,12 +880,12 @@ class LegacyConfigMod(loader.Module):
                 ],
                 [
                     {
-                        "text": self.strings("back_btn"),
+                        "text": self.strings["back_btn"],
                         "callback": self.inline__configure,
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {"text": self.strings["close_btn"], "action": "close"},
                 ],
             ]
 
@@ -923,9 +925,9 @@ class LegacyConfigMod(loader.Module):
         ]
 
         await call.edit(
-            self.strings(
+            self.strings[
                 "configuring_mod" if isinstance(obj_type, bool) else "configuring_lib"
-            ).format(
+            ].format(
                 utils.escape_html(mod),
                 "\n".join(
                     [
@@ -941,28 +943,28 @@ class LegacyConfigMod(loader.Module):
             + [
                 [
                     {
-                        "text": self.strings("back_btn"),
+                        "text": self.strings["back_btn"],
                         "callback": self.inline__global_config,
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {"text": self.strings["close_btn"], "action": "close"},
                 ]
             ],
         )
 
     async def inline__choose_category(self, call: typing.Union[Message, InlineCall]):
         await utils.answer(
-            call,
-            self.strings("choose_core"),
+            call,  # type: ignore
+            self.strings["choose_core"],
             reply_markup=[
                 [
                     {
-                        "text": self.strings("builtin"),
+                        "text": self.strings["builtin"],
                         "callback": self.inline__global_config,
                         "kwargs": {"obj_type": True},
                     },
                     {
-                        "text": self.strings("external"),
+                        "text": self.strings["external"],
                         "callback": self.inline__global_config,
                     },
                 ],
@@ -970,17 +972,17 @@ class LegacyConfigMod(loader.Module):
                     [
                         [
                             {
-                                "text": self.strings("libraries"),
+                                "text": self.strings["libraries"],
                                 "callback": self.inline__global_config,
                                 "kwargs": {"obj_type": "library"},
                             }
                         ]
                     ]
-                    if self.allmodules.libraries
-                    and any(hasattr(lib, "config") for lib in self.allmodules.libraries)
+                    if self.allmodules.libraries  # type: ignore
+                    and any(hasattr(lib, "config") for lib in self.allmodules.libraries)  # type: ignore
                     else []
                 ),
-                [{"text": self.strings("close_btn"), "action": "close"}],
+                [{"text": self.strings["close_btn"], "action": "close"}],
             ],
         )
 
@@ -993,7 +995,7 @@ class LegacyConfigMod(loader.Module):
         if isinstance(obj_type, bool):
             to_config = [
                 mod.strings("name")
-                for mod in self.allmodules.modules
+                for mod in self.allmodules.modules  # type: ignore
                 if hasattr(mod, "config")
                 and callable(mod.strings)
                 and (mod.__origin__.startswith("<core") or not obj_type)
@@ -1001,10 +1003,10 @@ class LegacyConfigMod(loader.Module):
             ]
         else:
             to_config = [
-                lib.name for lib in self.allmodules.libraries if hasattr(lib, "config")
+                lib.name for lib in self.allmodules.libraries if hasattr(lib, "config")  # type: ignore
             ]
 
-        to_config.sort()
+        to_config.sort()  # type: ignore
 
         kb = []
         for mod_row in utils.chunks(
@@ -1035,23 +1037,23 @@ class LegacyConfigMod(loader.Module):
         kb += [
             [
                 {
-                    "text": self.strings("back_btn"),
+                    "text": self.strings["back_btn"],
                     "callback": self.inline__choose_category,
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {"text": self.strings["close_btn"], "action": "close"},
             ]
         ]
 
         await call.edit(
-            self.strings(
+            self.strings[
                 "configure" if isinstance(obj_type, bool) else "configure_lib"
-            ),
+            ],
             reply_markup=kb,
         )
 
     @loader.command(alias="cfg")
     async def configcmd(self, message: Message):
-        args = utils.get_args_raw(message)
+        args = utils.get_args_raw(message)  # type: ignore
         if self.lookup(args) and hasattr(self.lookup(args), "config"):
             form = await self.inline.form("🌙", message, silent=True)
             mod = self.lookup(args)
@@ -1067,30 +1069,32 @@ class LegacyConfigMod(loader.Module):
 
     @loader.command(alias="fcfg")
     async def fconfig(self, message: Message):
-        args = utils.get_args_raw(message).split(maxsplit=2)
+        args = utils.get_args_raw(message).split(maxsplit=2)  # type: ignore
 
         if len(args) < 3:
-            await utils.answer(message, self.strings("args"))
+            await utils.answer(message, self.strings["args"])  # type: ignore
             return
 
         mod, option, value = args
 
         if not (instance := self.lookup(mod)):
-            await utils.answer(message, self.strings("no_mod"))
+            await utils.answer(message, self.strings["no_mod"])  # type: ignore
             return
 
         if option not in instance.config:
-            await utils.answer(message, self.strings("no_option"))
+            await utils.answer(message, self.strings["no_option"])  # type: ignore
             return
 
         instance.config[option] = value
         await utils.answer(
-            message,
-            self.strings(
-                "option_saved"
-                if isinstance(instance, loader.Module)
-                else "option_saved_lib"
-            ).format(
+            message,  # type: ignore
+            self.strings[
+                (
+                    "option_saved"
+                    if isinstance(instance, loader.Module)
+                    else "option_saved_lib"
+                )
+            ].format(
                 utils.escape_html(option),
                 utils.escape_html(mod),
                 self._get_value(mod, option),

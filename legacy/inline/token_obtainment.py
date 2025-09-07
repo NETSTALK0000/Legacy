@@ -54,7 +54,7 @@ class TokenObtainment(InlineUnit):
                 username = f"@legacy_{uid}_bot"
 
             for msg in [
-                "🌙 Legacy userbot"[:64],
+                f"Legacy {utils.get_version_raw()} Bot"[:64],
                 username,
                 "/setuserpic",
                 username,
@@ -115,7 +115,9 @@ class TokenObtainment(InlineUnit):
                             data = await response.json()
 
                             if data.get("ok"):
-                                logger.info("Token validation successful. It will be used for inline bot")
+                                logger.info(
+                                    "Token validation successful. It will be used for inline bot"
+                                )
                                 self._token = passed_token
                                 self._db.set("legacy.inline", "bot_token", self._token)
 
@@ -125,7 +127,9 @@ class TokenObtainment(InlineUnit):
                 except aiohttp.ClientConnectionError as e:
                     logger.error(f"Connection error during token validation: {e}")
                 except Exception as e:
-                    logger.error(f"An unexpected error occurred during token validation: {e}")
+                    logger.error(
+                        f"An unexpected error occurred during token validation: {e}"
+                    )
 
         if self._token:
             return True
@@ -170,7 +174,9 @@ class TokenObtainment(InlineUnit):
                         "legacy.inline", "custom_bot", False
                     ) and self._db.get(
                         "legacy.inline", "custom_bot", False
-                    ) != button.text.strip("@"):
+                    ) != button.text.strip(
+                        "@"
+                    ):
                         continue
 
                     if not self._db.get(
