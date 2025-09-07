@@ -288,6 +288,7 @@ class CommandDispatcher:
         prefix = self._db.get(key, "command_prefix", {}).get(
             f"{event.sender_id}", set_default_prefix
         )
+
         change = str.maketrans(ru_keys + en_keys, en_keys + ru_keys)
         message = utils.censor(event.message)
 
