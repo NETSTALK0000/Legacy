@@ -11,7 +11,6 @@ import os
 
 from legacytl.errors.rpcerrorlist import YouBlockedUserError
 from legacytl.tl.functions.contacts import UnblockRequest
-from legacytl.tl.types import Message
 
 from .. import loader, utils
 from ..inline.types import BotInlineMessage
@@ -37,12 +36,12 @@ class InlineStuff(loader.Module):
         "only_inline",
         contains="This message will be deleted automatically",
     )
-    async def watcher(self, message: Message):
+    async def watcher(self, message):
         if message.via_bot_id == self.inline.bot_id:
             await message.delete()
 
     @loader.watcher("out", "only_inline", contains="Opening gallery...")
-    async def gallery_watcher(self, message: Message):
+    async def gallery_watcher(self, message):
         if message.via_bot_id != self.inline.bot_id:
             return
 
@@ -93,7 +92,7 @@ class InlineStuff(loader.Module):
                     return True
 
     @loader.command()
-    async def ch_legacy_bot(self, message: Message):
+    async def ch_legacy_bot(self, message):
         args = utils.get_args_raw(message).strip("@")
         if (
             not args
@@ -121,11 +120,20 @@ class InlineStuff(loader.Module):
         await utils.answer(message, self.strings["bot_updated"])
 
     @loader.command()
-    async def ch_bot_token(self, message: Message):
+    async def ch_bot_token(self, message):
         args = utils.get_args_raw(message)
 
         if not args:
             await utils.answer(message, self.strings["token_not_provided"])
+            return
+
+        if not re.match(r"^\d{8,10}:[a-zA-Z0-9_-]{35}$", args):
+            await utils.answer(
+                message,
+                self.strings["invalid_token_format"].format(
+                    "1234567890:skjdfh7yrh7832href83nfiosefh723o8i"
+                ),
+            )
             return
 
         self._db.set("legacy.inline", "bot_token", args)
@@ -133,7 +141,7 @@ class InlineStuff(loader.Module):
         await utils.answer(message, self.strings["token_changed"])
 
     @loader.command()
-    async def iauth(self, message: Message, force: bool = False):
+    async def iauth(self, message, force: bool = False):
         if "SHARKHOST" in os.environ:
             await utils.answer(message, self.strings["forbid"])
             return
