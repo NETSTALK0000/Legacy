@@ -156,15 +156,16 @@ class SudoMessageEditor(MessageEditor):
             and self.state == 1
         ):
             logger.debug("switching state to 0")
-            await self.authmsg.edit(self.strings("auth_failed"))
+            await utils.answer(self.message, self.strings("auth_fail"))
             self.state = 0
             handled = True
             await asyncio.sleep(2)
-            await self.authmsg.delete()
+            if self.authmsg:
+                await self.authmsg.delete()
 
         if lastlines[0] == self.PASS_REQ and self.state == 0:
             logger.debug("Success to find sudo log!")
-            text = self.strings("auth_needed").format(self._tg_id)
+            text = self.strings("auth_needed").format(self.message.client.legacy_me.id)
 
             try:
                 await utils.answer(self.message, text)
@@ -175,14 +176,14 @@ class SudoMessageEditor(MessageEditor):
             command = "<code>" + utils.escape_html(self.command) + "</code>"
             user = utils.escape_html(lastlines[1][:-1])
 
-            self.authmsg = await self.message[0].client.send_message(
+            self.authmsg = await self.message.client.send_message(
                 "me",
                 self.strings("auth_msg").format(command, user),
             )
             logger.debug("sent message to self")
 
-            self.message[0].client.remove_event_handler(self.on_message_edited)
-            self.message[0].client.add_event_handler(
+            self.message.client.remove_event_handler(self.on_message_edited)
+            self.message.client.add_event_handler(
                 self.on_message_edited,
                 legacytl.events.messageedited.MessageEdited(chats=["me"]),
             )
@@ -202,7 +203,7 @@ class SudoMessageEditor(MessageEditor):
         if not handled:
             logger.debug("Didn't find sudo log.")
             if self.authmsg is not None:
-                await self.authmsg[0].delete()
+                await self.authmsg.delete()
                 self.authmsg = None
             self.state = 2
             await self.redraw()
