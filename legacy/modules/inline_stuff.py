@@ -8,6 +8,7 @@ import re
 import string
 import logging
 import os
+import aiohttp
 
 from legacytl.errors.rpcerrorlist import YouBlockedUserError
 from legacytl.tl.functions.contacts import UnblockRequest
@@ -127,18 +128,27 @@ class InlineStuff(loader.Module):
             await utils.answer(message, self.strings["token_not_provided"])
             return
 
-        if not re.match(r"^\d{8,10}:[a-zA-Z0-9_-]{35}$", args):
-            await utils.answer(
-                message,
-                self.strings["invalid_token_format"].format(
-                    "1234567890:skjdfh7yrh7832href83nfiosefh723o8i"
-                ),
-            )
-            return
-
-        self._db.set("legacy.inline", "bot_token", args)
-
-        await utils.answer(message, self.strings["token_changed"])
+        url = f"https://api.telegram.org/bot{args}/getMe"
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        if data.get("ok"):
+                            self._db.set("legacy.inline", "bot_token", args)
+                            return await utils.answer(
+                                message, self.strings["token_changed"]
+                            )
+                    logger.error("Token validation failed!")
+                    return await utils.answer(
+                        message, self.strings["invalid_token_format"]
+                    )
+            except aiohttp.ClientConnectionError as e:
+                logger.error(f"Connection error during token validation: {e}")
+            except Exception as e:
+                logger.error(
+                    f"An unexpected error occurred during token validation: {e}"
+                )
 
     @loader.command()
     async def iauth(self, message, force: bool = False):
