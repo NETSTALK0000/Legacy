@@ -127,9 +127,18 @@ class MessageEditor:
 
 class SudoMessageEditor(MessageEditor):
     # Let's just hope these are safe to parse
-    PASS_REQ = "[sudo] password for"
-    WRONG_PASS = r"\[sudo\] password for (.*): Sorry, try again\."
-    TOO_MANY_TRIES = (r"\[sudo\] password for (.*): sudo: [0-9]+ incorrect password attempts")  # fmt: skip
+    PASS_REQ = [
+        "[sudo] password for",
+        "[sudo] пароль для"
+    ]
+    WRONG_PASS = [
+        r"\[sudo\] password for (.*): Sorry, try again\.",
+        r"\[sudo\] пароль для (.*): Попробуйте ещё раз.\."
+    ]
+    TOO_MANY_TRIES = [
+        r"\[sudo\] password for (.*): sudo: [0-9]+ incorrect password attempts",
+        r"\[sudo\] пароль для (.*): sudo: [0-9]+ неправильные попытки ввода пароля"
+    ]  # fmt: skip
 
     def __init__(self, message, command, config, strings, request_message):
         super().__init__(message, command, config, strings, request_message)
@@ -151,8 +160,8 @@ class SudoMessageEditor(MessageEditor):
 
         if (
             len(lines) > 1
-            and re.fullmatch(self.WRONG_PASS, lines[-2])
-            and lastlines[0] == self.PASS_REQ
+            and any(re.fullmatch(p, lines[-2]) for p in self.WRONG_PASS)
+            and any(lastlines[0] == p for p in self.PASS_REQ)
             and self.state == 1
         ):
             logger.debug("switching state to 0")
@@ -163,7 +172,7 @@ class SudoMessageEditor(MessageEditor):
             if self.authmsg:
                 await self.authmsg.delete()
 
-        if lastlines[0] == self.PASS_REQ and self.state == 0:
+        if any(lastlines[0] == p for p in self.PASS_REQ) and self.state == 0:
             logger.debug("Success to find sudo log!")
             text = self.strings("auth_needed").format(self.message.client.legacy_me.id)
 
@@ -192,7 +201,8 @@ class SudoMessageEditor(MessageEditor):
             handled = True
 
         if len(lines) > 1 and (
-            re.fullmatch(self.TOO_MANY_TRIES, lastline) and self.state in {1, 3, 4}
+            any(re.fullmatch(p, lastline) for p in self.TOO_MANY_TRIES)
+            and self.state in {1, 3, 4}
         ):
             logger.debug("password wrong lots of times")
             await utils.answer(self.message, self.strings("auth_locked"))
