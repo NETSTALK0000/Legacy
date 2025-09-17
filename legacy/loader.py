@@ -804,19 +804,20 @@ class Modules:
     def lookup(
         self,
         modname: str,
-    ) -> typing.Union[bool, Module, Library]:
-        return next(
-            (lib for lib in self.libraries if lib.name.lower() == modname.lower()),
-            False,
-        ) or next(
-            (
-                mod
-                for mod in self.modules
-                if mod.__class__.__name__.lower() == modname.lower()
-                or mod.name.lower() == modname.lower()
-            ),
-            False,
-        )
+    ) -> typing.Union[bool, Module, Library, typing.List[typing.Union[Module, Library]]]:
+        lib_matches = [lib for lib in self.libraries if lib.name.lower() == modname.lower()]
+        mod_matches = [
+            mod for mod in self.modules
+            if mod.__class__.__name__.lower() == modname.lower()
+            or (hasattr(mod, 'name') and mod.name.lower() == modname.lower())
+        ]
+        all_matches = lib_matches + mod_matches
+        if not all_matches:
+            return False
+        elif len(all_matches) == 1:
+            return all_matches[0]
+        else:
+            return all_matches
 
     @property
     def get_approved_channel(self):

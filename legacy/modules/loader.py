@@ -38,15 +38,6 @@ from ..types import CoreOverwriteError, CoreUnloadError
 logger = logging.getLogger(__name__)
 
 
-class FakeOne:
-    def __eq__(self, other):
-        return other == -1 or isinstance(other, FakeOne)
-
-    def __bool__(self):
-        return False
-
-
-MODULE_LOADING_FORBIDDEN = FakeOne()
 MODULE_LOADING_FAILED = 0
 MODULE_LOADING_SUCCESS = 1
 
@@ -164,16 +155,10 @@ class LoaderMod(loader.Module):
 
     @loader.command(alias="dlm")
     async def dlmod(self, message: Message, force_pm: bool = False):
-        if args := utils.get_args(message):
-            args = args[0]
-
+        if args := utils.get_args_split_by(message, ","):
             await utils.answer(message, self.strings("finding_module_in_repos"))
 
-            if (
-                await self.download_and_install(args, message, force_pm)
-                == MODULE_LOADING_FORBIDDEN
-            ):
-                return
+            await self.download_and_install(args, message, force_pm)
 
             if self.fully_loaded:
                 self.update_modules_in_db()
@@ -274,56 +259,63 @@ class LoaderMod(loader.Module):
 
     async def download_and_install(
         self,
-        module_name: str,
+        module_names: list,
         message: typing.Optional[Message] = None,
         force_pm: bool = False,
-    ) -> int:
-        try:
-            blob_link = False
-            module_name = module_name.strip()
-            if urlparse(module_name).netloc:
-                url = module_name
-                if re.match(
-                    r"^(https:\/\/github\.com\/.*?\/.*?\/blob\/.*\.py)|"
-                    r"(https:\/\/gitlab\.com\/.*?\/.*?\/-\/blob\/.*\.py)$",
-                    url,
-                ):
-                    url = url.replace("/blob/", "/raw/")
-                    blob_link = True
-            else:
-                url = await self._find_link(module_name)
+    ) -> list:
+        buff = []
+        for module_name in module_names:
+            try:
+                blob_link = False
+                module_name = module_name.strip()
+                if urlparse(module_name).netloc:
+                    url = module_name
+                    if re.match(
+                        r"^(https:\/\/github\.com\/.*?\/.*?\/blob\/.*\.py)|"
+                        r"(https:\/\/gitlab\.com\/.*?\/.*?\/-\/blob\/.*\.py)$",
+                        url,
+                    ):
+                        url = url.replace("/blob/", "/raw/")
+                        blob_link = True
+                else:
+                    url = await self._find_link(module_name)
 
-                if not url:
+                    if not url:
+                        if message is not None:
+                            await utils.answer(message, self.strings("no_module"))
+
+                        buff.append(MODULE_LOADING_FAILED)
+                        continue
+
+                if message:
+                    message = await utils.answer(
+                        message,
+                        self.strings("installing").format(module_name),
+                    )
+
+                try:
+                    r = await self._storage.fetch(url, auth=self.config["basic_auth"])
+                except requests.exceptions.HTTPError:
                     if message is not None:
                         await utils.answer(message, self.strings("no_module"))
 
-                    return MODULE_LOADING_FAILED
+                    buff.append(MODULE_LOADING_FAILED)
+                    continue
 
-            if message:
-                message = await utils.answer(
+                await self.load_module(
+                    r,
                     message,
-                    self.strings("installing").format(module_name),
+                    module_name,
+                    url,
+                    blob_link=blob_link,
                 )
-
-            try:
-                r = await self._storage.fetch(url, auth=self.config["basic_auth"])
-            except requests.exceptions.HTTPError:
-                if message is not None:
-                    await utils.answer(message, self.strings("no_module"))
-
-                return MODULE_LOADING_FAILED
-
-            await self.load_module(
-                r,
-                message,
-                module_name,
-                url,
-                blob_link=blob_link,
-            )
-            return MODULE_LOADING_SUCCESS
-        except Exception:
-            logger.exception("Failed to load %s", module_name)
-            return MODULE_LOADING_FAILED
+                buff.append(MODULE_LOADING_SUCCESS)
+                continue
+            except Exception:
+                logger.exception("Failed to load %s", module_name)
+                buff.append(MODULE_LOADING_FAILED)
+                continue
+        return buff
 
     async def _inline__load(
         self,
@@ -973,48 +965,94 @@ class LoaderMod(loader.Module):
         await utils.answer(call, msg())
         await call.answer(self.strings("subscribed"))
 
+    async def _unload_selected_mod(self, call, selected_mod):
+        lookup = self.lookup(selected_mod)
+        success_msg = (
+            call._units.get(call.unit_id)
+            .get("text")
+            .replace(self.strings["several_same_modules"], "")
+            + "\n\n"
+            + self.strings["unloaded"].format(
+                "<emoji document_id=5784993237412351403>✅</emoji>",
+                selected_mod,
+            )
+        )
+        buttons = call._units.get(call.unit_id).get("buttons")
+        for button in buttons:
+            for b in button:
+                if b.get("text") == selected_mod:
+                    buttons.remove(button)
+        if isinstance(lookup, list):
+            for mod in lookup:
+                if mod.__class__.__name__ == selected_mod:
+                    await self.allmodules.unload_module(selected_mod)
+                    await call.edit(success_msg, reply_markup=buttons)
+                    await call.answer()
+            await call.answer()
+        elif isinstance(lookup, loader.Module):
+            await self.allmodules.unload_module(lookup.__class__.__name__)
+            await call.edit(success_msg, reply_markup=buttons)
+            await call.answer()
+        else:
+            await call.answer("ERROR")
+
     @loader.command(alias="ulm")
     async def unloadmod(self, message: Message):
-        if not (args := utils.get_args_raw(message)):
-            await utils.answer(message, self.strings("no_class"))
-            return
+        if not (args := utils.get_args_split_by(message, "\n")):
+            return await utils.answer(message, self.strings("no_class"))
 
-        instance = self.lookup(args)
+        instances = [self.lookup(arg) for arg in args]
+        msg = []
+        reply_markup = []
+        self.unloaded = []
 
-        if issubclass(instance.__class__, loader.Library):
-            await utils.answer(message, self.strings("cannot_unload_lib"))
-            return
+        for instance in instances:
+            if isinstance(instance, list):
+                reply_markup.append([])
+                for i in instance:
+                    if len(reply_markup) == len(instance):
+                        reply_markup.append([])
+                    reply_markup[-1].append(
+                        {
+                            "text": i.__class__.__name__,
+                            "callback": self._unload_selected_mod,
+                            "args": [i.__class__.__name__],
+                        }
+                    )
+                continue
+            if issubclass(instance.__class__, loader.Library):
+                msg.append(self.strings["cannot_unload_lib"])
 
-        try:
-            worked = await self.allmodules.unload_module(args)
-        except CoreUnloadError as e:
-            await utils.answer(
-                message,
-                self.strings("unload_core").format(e.module),
+            try:
+                worked = await self.allmodules.unload_module(
+                    instance.__class__.__name__
+                )
+            except CoreUnloadError as e:
+                msg.append(self.strings["unload_core"].format(e.module))
+                continue
+
+            self.set(
+                "loaded_modules",
+                {
+                    mod: link
+                    for mod, link in self.get("loaded_modules", {}).items()
+                    if mod not in worked
+                },
             )
-            return
 
-        self.set(
-            "loaded_modules",
-            {
-                mod: link
-                for mod, link in self.get("loaded_modules", {}).items()
-                if mod not in worked
-            },
-        )
+            if worked:
+                msg.append(
+                    self.strings["unloaded"].format(
+                        "<emoji document_id=5784993237412351403>✅</emoji>",
+                        ", ".join([mod for mod in worked]),
+                    )
+                )
+            else:
+                msg.append(self.strings["not_unloaded"])
+        if reply_markup:
+            msg.append(self.strings["several_same_modules"])
 
-        msg = (
-            self.strings("unloaded").format(
-                "<emoji document_id=5784993237412351403>✅</emoji>",
-                ", ".join(
-                    [(mod[:-3] if mod.endswith("Mod") else mod) for mod in worked]
-                ),
-            )
-            if worked
-            else self.strings("not_unloaded")
-        )
-
-        await utils.answer(message, msg)
+        await utils.answer(message, "\n".join(msg), reply_markup=reply_markup)
 
     @loader.command()
     async def clearmodules(self, message: Message):
@@ -1098,8 +1136,7 @@ class LoaderMod(loader.Module):
     async def _update_modules(self):
         todo = await self._get_modules_to_load()
 
-        for mod in todo.values():
-            await self.download_and_install(mod)
+        await self.download_and_install(todo.values())
 
         self.update_modules_in_db()
 
