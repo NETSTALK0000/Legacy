@@ -1006,7 +1006,7 @@ class LoaderMod(loader.Module):
 
     @loader.command(alias="ulm")
     async def unloadmod(self, message: Message):
-        if not (args := utils.get_args_split_by(message, "\n")):
+        if not (args := utils.get_args_split_by(message, ["\n", ","])):
             return await utils.answer(message, self.strings("no_class"))
 
         instances = [self.lookup(arg) for arg in args]

@@ -53,7 +53,7 @@ class Help(loader.Module):
 
     @loader.command()
     async def helphide(self, message: Message):
-        if not (modules := utils.get_args(message)):
+        if not (modules := utils.get_args_split_by(message, ["\n", ","])):
             await utils.answer(message, self.strings("no_mod"))
             return
 
@@ -336,9 +336,7 @@ class Help(loader.Module):
         full_list = (
             core_ + plain_ + no_commands_
             if force
-            else hidden_mods + no_commands_
-            if only_hidden
-            else core_ + plain_
+            else hidden_mods + no_commands_ if only_hidden else core_ + plain_
         )
         await utils.answer(
             message,

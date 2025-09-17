@@ -206,7 +206,7 @@ def get_args_html(message: Message) -> str:
 
 def get_args_split_by(
     message: typing.Union[Message, str],
-    separator: str,
+    separator: typing.Union[str, typing.List[str]],
 ) -> typing.List[str]:
     """
     Split args with a specific separator
@@ -214,9 +214,17 @@ def get_args_split_by(
     :param separator: Separator to split by
     :return: List of arguments
     """
-    return [
-        section.strip() for section in get_args_raw(message).split(separator) if section
-    ]
+    raw_args = get_args_raw(message)
+    if isinstance(separator, str):
+        sections = raw_args.split(separator)
+    else:
+        sections = [raw_args]
+        for sep in separator:
+            new_sections = []
+            for section in sections:
+                new_sections.extend(section.split(sep))
+            sections = new_sections
+    return [section.strip() for section in sections if section.strip()]
 
 
 def get_chat_id(message: typing.Union[Message, AiogramMessage]) -> int:
