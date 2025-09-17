@@ -977,6 +977,13 @@ class LoaderMod(loader.Module):
                 selected_mod,
             )
         )
+        failed_msg = (
+            call._units.get(call.unit_id)
+            .get("text")
+            .replace(self.strings["several_same_modules"], "")
+            + "\n\n"
+            + self.strings["not_unloaded"]
+        )
         buttons = call._units.get(call.unit_id).get("buttons")
         for button in buttons:
             for b in button:
@@ -994,7 +1001,8 @@ class LoaderMod(loader.Module):
             await call.edit(success_msg, reply_markup=buttons)
             await call.answer()
         else:
-            await call.answer("ERROR")
+            await call.edit(failed_msg, reply_markup=buttons)
+            await call.answer()
 
     @loader.command(alias="ulm")
     async def unloadmod(self, message: Message):
