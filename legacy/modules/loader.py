@@ -816,6 +816,8 @@ class LoaderMod(loader.Module):
 
         modhelp = ""
 
+        modconf = ""
+
         if instance.__doc__:
             modhelp += (
                 "<i>\n<emoji document_id=5879813604068298387>ℹ️</emoji>"
@@ -849,12 +851,13 @@ class LoaderMod(loader.Module):
         )
 
         def loaded_msg(use_subscribe: bool = True):
-            nonlocal modname, version, modhelp, developer, origin, subscribe, blob_link, depends_from
+            nonlocal modname, version, modhelp, modconf, developer, origin, subscribe, blob_link, depends_from
             return self.strings("loaded").format(
                 modname.strip(),
                 version,
                 utils.ascii_face(),
                 modhelp,
+                modconf,
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,
                 (
@@ -942,6 +945,28 @@ class LoaderMod(loader.Module):
                         else self.strings("undoc")
                     ),
                 )
+
+        if getattr(instance, "config", None):
+            current_lang = self._db.get("legacy.translations", "lang", "en")
+
+            mod_config_len = len(instance.config)
+
+            word_variants = {
+                "en": ("value", "values", "values"),
+                "ru": ("значение", "значения", "значений"),
+                "ua": ("значення", "значення", "значень")
+            }
+
+            if mod_config_len == 1:
+                word_variant = word_variants[current_lang][0]
+            elif mod_config_len <= 4:
+                word_variant = word_variants[current_lang][1]
+            else:
+                word_variant = word_variants[current_lang][2]
+
+            mod_config_string = "\n\n" + self.strings("mod_config").replace(word_variants[current_lang][2], word_variant)
+            
+            modconf = mod_config_string.format(mod_config_len)
 
         try:
             await utils.answer(message, loaded_msg(), reply_markup=subscribe_markup)
