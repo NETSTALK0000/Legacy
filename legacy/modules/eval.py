@@ -172,6 +172,10 @@ class Evaluator(loader.Module):
                     utils.escape_html(code),
                     "error" if error else "output",
                     utils.escape_html(result),
+                )
+                + (
+                    self.strings("result").format("c" if c else "cpp", utils.escape_html(result))
+                    if result and not error else ""
                 ),
             )
 
@@ -222,6 +226,10 @@ class Evaluator(loader.Module):
                     utils.escape_html(code),
                     "error" if error else "output",
                     utils.escape_html(result),
+                )
+                + (
+                    self.strings("result").format("javascript", utils.escape_html(result))
+                    if result and not error else ""
                 ),
             )
 
@@ -268,6 +276,10 @@ class Evaluator(loader.Module):
                     utils.escape_html(code),
                     "error" if error else "output",
                     utils.escape_html(result),
+                )
+                + (
+                    self.strings("result").format("php", utils.escape_html(result))
+                    if result and not error else ""
                 ),
             )
 
@@ -314,6 +326,10 @@ class Evaluator(loader.Module):
                     utils.escape_html(code),
                     "error" if error else "output",
                     utils.escape_html(result),
+                )
+                + (
+                    self.strings("result").format("ruby", utils.escape_html(result))
+                    if result and not error else ""
                 ),
             )
 
