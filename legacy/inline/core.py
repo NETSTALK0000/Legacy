@@ -256,7 +256,9 @@ class InlineManager(
             raise exception  # skipcq: PYL-E0702
 
         if not q:
-            await utils.answer(message, "No query results")
+            await utils.answer(
+                message, self.translator.getkey("inline.inline_unavailable")
+            )
             return
 
         return await q[0].click(
