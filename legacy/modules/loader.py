@@ -264,6 +264,7 @@ class LoaderMod(loader.Module):
         force_pm: bool = False,
     ) -> list:
         buff = []
+        output = []
         for module_name in module_names:
             try:
                 blob_link = False
@@ -302,12 +303,15 @@ class LoaderMod(loader.Module):
                     buff.append(MODULE_LOADING_FAILED)
                     continue
 
-                await self.load_module(
-                    r,
-                    message,
-                    module_name,
-                    url,
-                    blob_link=blob_link,
+                output.append(
+                    await self.load_module(
+                        r,
+                        message,
+                        module_name,
+                        url,
+                        blob_link=blob_link,
+                        suggest_sub=False if len(module_names) > 1 else True,
+                    )
                 )
                 buff.append(MODULE_LOADING_SUCCESS)
                 continue
@@ -315,6 +319,8 @@ class LoaderMod(loader.Module):
                 logger.exception("Failed to load %s", module_name)
                 buff.append(MODULE_LOADING_FAILED)
                 continue
+        if len(list(filter(None, output))) > 1:
+            await utils.answer(message, "\n\n".join(output))
         return buff
 
     async def _inline__load(
@@ -463,6 +469,7 @@ class LoaderMod(loader.Module):
         did_requirements: bool = False,
         save_fs: bool = False,
         blob_link: bool = False,
+        suggest_sub: bool = True,
     ):
         if any(
             line.replace(" ", "") == "#scope:ffmpeg" for line in doc.splitlines()
@@ -877,6 +884,7 @@ class LoaderMod(loader.Module):
                     developer_entity
                     and getattr(developer_entity, "left", True)
                     and self._db.get(main.__name__, "suggest_subscribe", True)
+                    and suggest_sub
                 ):
                     subscribe = self.strings("suggest_subscribe").format(
                         f"@{utils.escape_html(developer_entity.username)}"
@@ -914,8 +922,11 @@ class LoaderMod(loader.Module):
             line.replace(" ", "") == "#scope:disable_onload_docs"
             for line in doc.splitlines()
         ):
-            await utils.answer(message, loaded_msg(), reply_markup=subscribe_markup)
-            return
+            if suggest_sub:
+                await utils.answer(message, loaded_msg(), reply_markup=subscribe_markup)
+                return
+            else:
+                return loaded_msg()
 
         for _name, fun in sorted(
             instance.commands.items(),
@@ -971,7 +982,11 @@ class LoaderMod(loader.Module):
             modconf = mod_config_string.format(mod_config_len)
 
         try:
-            await utils.answer(message, loaded_msg(), reply_markup=subscribe_markup)
+            return (
+                await utils.answer(message, loaded_msg(), reply_markup=subscribe_markup)
+                if suggest_sub
+                else loaded_msg()
+            )
         except MediaCaptionTooLongError:
             await message.reply(loaded_msg(False))
 
