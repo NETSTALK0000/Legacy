@@ -256,7 +256,8 @@ class InlineManager(
             raise exception  # skipcq: PYL-E0702
 
         if not q:
-            raise Exception("No query results")
+            await utils.answer(message, "No query results")
+            return
 
         return await q[0].click(
             utils.get_chat_id(message) if isinstance(message, Message) else message,

@@ -954,7 +954,7 @@ class LoaderMod(loader.Module):
             word_variants = {
                 "en": ("value", "values", "values"),
                 "ru": ("значение", "значения", "значений"),
-                "ua": ("значення", "значення", "значень")
+                "ua": ("значення", "значення", "значень"),
             }
 
             if mod_config_len == 1:
@@ -964,8 +964,10 @@ class LoaderMod(loader.Module):
             else:
                 word_variant = word_variants[current_lang][2]
 
-            mod_config_string = "\n\n" + self.strings("mod_config").replace(word_variants[current_lang][2], word_variant)
-            
+            mod_config_string = "\n\n" + self.strings("mod_config").replace(
+                word_variants[current_lang][2], word_variant
+            )
+
             modconf = mod_config_string.format(mod_config_len)
 
         try:

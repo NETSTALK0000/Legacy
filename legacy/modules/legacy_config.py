@@ -30,24 +30,23 @@ class LegacyConfigMod(loader.Module):
     def prep_value(value: typing.Any, _cut: bool = False) -> typing.Any:
         if isinstance(value, str):
             val = (
-                "..."
-                if _cut and len(value) > 0
-                else utils.escape_html(value.strip()) if value else ""
+                f"{utils.escape_html(value[:24])}..."
+                if _cut and len(value) > 24
+                else utils.escape_html(value.strip())
             )
             return f"</b><code>{val}</code><b>"
 
         if isinstance(value, list) and value:
             val = [
                 (
-                    f"<code>{'...'}</code>"
-                    if _cut and len(value) > 0
-                    else utils.escape_html(item).strip()
+                    f"<code>{utils.escape_html(item[:16]).strip()}...</code>"
+                    if _cut and len(item) > 16
+                    else f"<code>{utils.escape_html(item).strip()}</code>"
                 )
                 for item in value
             ]
             return "</b><code>[</code>" + ", ".join(val) + "<code>]</code><b>"
-
-        return f"</b><code>{'...' if _cut and value else utils.escape_html(f'{value}') if value else ''}</code><b>"
+        return f"</b><code>{utils.escape_html(f'{str(value)[:24]}...') if len(str(value)) > 24 else utils.escape_html(str(value))}</code><b>"
 
     def hide_value(self, value: typing.Any) -> str:
         if isinstance(value, list) and value:
