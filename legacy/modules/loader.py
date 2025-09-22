@@ -283,7 +283,7 @@ class LoaderMod(loader.Module):
 
                     if not url:
                         if message is not None:
-                            await utils.answer(message, self.strings("no_module"))
+                            output.append(self.strings("no_module").format(module_name))
 
                         buff.append(MODULE_LOADING_FAILED)
                         continue
@@ -298,7 +298,7 @@ class LoaderMod(loader.Module):
                     r = await self._storage.fetch(url, auth=self.config["basic_auth"])
                 except requests.exceptions.HTTPError:
                     if message is not None:
-                        await utils.answer(message, self.strings("no_module"))
+                        output.append(self.strings("no_module").format(module_name))
 
                     buff.append(MODULE_LOADING_FAILED)
                     continue
@@ -474,22 +474,18 @@ class LoaderMod(loader.Module):
         if any(
             line.replace(" ", "") == "#scope:ffmpeg" for line in doc.splitlines()
         ) and os.system("ffmpeg -version 1>/dev/null 2>/dev/null"):
-            if isinstance(message, Message):
-                await utils.answer(message, self.strings("ffmpeg_required"))
-            return
+            return self.strings("ffmpeg_required")
 
         if (
             any(line.replace(" ", "") == "#scope:inline" for line in doc.splitlines())
             and not self.inline.init_complete
         ):
-            if isinstance(message, Message):
-                await utils.answer(message, self.strings("inline_init_failed"))
-            return
+            return self.strings["inline_init_failed"]
 
         developer = re.search(r"# ?meta developer: ?(.+)", doc)
         developer = developer.group(1) if developer else False
 
-        blob_link = self.strings("blob_link") if blob_link else ""
+        blob_link = self.strings["blob_link"] if blob_link else ""
 
         if name is None:
             try:
@@ -531,15 +527,12 @@ class LoaderMod(loader.Module):
             if not message:
                 return
 
-            await utils.answer(
-                message,
-                self.strings(f"overwrite_{e.type}").format(
-                    *(
-                        (e.target,)
-                        if e.type == "module"
-                        else (utils.escape_html(self.get_prefix()), e.target)
-                    )
-                ),
+            return self.strings(f"overwrite_{e.type}").format(
+                *(
+                    (e.target,)
+                    if e.type == "module"
+                    else (utils.escape_html(self.get_prefix()), e.target)
+                )
             )
 
         try:
@@ -590,13 +583,7 @@ class LoaderMod(loader.Module):
                 logger.debug("Installing requirements: %s", requirements)
 
                 if did_requirements:
-                    if message is not None:
-                        await utils.answer(
-                            message,
-                            self.strings("requirements_restart").format(e.name),
-                        )
-
-                    return
+                    return self.strings("requirements_restart").format(e.name)
 
                 if message is not None:
                     await utils.answer(
@@ -627,12 +614,7 @@ class LoaderMod(loader.Module):
                 rc = await pip.wait()
 
                 if rc != 0:
-                    if message is not None:
-                        await utils.answer(
-                            message,
-                            self.strings("requirements_failed"),
-                        )
-                    return
+                    return self.strings["requirements_failed"]
 
                 importlib.invalidate_caches()
 
@@ -641,31 +623,18 @@ class LoaderMod(loader.Module):
 
                 return await self.load_module(**kwargs)  # Try again
             except CoreOverwriteError as e:
-                await core_overwrite(e)
-                return
+                return await core_overwrite(e)
             except loader.LoadError as e:
                 with contextlib.suppress(Exception):
                     await self.allmodules.unload_module(instance.__class__.__name__)
 
                 with contextlib.suppress(Exception):
                     self.allmodules.modules.remove(instance)
-
-                if message:
-                    await utils.answer(
-                        message,
-                        (
-                            "<emoji document_id=5454225457916420314>😖</emoji>"
-                            f" <b>{utils.escape_html(str(e))}</b>"
-                        ),
-                    )
-                return
+                return f"<emoji document_id=5454225457916420314>😖</emoji> <b>{utils.escape_html(str(e))}</b>"
         except Exception as e:
             logger.exception("Loading external module failed due to %s", e)
 
-            if message is not None:
-                await utils.answer(message, self.strings("load_failed"))
-
-            return
+            return self.strings("load_failed")
 
         if hasattr(instance, "__version__") and isinstance(instance.__version__, tuple):
             version = (
@@ -711,8 +680,7 @@ class LoaderMod(loader.Module):
                 )
                 task.cancel()
             except CoreOverwriteError as e:
-                await core_overwrite(e)
-                return
+                return await core_overwrite(e)
             except loader.LoadError as e:
                 with contextlib.suppress(Exception):
                     await self.allmodules.unload_module(instance.__class__.__name__)
@@ -720,15 +688,7 @@ class LoaderMod(loader.Module):
                 with contextlib.suppress(Exception):
                     self.allmodules.modules.remove(instance)
 
-                if message:
-                    await utils.answer(
-                        message,
-                        (
-                            "<emoji document_id=5454225457916420314>😖</emoji>"
-                            f" <b>{utils.escape_html(str(e))}</b>"
-                        ),
-                    )
-                return
+                return "<emoji document_id=5454225457916420314>😖</emoji> <b>{utils.escape_html(str(e))}</b>"
             except loader.SelfUnload as e:
                 logger.debug("Unloading %s, because it raised `SelfUnload`", instance)
                 with contextlib.suppress(Exception):
@@ -737,33 +697,18 @@ class LoaderMod(loader.Module):
                 with contextlib.suppress(Exception):
                     self.allmodules.modules.remove(instance)
 
-                if message:
-                    await utils.answer(
-                        message,
-                        (
-                            "<emoji document_id=5454225457916420314>😖</emoji>"
-                            f" <b>{utils.escape_html(str(e))}</b>"
-                        ),
-                    )
-                return
+                return f"<emoji document_id=5454225457916420314>😖</emoji> <b>{utils.escape_html(str(e))}</b>"
             except loader.SelfSuspend as e:
                 logger.debug("Suspending %s, because it raised `SelfSuspend`", instance)
                 if message:
-                    await utils.answer(
-                        message,
-                        (
-                            "🥶 <b>Module suspended itself\nReason:"
-                            f" {utils.escape_html(str(e))}</b>"
-                        ),
-                    )
-                return
+                    return f"🥶 <b>Module suspended itself\nReason: {utils.escape_html(str(e))}</b>"
+                return f"🥶 <b>Module suspended itself\nReason: {utils.escape_html(str(e))}</b>"
         except Exception as e:
             logger.exception("Module threw because of %s", e)
 
             if message is not None:
-                await utils.answer(message, self.strings("load_failed"))
-
-            return
+                return self.strings["load_failed"]
+            return self.strings["load_failed"]
 
         instance.legacy_meta_pic = next(
             (
