@@ -256,13 +256,17 @@ class LegacySecurityMod(loader.Module):
     async def sgroups(self, message: Message):
         await utils.answer(
             message,
-            self.strings("sgroups_list").format(
-                "\n".join(
-                    self.strings("sgroup_li").format(
-                        group.name, len(group.users), len(group.permissions)
+            (
+                self.strings("sgroups_list").format(
+                    "\n".join(
+                        self.strings("sgroup_li").format(
+                            group.name, len(group.users), len(group.permissions)
+                        )
+                        for group in self._sgroups.values()
                     )
-                    for group in self._sgroups.values()
                 )
+                if list(self._sgroups)
+                else self.strings("no_sgroups")
             ),
         )
 
@@ -1073,9 +1077,7 @@ class LegacySecurityMod(loader.Module):
                 return
 
             group = self._sgroups[args[1]]
-            print(f"{group}\n\n")
             permissions = group.permissions
-            print(f"{permissions}\n\n")
             _any = False
             for rule in permissions:
                 if rule["rule"] == args[2]:
@@ -1193,53 +1195,55 @@ class LegacySecurityMod(loader.Module):
     @loader.command()
     async def tsec(self, message: Message):
         if not (args := utils.get_args(message)):
-            await utils.answer(
-                message,
-                self.strings("rules").format(
+            rules_list = (
+                [
+                    "<emoji document_id=6037355667365300960>👥</emoji> <b><a"
+                    " href='{}'>{}</a> {} {} {}</b> <code>{}</code>".format(
+                        rule["entity_url"],
+                        utils.escape_html(rule["entity_name"]),
+                        self._convert_time(int(rule["expires"] - time.time())),
+                        self.strings("for"),
+                        self.strings(rule["rule_type"]),
+                        rule["rule"],
+                    )
+                    for rule in self._client.dispatcher.security.tsec_chat
+                ]
+                + [
+                    "<emoji document_id=6037122016849432064>👤</emoji> <b><a"
+                    " href='{}'>{}</a> {} {} {}</b> <code>{}</code>".format(
+                        rule["entity_url"],
+                        utils.escape_html(rule["entity_name"]),
+                        self._convert_time(int(rule["expires"] - time.time())),
+                        self.strings("for"),
+                        self.strings(rule["rule_type"]),
+                        rule["rule"],
+                    )
+                    for rule in self._client.dispatcher.security.tsec_user
+                ]
+                + [
                     "\n".join(
                         [
-                            "<emoji document_id=6037355667365300960>👥</emoji> <b><a"
-                            " href='{}'>{}</a> {} {} {}</b> <code>{}</code>".format(
-                                rule["entity_url"],
-                                utils.escape_html(rule["entity_name"]),
+                            "<emoji document_id=5870704313440932932>🔒</emoji>"
+                            " <code>{}</code> <b>{} {} {}</b> <code>{}</code>".format(
+                                utils.escape_html(group.name),
                                 self._convert_time(int(rule["expires"] - time.time())),
                                 self.strings("for"),
                                 self.strings(rule["rule_type"]),
                                 rule["rule"],
                             )
-                            for rule in self._client.dispatcher.security.tsec_chat
-                        ]
-                        + [
-                            "<emoji document_id=6037122016849432064>👤</emoji> <b><a"
-                            " href='{}'>{}</a> {} {} {}</b> <code>{}</code>".format(
-                                rule["entity_url"],
-                                utils.escape_html(rule["entity_name"]),
-                                self._convert_time(int(rule["expires"] - time.time())),
-                                self.strings("for"),
-                                self.strings(rule["rule_type"]),
-                                rule["rule"],
-                            )
-                            for rule in self._client.dispatcher.security.tsec_user
-                        ]
-                        + [
-                            "\n".join(
-                                [
-                                    "<emoji document_id=5870704313440932932>🔒</emoji>"
-                                    " <code>{}</code> <b>{} {} {}</b> <code>{}</code>".format(
-                                        utils.escape_html(group.name),
-                                        self._convert_time(
-                                            int(rule["expires"] - time.time())
-                                        ),
-                                        self.strings("for"),
-                                        self.strings(rule["rule_type"]),
-                                        rule["rule"],
-                                    )
-                                    for rule in group.permissions
-                                ]
-                            )
-                            for group in self._sgroups.values()
+                            for rule in group.permissions
                         ]
                     )
+                    for group in self._sgroups.values()
+                ]
+            )
+            filtered_rules_list = list(filter(None, rules_list))
+            await utils.answer(
+                message,
+                (
+                    self.strings("rules").format("\n".join(filtered_rules_list))
+                    if filtered_rules_list
+                    else self.strings("no_tsec")
                 ),
             )
             return

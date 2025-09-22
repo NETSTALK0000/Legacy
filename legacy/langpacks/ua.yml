@@ -27,9 +27,10 @@ legacy_security:
   user_nn: '🔰 <b>NoNick для <a href="tg://user?id={}">{}</a> ввімкнено</b>'
   enable_nonick_btn: "🔰 Ввімкнути"
   owner_added: '<emoji document_id="5386399931378440814">😎</emoji> <b><a href="tg://user?id={}">{}</a> додано до групи</b> <code>owner</code>'
+  no_sgroups: "<emoji document_id=5251741320690551495>👎</emoji> <b>У вас немає жодної сгрупи.</b>"
   owner_removed: '<emoji document_id="5386399931378440814">😎</emoji> <b><a href="tg://user?id={}">{}</a> видалено з групи</b> <code>owner</code>'
   _cls_doc: "Керування налаштуваннями безпеки"
-  what: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Вам потрібно вказати тип цілі першим аргументом (</b><code>user</code> <b>or</b> <code>chat</code><b>)</b>"
+  what: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Вам потрібно вказати тип цілі першим аргументом (</b><code>user</code>, <code>sgroup</code> <b>або</b> <code>chat</code><b>)</b>"
   no_target: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Не вказана мета правила безпеки</b>"
   no_rule: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Не вказано правило безпеки (модуль або команда)</b>"
   confirm_rule: "🔐 <b>Будь ласка, підтвердіть, що хочете видати {} <a href='{}'>{}</a> право використовувати {}</b> <code>{}</code> <b>{}</b>"

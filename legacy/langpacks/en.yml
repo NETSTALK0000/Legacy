@@ -31,7 +31,7 @@ legacy_security:
   self: "<emoji document_id=5447644880824181073>⚠️</emoji> <b>You can't promote/demote yourself!</b>"
   suggest_nonick: "🔰 <i>Do you want to enable NoNick for this user?</i>"
   user_nn: '🔰 <b>NoNick for <a href="tg://user?id={}">{}</a> enabled</b>'
-  what: "<emoji document_id=5210952531676504517>🚫</emoji> <b>You need to specify the type of target as first argument (</b><code>user</code> <b>or</b> <code>chat</code><b>)</b>"
+  what: "<emoji document_id=5210952531676504517>🚫</emoji> <b>You need to specify the type of target as first argument (</b><code>user</code>, <code>sgroup</code> <b>or</b> <code>chat</code><b>)</b>"
   no_target: "<emoji document_id=5210952531676504517>🚫</emoji> <b>You didn't specify the target of security rule</b>"
   no_rule: "<emoji document_id=5210952531676504517>🚫</emoji> <b>You didn't specify the rule (module or command)</b>"
   confirm_rule: "🔐 <b>Please, confirm that you want to give {} <a href='{}'>{}</a> a permission to use {}</b> <code>{}</code> <b>{}?</b>"
@@ -78,6 +78,8 @@ legacy_security:
   sgroup_not_found: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Security group</b> <code>{}</code> <b>not found</b>"
   no_users: "<emoji document_id=5870772616305839506>👥</emoji> <b>No users</b>"
   users_list: "<emoji document_id=5870772616305839506>👥</emoji> <b>Users:</b>\n{}\n"
+  no_sgroups: "<emoji document_id=5251741320690551495>👎</emoji> <b>You don't have any sgroup.</b>"
+  no_tsec: "<emoji document_id=5251741320690551495>👎</emoji> <b>You don't have any tsec.</b>"
   no_permissions: "<emoji document_id=5870450390679425417>🗒</emoji> <b>No permissions</b>"
   permissions_list: "<emoji document_id=5870450390679425417>🗒</emoji> <b>Permissions:</b>\n{}\n"
   sgroup_li: "<emoji document_id=4974264756668990388>▫️</emoji> <code>{}</code> · <b>{} user(-s)</b> · <b>{} rule(-s)</b>"
