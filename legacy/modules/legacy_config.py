@@ -30,18 +30,18 @@ class LegacyConfigMod(loader.Module):
     def prep_value(value: typing.Any, _cut: bool = False) -> typing.Any:
         if isinstance(value, str):
             val = (
-                f"{utils.escape_html(value[:24])}..."
-                if _cut and len(value) > 24
-                else utils.escape_html(value.strip())
+                f"{utils.escape_html(str(value)[:24])}..."
+                if _cut and len(str(value)) > 24
+                else utils.escape_html(str(value).strip())
             )
             return f"</b><code>{val}</code><b>"
 
         if isinstance(value, list) and value:
             val = [
                 (
-                    f"<code>{utils.escape_html(item[:16]).strip()}...</code>"
-                    if _cut and len(item) > 16
-                    else f"<code>{utils.escape_html(item).strip()}</code>"
+                    f"<code>{utils.escape_html(str(item)[:16]).strip()}...</code>"
+                    if _cut and len(str(item)) > 16
+                    else f"<code>{utils.escape_html(str(item)).strip()}</code>"
                 )
                 for item in value
             ]
