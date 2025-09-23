@@ -155,7 +155,7 @@ class LoaderMod(loader.Module):
 
     @loader.command(alias="dlm")
     async def dlmod(self, message: Message, force_pm: bool = False):
-        if args := utils.get_args_split_by(message, ","):
+        if args := utils.get_args_split_by(message, [",", "\n"]):
             await utils.answer(message, self.strings("finding_module_in_repos"))
 
             await self.download_and_install(args, message, force_pm)

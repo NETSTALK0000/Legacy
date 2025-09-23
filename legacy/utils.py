@@ -1459,7 +1459,7 @@ def mime_type(message: Message) -> str:
     return (
         ""
         if not isinstance(message, Message) or not getattr(message, "media", False)
-        else getattr(getattr(message, "media", False), "mime_type", False) or ""
+        else getattr(getattr(getattr(message, "media", False), "document", False), "mime_type") or ""
     )
 
 

@@ -579,8 +579,8 @@ class CommandDispatcher:
                 or not getattr(m, "private", False)
                 and not getattr(m, "is_channel", False)
             ),
-            "no_pm": lambda: not getattr(m, "private", False),
-            "only_pm": lambda: getattr(m, "private", False),
+            "no_pm": lambda: not getattr(m, "is_private", False),
+            "only_pm": lambda: getattr(m, "is_private", False),
             "no_inline": lambda: not getattr(m, "via_bot_id", False),
             "no_stickers": lambda: not getattr(m, "sticker", False),
             "no_docs": lambda: not getattr(m, "document", False),
@@ -602,11 +602,13 @@ class CommandDispatcher:
             "contains": lambda: isinstance(m, Message) and func.contains in m.raw_text,
             "filter": lambda: callable(func.filter) and func.filter(m),
             "from_id": lambda: getattr(m, "sender_id", None) == func.from_id,
-            "chat_id": lambda: utils.get_chat_id(m)
-            == (
-                func.chat_id
-                if not str(func.chat_id).startswith("-100")
-                else int(str(func.chat_id)[4:])
+            "chat_id": (
+                lambda: utils.get_chat_id(m)
+                == (
+                    func.chat_id
+                    if not str(func.chat_id).startswith("-100")
+                    else int(str(func.chat_id)[4:])
+                )
             ),
             "regex": lambda: (
                 isinstance(m, Message) and re.search(func.regex, m.raw_text)
