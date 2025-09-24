@@ -70,7 +70,7 @@ def start():
     try:
         import legacytl
 
-        if tuple(map(int, legacytl.__version__.split("."))) < (1, 5, 0):
+        if tuple(map(int, legacytl.__version__.split("."))) < (1, 7, 5):
             raise ImportError
     except Exception:
         deps()

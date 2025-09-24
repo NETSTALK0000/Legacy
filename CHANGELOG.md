@@ -47,3 +47,8 @@
 - Removed debugger
 - Fixed SudoMessageEditor in TerminalMod
 - Added HikkaHost EULA
+- Added multi-dlm/ulm
+- Fixed configs
+- Updated LegacyInfoMod
+- Updatel Legacy-TL-New
+
