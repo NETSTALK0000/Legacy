@@ -75,6 +75,8 @@ from legacytl.tl.types import (
     MessageEntityCode,
     MessageEntityEmail,
     MessageEntityHashtag,
+    InputMediaWebPage,
+    TypeInputMedia,
     MessageEntityItalic,
     MessageEntityMention,
     MessageEntityMentionName,
@@ -443,6 +445,7 @@ async def answer(
     message: typing.Union[Message, InlineCall, InlineMessage],
     response: str,
     *,
+    media: typing.Optional[TypeInputMedia] = None,
     reply_markup: typing.Optional[LegacyReplyMarkup] = None,
     **kwargs,
 ) -> typing.Union[InlineCall, InlineMessage, Message]:
@@ -494,7 +497,7 @@ async def answer(
             return result
 
     if isinstance(message, (InlineMessage, InlineCall, BotInlineCall)):
-        await message.edit(response)
+        await message.edit(response, **kwargs)
         return message
 
     kwargs.setdefault("link_preview", False)
@@ -554,22 +557,40 @@ async def answer(
 
                 return result
 
-        result = await (message.edit if edit else message.respond)(
-            text,
-            parse_mode=lambda t: (t, entities),
-            **kwargs,
-        )
+        if edit:
+            result = await message.edit(
+                text,
+                parse_mode=lambda t: (t, entities),
+                media=media,
+                **kwargs,
+            )
+        else:
+            result = await message.respond(
+                text,
+                parse_mode=lambda t: (t, entities),
+                file=media,
+                **kwargs,
+            )
     elif isinstance(response, Message):
-        if message.media is None and (
-            response.media is None or isinstance(response.media, MessageMediaWebPage)
-        ):
+        if edit:
             result = await message.edit(
                 response.message,
                 parse_mode=lambda t: (t, response.entities or []),
-                link_preview=isinstance(response.media, MessageMediaWebPage),
+                media=response.media,
+                **kwargs,
             )
         else:
-            result = await message.respond(response, **kwargs)
+            result = await message.respond(
+                response.message,
+                parse_mode=lambda t: (t, response.entities or []),
+                file=(
+                    response.media
+                    if not isinstance(response.media, MessageMediaWebPage)
+                    else InputMediaWebPage(response.media.webpage.url)
+                ),
+                invert_media=response.invert_media,
+                **kwargs,
+            )
     else:
         if isinstance(response, bytes):
             response = io.BytesIO(response)
@@ -1459,7 +1480,10 @@ def mime_type(message: Message) -> str:
     return (
         ""
         if not isinstance(message, Message) or not getattr(message, "media", False)
-        else getattr(getattr(getattr(message, "media", False), "document", False), "mime_type") or ""
+        else getattr(
+            getattr(getattr(message, "media", False), "document", False), "mime_type"
+        )
+        or ""
     )
 
 

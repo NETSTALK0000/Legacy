@@ -5,7 +5,7 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import git
-from legacytl.tl.types import Message
+from legacytl.types import InputMediaWebPage
 from legacytl.utils import get_display_name
 from .. import loader, utils, version
 import platform as lib_platform
@@ -21,12 +21,12 @@ class LegacyInfoMod(loader.Module):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "custom_message",
-                doc=lambda: self.strings("_cfg_cst_msg"),
+                doc=lambda: self.strings["_cfg_cst_msg"],
             ),
             loader.ConfigValue(
                 "banner_url",
                 "https://i.postimg.cc/9MTZgB2j/legacy-info.gif",
-                lambda: self.strings("_cfg_banner"),
+                lambda: self.strings["_cfg_banner"],
             ),
         )
 
@@ -85,9 +85,11 @@ class LegacyInfoMod(loader.Module):
                 user=getpass.getuser(),
                 kernel=lib_platform.uname().release,
                 os=distro.name(pretty=True),
-                label=utils.get_platform_emoji()
-                if self._client.legacy_me.premium
-                else "🌙 <b>Legacy</b>",
+                label=(
+                    utils.get_platform_emoji()
+                    if self._client.legacy_me.premium
+                    else "🌙 <b>Legacy</b>"
+                ),
             )
             if self.config["custom_message"] and "-d" not in args
             else (
@@ -120,24 +122,26 @@ class LegacyInfoMod(loader.Module):
         )
 
     @loader.command()
-    async def infocmd(self, message: Message):
+    async def infocmd(self, message):
         args = utils.get_args(message)
         custom_prefix = self.get_prefix(message.sender_id)
-        if self.config["banner_url"]:
-            await utils.answer_file(
-                message,
-                self.config["banner_url"],
-                await self._render_info(args, custom_prefix),
-            )
-        else:
-            await utils.answer(message, await self._render_info(args, custom_prefix))
+        await utils.answer(
+            message,
+            await self._render_info(args, custom_prefix),
+            media=(
+                InputMediaWebPage(self.config["banner_url"])
+                if self.config["banner_url"]
+                else None
+            ),
+            invert_media=True,
+        )
 
     @loader.command()
-    async def ubinfo(self, message: Message):
+    async def ubinfo(self, message):
         await utils.answer(message, self.strings("desc"))
 
     @loader.command()
-    async def setinfo(self, message: Message):
+    async def setinfo(self, message):
         if not (args := utils.get_args_html(message)):
             return await utils.answer(message, self.strings("setinfo_no_args"))
 

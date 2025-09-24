@@ -12,6 +12,7 @@ import subprocess
 import sys
 import time
 
+
 def deps():
     subprocess.run(
         [
@@ -28,6 +29,7 @@ def deps():
         ],
         check=True,
     )
+
 
 def start():
     from . import main
@@ -47,7 +49,7 @@ def start():
         print()
         print("Type force_insecure to ignore this warning")
         print("Type no_sudo if your system has no sudo (Debian vibes)")
-        inp = input('> ').lower()
+        inp = input("> ").lower()
         if inp != "force_insecure":
             sys.exit(1)
         elif inp == "no_sudo":
@@ -60,11 +62,14 @@ def start():
         sys.exit(1)
 
     if __package__ != "legacy":
-        print("🚫 Error: you cannot run this as a script; you must execute as a package")
+        print(
+            "🚫 Error: you cannot run this as a script; you must execute as a package"
+        )
         sys.exit(1)
 
     try:
         import legacytl
+
         if tuple(map(int, legacytl.__version__.split("."))) < (1, 5, 0):
             raise ImportError
     except Exception:
@@ -77,6 +82,7 @@ def start():
     os.environ.pop("HIKKA_DO_NOT_RESTART2", None)
 
     main.legacy.main()
+
 
 try:
     start()
@@ -97,4 +103,3 @@ except Exception as e2:
         time.sleep(9999)
 
     sys.exit(1)
-
