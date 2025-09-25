@@ -576,7 +576,12 @@ async def answer(
             result = await message.edit(
                 response.message,
                 parse_mode=lambda t: (t, response.entities or []),
-                media=response.media,
+                media=(
+                    response.media
+                    if not isinstance(response.media, MessageMediaWebPage)
+                    else InputMediaWebPage(response.media.webpage.url)
+                ),
+                invert_media=response.invert_media,
                 **kwargs,
             )
         else:
