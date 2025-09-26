@@ -525,10 +525,6 @@ class LegacySecurityMod(loader.Module):
             except ValueError:
                 user = await reply.get_sender()
 
-        if not isinstance(user, (User, PeerUser)):
-            await utils.answer(message, self.strings("not_a_user"))
-            return
-
         if user.id == self.tg_id:
             await utils.answer(message, self.strings("self"))
             return

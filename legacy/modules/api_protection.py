@@ -23,23 +23,28 @@ from ..inline.types import InlineCall
 logger = logging.getLogger(__name__)
 
 GROUPS = [
-    "auth",
     "account",
-    "users",
-    "contacts",
-    "messages",
-    "updates",
-    "photos",
-    "upload",
-    "help",
-    "channels",
+    "auth",
     "bots",
-    "payments",
-    "stickers",
-    "phone",
-    "langpack",
+    "channels",
+    "chatlists",
+    "contacts",
     "folders",
+    "fragment",
+    "help",
+    "langpack",
+    "messages",
+    "payments",
+    "phone",
+    "photos",
+    "premium",
+    "smsjobs",
     "stats",
+    "stickers",
+    "stories",
+    "upadates",
+    "upload",
+    "users",
 ]
 
 
@@ -97,7 +102,7 @@ class APIRatelimiterMod(loader.Module):
                     "importChatInvite",
                     "changePhone",
                     "resetPassword",
-                    "DeleteAccount",
+                    "deleteAccount",
                 ],
                 lambda: self.strings("_cfg_forbidden_methods"),
                 validator=loader.validators.MultiChoice(
@@ -110,7 +115,7 @@ class APIRatelimiterMod(loader.Module):
                         "setPrivacy",
                         "changePhone",
                         "resetPassword",
-                        "DeleteAccount",
+                        "deleteAccount",
                     ]
                 ),
                 on_change=lambda: (
