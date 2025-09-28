@@ -33,10 +33,10 @@ from legacytl.tl.types import (
 )
 
 from ._reference_finder import replace_all_refs
+from aiogram.types import Message as BotMessage
 from .inline.types import (
     BotInlineCall,
     BotInlineMessage,
-    BotMessage,
     InlineCall,
     InlineMessage,
     InlineQuery,

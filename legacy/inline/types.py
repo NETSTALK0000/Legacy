@@ -74,7 +74,7 @@ class BotInlineMessage:
             {"id": unit_id, **self._units[unit_id]} if unit_id in self._units else {}
         )
 
-    async def edit(self, *args, **kwargs) -> "BotMessage":
+    async def edit(self, *args, **kwargs) -> AiogramMessage:
         if "unit_id" in kwargs:
             kwargs.pop("unit_id")
 
@@ -195,13 +195,6 @@ class InlineUnit:
 
     def __init__(self):
         """Made just for type specification"""
-
-
-class BotMessage(AiogramMessage):
-    """Modified version of original Aiogram Message"""
-
-    def __init__(self):
-        super().__init__()
 
 
 class InlineQuery(AiogramInlineQuery):

@@ -26,6 +26,7 @@ import asyncio
 import contextlib
 import inspect
 import logging
+import socket
 import os
 import requests
 
@@ -86,18 +87,30 @@ class Web(root.Web):
                 )
 
         if not url:
-            # вырезана проверка на докер
             platform = utils.get_named_platform()
 
             if any(keyword in platform for keyword in ["WSL", "UserLand"]):
                 ip = "127.0.0.1"
             else:
                 try:
+                    original_getaddrinfo = socket.getaddrinfo
+
+                    def getaddrinfo_ipv4_only(
+                        host, port, family=0, type=0, proto=0, flags=0
+                    ):
+                        return original_getaddrinfo(
+                            host, port, socket.AF_INET, type, proto, flags
+                        )
+
+                    socket.getaddrinfo = getaddrinfo_ipv4_only
+
                     resp = requests.get("http://ifconfig.me/ip", timeout=5)
                     resp.raise_for_status()
                     ip = resp.text.strip()
-                except (requests.exceptions.RequestException, ValueError):
+                except (requests.exceptions.RequestException, ValueError) as e:
                     ip = "127.0.0.1"
+                finally:
+                    socket.getaddrinfo = original_getaddrinfo
 
             url = f"http://{ip}:{self.port}"
 
