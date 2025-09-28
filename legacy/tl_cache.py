@@ -22,7 +22,6 @@ from legacytl.tl.functions.users import GetFullUserRequest
 from legacytl.tl.tlobject import TLRequest
 from legacytl.tl.types import (
     ChannelFull,
-    Message,
     Updates,
     UpdatesCombined,
     UpdateShort,
@@ -212,7 +211,6 @@ class CustomTelegramClient(TelegramClient):
 
     async def force_get_entity(self, *args, **kwargs):
         """Forcefully makes a request to Telegram to get the entity."""
-
         return await self.get_entity(*args, force=True, **kwargs)
 
     async def get_entity(
@@ -375,9 +373,9 @@ class CustomTelegramClient(TelegramClient):
                 resolved_perms,
                 exp,
             )
-            self._legacy_perms_cache.setdefault(hashable_entity, {})[
-                hashable_user
-            ] = cache_record
+            self._legacy_perms_cache.setdefault(hashable_entity, {})[hashable_user] = (
+                cache_record
+            )
             logger.debug("Saved hashable_entity %s perms to cache", hashable_entity)
 
             def save_user(key: typing.Union[str, int]):
@@ -389,9 +387,9 @@ class CustomTelegramClient(TelegramClient):
                     self._legacy_perms_cache.setdefault(key, {})[
                         f"@{user.username}"
                     ] = cache_record
-                    self._legacy_perms_cache.setdefault(key, {})[
-                        user.username
-                    ] = cache_record
+                    self._legacy_perms_cache.setdefault(key, {})[user.username] = (
+                        cache_record
+                    )
 
             if getattr(entity, "id", None):
                 logger.debug("Saved resolved_entity id %s perms to cache", entity.id)
@@ -451,7 +449,7 @@ class CustomTelegramClient(TelegramClient):
         ):
             return self._legacy_fullchannel_cache[hashable_entity].full_channel
 
-        result = await self(GetFullChannelRequest(channel=entity))
+        result = await self._call(self._sender, GetFullChannelRequest(channel=entity))
         self._legacy_fullchannel_cache[hashable_entity] = CacheRecordFullChannel(
             hashable_entity,
             result,
@@ -503,25 +501,13 @@ class CustomTelegramClient(TelegramClient):
         ):
             return self._legacy_fulluser_cache[hashable_entity].full_user
 
-        result = await self(GetFullUserRequest(entity))
+        result = await self._call(self._sender, GetFullUserRequest(entity))
         self._legacy_fulluser_cache[hashable_entity] = CacheRecordFullUser(
             hashable_entity,
             result,
             exp,
         )
         return result
-
-    async def send_file(self, *args, **kwargs) -> Message:
-        return await super().send_file(
-            *args,
-            **kwargs,
-        )
-
-    async def send_message(self, *args, **kwargs) -> Message:
-        return await super().send_message(
-            *args,
-            **kwargs,
-        )
 
     async def _call(
         self,

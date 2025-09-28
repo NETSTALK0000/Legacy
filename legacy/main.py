@@ -780,6 +780,9 @@ class Legacy:
                     session.filename,
                 )
                 self.sessions.remove(session)
+            except Exception as e:
+                logging.exception("Failed to load session %s: %s", session.filename, e)
+                self.sessions.remove(session)
 
         return bool(self.sessions)
 
@@ -869,12 +872,12 @@ class Legacy:
 
         client.add_event_handler(
             dispatcher.handle_incoming,
-            events.NewMessage,
+            events.NewMessage(incoming=True),
         )
 
         client.add_event_handler(
             dispatcher.handle_incoming,
-            events.ChatAction,
+            events.ChatAction(),
         )
 
         client.add_event_handler(

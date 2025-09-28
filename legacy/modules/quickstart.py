@@ -21,7 +21,7 @@ class Quickstart(loader.Module):
         self.mark = lambda: [
             [
                 {
-                    "text": self.strings("btn_support"),
+                    "text": self.strings["btn_support"],
                     "url": "https://t.me/legacy_help",
                 }
             ],

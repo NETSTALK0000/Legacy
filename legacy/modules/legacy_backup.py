@@ -15,7 +15,6 @@ import time
 import zipfile
 from pathlib import Path
 
-from legacytl.tl.types import Message
 
 from .. import loader, utils, main
 from ..inline.types import BotInlineCall
@@ -32,7 +31,7 @@ class LegacyBackupMod(loader.Module):
             await self.inline.bot.send_photo(
                 self.tg_id,
                 photo="https://i.postimg.cc/8PPXPyK5/legacy-unit-alpha.png",
-                caption=self.strings("period"),
+                caption=self.strings["period"],
                 reply_markup=self.inline.generate_markup(
                     utils.chunks(
                         [
@@ -82,26 +81,26 @@ class LegacyBackupMod(loader.Module):
         self.set("last_backup", round(time.time()))
 
         await call.answer(
-            self.strings("saved").format(self.get_prefix()),
+            self.strings["saved"].format(self.get_prefix()),
             show_alert=True,
         )
         await call.delete()
 
     @loader.command()
-    async def set_backup_period(self, message: Message):
+    async def set_backup_period(self, message):
         if (
             not (args := utils.get_args_raw(message))
             or not args.isdigit()
             or int(args) not in range(200)
         ):
-            await utils.answer(message, self.strings("invalid_args"))
+            await utils.answer(message, self.strings["invalid_args"])
             return
 
         if not int(args):
             self.set("period", "disabled")
             await utils.answer(
                 message,
-                self.strings("never").format(self.get_prefix(message.sender_id)),
+                self.strings["never"].format(self.get_prefix(message.sender_id)),
             )
             return
 
@@ -109,7 +108,7 @@ class LegacyBackupMod(loader.Module):
         self.set("period", period)
         self.set("last_backup", round(time.time()))
         await utils.answer(
-            message, self.strings("saved").format(self.get_prefix(message.sender_id))
+            message, self.strings["saved"].format(self.get_prefix(message.sender_id))
         )
 
     @loader.loop(interval=1, autostart=True)
@@ -150,7 +149,7 @@ class LegacyBackupMod(loader.Module):
             await self.inline.bot.send_document(
                 int(f"-100{self._backup_channel.id}"),
                 outfile,
-                caption=self.strings("backup_caption").format(
+                caption=self.strings["backup_caption"].format(
                     prefix=self.get_prefix(),
                     num_of_modules=f"{len([m for m in self.allmodules.modules if getattr(m, '__origin__', None) != '<core>'])}",
                 ),
@@ -158,7 +157,7 @@ class LegacyBackupMod(loader.Module):
                     [
                         [
                             {
-                                "text": self.strings("restore_this"),
+                                "text": self.strings["restore_this"],
                                 "data": "legacy/backup/restore/confirm",
                             },
                         ],
@@ -181,16 +180,16 @@ class LegacyBackupMod(loader.Module):
         if call.data == "legacy/backup/restore/confirm":
             await utils.answer(
                 call,
-                self.strings("confirm"),
+                self.strings["confirm"],
                 reply_markup=[
                     {
-                        "text": self.strings("_btn_yes"),
+                        "text": self.strings["_btn_yes"],
                         "data": "legacy/backup/restore",
                     },
                     {
-                        "text": self.strings("_btn_no"),
+                        "text": self.strings["_btn_no"],
                         "data": "legacy/backup/restore/cancel",
-                    }
+                    },
                 ],
             )
             return
@@ -234,11 +233,11 @@ class LegacyBackupMod(loader.Module):
             logger.exception("Unable to restore backup")
             return
 
-        await call.answer(self.strings("backup_restored"), show_alert=True)
+        await call.answer(self.strings["backup_restored"], show_alert=True)
         await self.invoke("restart", "-f", peer=self.inline.bot_id)
 
     @loader.command()
-    async def backup(self, message: Message):
+    async def backup(self, message):
         db_dump = ujson.dumps(self._db).encode()
 
         result = io.BytesIO()
@@ -258,7 +257,7 @@ class LegacyBackupMod(loader.Module):
         backup_msg = await self.inline.bot.send_document(
             int(f"-100{self._backup_channel.id}"),
             outfile,
-            caption=self.strings("backup_caption").format(
+            caption=self.strings["backup_caption"].format(
                 prefix=self.get_prefix(message.sender_id),
                 num_of_modules=f"{len([m for m in self.allmodules.modules if getattr(m, '__origin__', None) != '<core>'])}",
             ),
@@ -266,7 +265,7 @@ class LegacyBackupMod(loader.Module):
                 [
                     [
                         {
-                            "text": self.strings("restore_this"),
+                            "text": self.strings["restore_this"],
                             "data": "legacy/backup/restore/confirm",
                         },
                     ],
@@ -276,15 +275,15 @@ class LegacyBackupMod(loader.Module):
 
         await utils.answer(
             message,
-            self.strings("backup_sent").format(
+            self.strings["backup_sent"].format(
                 f"https://t.me/c/{self._backup_channel.id}/{backup_msg.message_id}"
             ),
         )
 
     @loader.command()
-    async def restore(self, message: Message):
+    async def restore(self, message):
         if not (reply := await message.get_reply_message()) or not reply.media:
-            await utils.answer(message, self.strings("reply_to_file"))
+            await utils.answer(message, self.strings["reply_to_file"])
             return
 
         logger.info("📚 Trying to restore backup")
@@ -318,8 +317,8 @@ class LegacyBackupMod(loader.Module):
                         path.write_bytes(module.read())
         except Exception:
             logger.exception("Unable to restore backup")
-            await utils.answer(message, self.strings("reply_to_file"))
+            await utils.answer(message, self.strings["reply_to_file"])
             return
 
-        await utils.answer(message, self.strings("backup_restored"))
+        await utils.answer(message, self.strings["backup_restored"])
         await self.invoke("restart", "-f", peer=message.peer_id)
