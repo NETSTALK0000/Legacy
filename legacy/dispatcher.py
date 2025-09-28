@@ -23,7 +23,6 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import asyncio
-import collections
 import contextlib
 import copy
 import inspect
@@ -93,13 +92,6 @@ ALL_TAGS = [
 ]
 
 
-def _decrement_ratelimit(delay, data, key, severity):
-    def inner():
-        data[key] = max(0, data[key] - severity)
-
-    asyncio.get_event_loop().call_later(delay, inner)
-
-
 class CommandDispatcher:
     def __init__(
         self,
@@ -111,11 +103,6 @@ class CommandDispatcher:
         self._client = client
         self.client = client
         self._db = db
-
-        self._ratelimit_storage_user = collections.defaultdict(int)
-        self._ratelimit_storage_chat = collections.defaultdict(int)
-        self._ratelimit_max_user = db.get(__name__, "ratelimit_max_user", 30)
-        self._ratelimit_max_chat = db.get(__name__, "ratelimit_max_chat", 100)
 
         self.security = security.SecurityManager(client, db)
 
@@ -134,52 +121,6 @@ class CommandDispatcher:
         )
 
         self.raw_handlers = []
-        self._external_bl: typing.List[int] = []
-
-    async def _handle_ratelimit(self, message: Message, func: callable) -> bool:
-        if await self.security.check(message, security.OWNER):
-            return True
-
-        func = getattr(func, "__func__", func)
-        ret = True
-        chat = self._ratelimit_storage_chat[message.chat_id]
-
-        if message.sender_id:
-            user = self._ratelimit_storage_user[message.sender_id]
-            severity = (5 if getattr(func, "ratelimit", False) else 2) * (
-                (user + chat) // 30 + 1
-            )
-            user += severity
-            self._ratelimit_storage_user[message.sender_id] = user
-            if user > self._ratelimit_max_user:
-                ret = False
-            else:
-                self._ratelimit_storage_chat[message.chat_id] = chat
-
-            _decrement_ratelimit(
-                self._ratelimit_max_user * severity,
-                self._ratelimit_storage_user,
-                message.sender_id,
-                severity,
-            )
-        else:
-            severity = (5 if getattr(func, "ratelimit", False) else 2) * (
-                chat // 15 + 1
-            )
-
-        chat += severity
-
-        if chat > self._ratelimit_max_chat:
-            ret = False
-
-        _decrement_ratelimit(
-            self._ratelimit_max_chat * severity,
-            self._ratelimit_storage_chat,
-            message.chat_id,
-            severity,
-        )
-
-        return ret
 
     def _handle_grep(self, message: Message) -> Message:
         # Allow escaping grep with double stick
@@ -304,6 +245,7 @@ class CommandDispatcher:
                 or message.message.startswith(str.translate(prefix * 2, change))
                 and any(s != str.translate(prefix, change) for s in message.message)
             )
+            and prefix != "s"  # To avoid bug with setprefix command
         ):
             # Allow escaping commands using .'s
             if not watcher:
@@ -321,35 +263,17 @@ class CommandDispatcher:
             event.message.message.startswith(str.translate(prefix, change))
             and str.translate(prefix, change) != prefix
         ):
-            message.message = str.translate(message.message, change)
             message.text = str.translate(message.text, change)
         elif not event.message.message.startswith(prefix):
-            return False
-
-        if (
-            event.sticker
-            or event.dice
-            or event.audio
-            or event.via_bot_id
-            or getattr(event, "reactions", False)
-        ):
             return False
 
         blacklist_chats = self._db.get(main.__name__, "blacklist_chats", [])
         whitelist_chats = self._db.get(main.__name__, "whitelist_chats", [])
         whitelist_modules = self._db.get(main.__name__, "whitelist_modules", [])
+        chat_id = utils.get_chat_id(message)
 
-        # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-        # It's not recommended to remove the security check below (external_bl)
-        # If you attempt to bypass this protection, you will be banned from the chat
-        # The protection from using userbots is multi-layer and this is one of the layers
-        # If you bypass it, the next (external) layer will trigger and you will be banned
-        # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-
-        if (
-            (chat_id := utils.get_chat_id(message)) in self._external_bl
-            or chat_id in blacklist_chats
-            or (whitelist_chats and chat_id not in whitelist_chats)
+        if chat_id in blacklist_chats or (
+            whitelist_chats and chat_id not in whitelist_chats
         ):
             return False
 
@@ -394,31 +318,11 @@ class CommandDispatcher:
 
         txt, func = self._modules.dispatch(tag[0])
 
-        if (
-            not func
-            or not await self._handle_ratelimit(message, func)
-            or not await self.security.check(
-                message,
-                func,
-                usernames=self._cached_usernames,
-            )
+        if not func or not await self.security.check(
+            message,
+            func,
+            usernames=self._cached_usernames,
         ):
-            return False
-
-        if message.is_channel and message.edit_date and not message.is_group:
-            async for event in self._client.iter_admin_log(
-                chat_id,
-                limit=10,
-                edit=True,
-            ):
-                if event.action.prev_message.id == message.id:
-                    if event.user_id != self._client.tg_id:
-                        logger.debug("Ignoring edit in channel")
-                        return False
-
-                    break
-            if not watcher:
-                logger.warning("Ignoring message in datachat \\ logging chat")
             return False
 
         message.message = prefix + txt + message.message[len(prefix + command) :]
@@ -520,7 +424,7 @@ class CommandDispatcher:
                 )
 
         with contextlib.suppress(Exception):
-            await (message.edit if message.out else message.reply)(txt)
+            await utils.answer(message, txt)
 
     async def watcher_exc(self, *_):
         logger.exception("Error running watcher", extra={"stack": inspect.stack()})
@@ -536,7 +440,7 @@ class CommandDispatcher:
         self,
         event: typing.Union[events.NewMessage, events.MessageDeleted],
         func: callable,
-    ) -> str:
+    ) -> typing.Optional[str]:
         """
         Handle tags.
         :param event: The event to handle.
@@ -646,18 +550,10 @@ class CommandDispatcher:
         blacklist_chats = self._db.get(main.__name__, "blacklist_chats", [])
         whitelist_chats = self._db.get(main.__name__, "whitelist_chats", [])
         whitelist_modules = self._db.get(main.__name__, "whitelist_modules", [])
+        chat_id = utils.get_chat_id(message)
 
-        # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-        # It's not recommended to remove the security check below (external_bl)
-        # If you attempt to bypass this protection, you will be banned from the chat
-        # The protection from using userbots is multi-layer and this is one of the layers
-        # If you bypass it, the next (external) layer will trigger and you will be banned
-        # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-
-        if (
-            (chat_id := utils.get_chat_id(message)) in self._external_bl
-            or chat_id in blacklist_chats
-            or (whitelist_chats and chat_id not in whitelist_chats)
+        if (blacklist_chats and chat_id in blacklist_chats) or (
+            whitelist_chats and chat_id not in whitelist_chats
         ):
             logger.debug("Message is blacklisted")
             return
@@ -670,16 +566,10 @@ class CommandDispatcher:
                 modname in bl
                 and isinstance(message, Message)
                 and (
-                    "*" in bl[modname]
-                    or chat_id in bl[modname]
-                    or "only_chats" in bl[modname]
-                    and message.is_private
-                    or "only_pm" in bl[modname]
-                    and not message.is_private
-                    or "out" in bl[modname]
-                    and not message.out
-                    or "in" in bl[modname]
-                    and message.out
+                    ("*" in bl[modname])
+                    or (chat_id in bl[modname])
+                    or ("only_chats" in bl[modname] and message.is_private)
+                    or ("only_pm" in bl[modname] and not message.is_private)
                 )
                 or f"{str(chat_id)}.{func.__self__.__module__}" in blacklist_chats
                 or whitelist_modules
