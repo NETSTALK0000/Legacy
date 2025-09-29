@@ -6,6 +6,7 @@
 
 from legacytl.extensions.html import CUSTOM_EMOJIS
 from legacytl.tl.types import Message
+from legacytl.types import InputMediaWebPage
 import legacytl
 
 from .. import loader, main, utils
@@ -67,9 +68,8 @@ class CoreMod(loader.Module):
     @loader.command()
     async def legacy(self, message: Message):
         py_ver = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-        await utils.answer_file(
+        await utils.answer(
             message,
-            "https://i.postimg.cc/90QXwWJN/legacy-userbot.gif",
             self.strings["legacy"].format(
                 (
                     utils.get_platform_emoji()
@@ -79,6 +79,8 @@ class CoreMod(loader.Module):
                 (legacytl.__version__),
                 (py_ver),
             ),
+            media=InputMediaWebPage("https://i.postimg.cc/90QXwWJN/legacy-userbot.gif"),
+            invert_media=True,
         )
 
     @loader.command()

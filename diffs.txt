@@ -1,0 +1,657 @@
+diff --git a/legacy/dispatcher.py b/legacy/dispatcher.py
+index e61a0f9..f588fb3 100644
+--- a/legacy/dispatcher.py
++++ b/legacy/dispatcher.py
+@@ -23,7 +23,6 @@
+ # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+ 
+ import asyncio
+-import collections
+ import contextlib
+ import copy
+ import inspect
+@@ -93,13 +92,6 @@ ALL_TAGS = [
+ ]
+ 
+ 
+-def _decrement_ratelimit(delay, data, key, severity):
+-    def inner():
+-        data[key] = max(0, data[key] - severity)
+-
+-    asyncio.get_event_loop().call_later(delay, inner)
+-
+-
+ class CommandDispatcher:
+     def __init__(
+         self,
+@@ -112,11 +104,6 @@ class CommandDispatcher:
+         self.client = client
+         self._db = db
+ 
+-        self._ratelimit_storage_user = collections.defaultdict(int)
+-        self._ratelimit_storage_chat = collections.defaultdict(int)
+-        self._ratelimit_max_user = db.get(__name__, "ratelimit_max_user", 30)
+-        self._ratelimit_max_chat = db.get(__name__, "ratelimit_max_chat", 100)
+-
+         self.security = security.SecurityManager(client, db)
+ 
+         self.check_security = self.security.check
+@@ -134,52 +121,6 @@ class CommandDispatcher:
+         )
+ 
+         self.raw_handlers = []
+-        self._external_bl: typing.List[int] = []
+-
+-    async def _handle_ratelimit(self, message: Message, func: callable) -> bool:
+-        if await self.security.check(message, security.OWNER):
+-            return True
+-
+-        func = getattr(func, "__func__", func)
+-        ret = True
+-        chat = self._ratelimit_storage_chat[message.chat_id]
+-
+-        if message.sender_id:
+-            user = self._ratelimit_storage_user[message.sender_id]
+-            severity = (5 if getattr(func, "ratelimit", False) else 2) * (
+-                (user + chat) // 30 + 1
+-            )
+-            user += severity
+-            self._ratelimit_storage_user[message.sender_id] = user
+-            if user > self._ratelimit_max_user:
+-                ret = False
+-            else:
+-                self._ratelimit_storage_chat[message.chat_id] = chat
+-
+-            _decrement_ratelimit(
+-                self._ratelimit_max_user * severity,
+-                self._ratelimit_storage_user,
+-                message.sender_id,
+-                severity,
+-            )
+-        else:
+-            severity = (5 if getattr(func, "ratelimit", False) else 2) * (
+-                chat // 15 + 1
+-            )
+-
+-        chat += severity
+-
+-        if chat > self._ratelimit_max_chat:
+-            ret = False
+-
+-        _decrement_ratelimit(
+-            self._ratelimit_max_chat * severity,
+-            self._ratelimit_storage_chat,
+-            message.chat_id,
+-            severity,
+-        )
+-
+-        return ret
+ 
+     def _handle_grep(self, message: Message) -> Message:
+         # Allow escaping grep with double stick
+@@ -304,6 +245,7 @@ class CommandDispatcher:
+                 or message.message.startswith(str.translate(prefix * 2, change))
+                 and any(s != str.translate(prefix, change) for s in message.message)
+             )
++            and prefix != "s"  # To avoid bug with setprefix command
+         ):
+             # Allow escaping commands using .'s
+             if not watcher:
+@@ -321,35 +263,17 @@ class CommandDispatcher:
+             event.message.message.startswith(str.translate(prefix, change))
+             and str.translate(prefix, change) != prefix
+         ):
+-            message.message = str.translate(message.message, change)
+             message.text = str.translate(message.text, change)
+         elif not event.message.message.startswith(prefix):
+             return False
+ 
+-        if (
+-            event.sticker
+-            or event.dice
+-            or event.audio
+-            or event.via_bot_id
+-            or getattr(event, "reactions", False)
+-        ):
+-            return False
+-
+         blacklist_chats = self._db.get(main.__name__, "blacklist_chats", [])
+         whitelist_chats = self._db.get(main.__name__, "whitelist_chats", [])
+         whitelist_modules = self._db.get(main.__name__, "whitelist_modules", [])
++        chat_id = utils.get_chat_id(message)
+ 
+-        # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+-        # It's not recommended to remove the security check below (external_bl)
+-        # If you attempt to bypass this protection, you will be banned from the chat
+-        # The protection from using userbots is multi-layer and this is one of the layers
+-        # If you bypass it, the next (external) layer will trigger and you will be banned
+-        # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+-
+-        if (
+-            (chat_id := utils.get_chat_id(message)) in self._external_bl
+-            or chat_id in blacklist_chats
+-            or (whitelist_chats and chat_id not in whitelist_chats)
++        if chat_id in blacklist_chats or (
++            whitelist_chats and chat_id not in whitelist_chats
+         ):
+             return False
+ 
+@@ -394,33 +318,13 @@ class CommandDispatcher:
+ 
+         txt, func = self._modules.dispatch(tag[0])
+ 
+-        if (
+-            not func
+-            or not await self._handle_ratelimit(message, func)
+-            or not await self.security.check(
+-                message,
+-                func,
+-                usernames=self._cached_usernames,
+-            )
++        if not func or not await self.security.check(
++            message,
++            func,
++            usernames=self._cached_usernames,
+         ):
+             return False
+ 
+-        if message.is_channel and message.edit_date and not message.is_group:
+-            async for event in self._client.iter_admin_log(
+-                chat_id,
+-                limit=10,
+-                edit=True,
+-            ):
+-                if event.action.prev_message.id == message.id:
+-                    if event.user_id != self._client.tg_id:
+-                        logger.debug("Ignoring edit in channel")
+-                        return False
+-
+-                    break
+-            if not watcher:
+-                logger.warning("Ignoring message in datachat \\ logging chat")
+-            return False
+-
+         message.message = prefix + txt + message.message[len(prefix + command) :]
+ 
+         if (
+@@ -520,7 +424,7 @@ class CommandDispatcher:
+                 )
+ 
+         with contextlib.suppress(Exception):
+-            await (message.edit if message.out else message.reply)(txt)
++            await utils.answer(message, txt)
+ 
+     async def watcher_exc(self, *_):
+         logger.exception("Error running watcher", extra={"stack": inspect.stack()})
+@@ -536,7 +440,7 @@ class CommandDispatcher:
+         self,
+         event: typing.Union[events.NewMessage, events.MessageDeleted],
+         func: callable,
+-    ) -> str:
++    ) -> typing.Optional[str]:
+         """
+         Handle tags.
+         :param event: The event to handle.
+@@ -646,18 +550,10 @@ class CommandDispatcher:
+         blacklist_chats = self._db.get(main.__name__, "blacklist_chats", [])
+         whitelist_chats = self._db.get(main.__name__, "whitelist_chats", [])
+         whitelist_modules = self._db.get(main.__name__, "whitelist_modules", [])
++        chat_id = utils.get_chat_id(message)
+ 
+-        # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+-        # It's not recommended to remove the security check below (external_bl)
+-        # If you attempt to bypass this protection, you will be banned from the chat
+-        # The protection from using userbots is multi-layer and this is one of the layers
+-        # If you bypass it, the next (external) layer will trigger and you will be banned
+-        # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+-
+-        if (
+-            (chat_id := utils.get_chat_id(message)) in self._external_bl
+-            or chat_id in blacklist_chats
+-            or (whitelist_chats and chat_id not in whitelist_chats)
++        if (blacklist_chats and chat_id in blacklist_chats) or (
++            whitelist_chats and chat_id not in whitelist_chats
+         ):
+             logger.debug("Message is blacklisted")
+             return
+@@ -670,16 +566,10 @@ class CommandDispatcher:
+                 modname in bl
+                 and isinstance(message, Message)
+                 and (
+-                    "*" in bl[modname]
+-                    or chat_id in bl[modname]
+-                    or "only_chats" in bl[modname]
+-                    and message.is_private
+-                    or "only_pm" in bl[modname]
+-                    and not message.is_private
+-                    or "out" in bl[modname]
+-                    and not message.out
+-                    or "in" in bl[modname]
+-                    and message.out
++                    ("*" in bl[modname])
++                    or (chat_id in bl[modname])
++                    or ("only_chats" in bl[modname] and message.is_private)
++                    or ("only_pm" in bl[modname] and not message.is_private)
+                 )
+                 or f"{str(chat_id)}.{func.__self__.__module__}" in blacklist_chats
+                 or whitelist_modules
+diff --git a/legacy/inline/types.py b/legacy/inline/types.py
+index 6eb2f14..5d333a0 100644
+--- a/legacy/inline/types.py
++++ b/legacy/inline/types.py
+@@ -74,7 +74,7 @@ class BotInlineMessage:
+             {"id": unit_id, **self._units[unit_id]} if unit_id in self._units else {}
+         )
+ 
+-    async def edit(self, *args, **kwargs) -> "BotMessage":
++    async def edit(self, *args, **kwargs) -> AiogramMessage:
+         if "unit_id" in kwargs:
+             kwargs.pop("unit_id")
+ 
+@@ -197,13 +197,6 @@ class InlineUnit:
+         """Made just for type specification"""
+ 
+ 
+-class BotMessage(AiogramMessage):
+-    """Modified version of original Aiogram Message"""
+-
+-    def __init__(self):
+-        super().__init__()
+-
+-
+ class InlineQuery(AiogramInlineQuery):
+     """Modified version of original Aiogram InlineQuery"""
+ 
+diff --git a/legacy/main.py b/legacy/main.py
+index 9226645..ef2f53f 100644
+--- a/legacy/main.py
++++ b/legacy/main.py
+@@ -780,6 +780,9 @@ class Legacy:
+                     session.filename,
+                 )
+                 self.sessions.remove(session)
++            except Exception as e:
++                logging.exception("Failed to load session %s: %s", session.filename, e)
++                self.sessions.remove(session)
+ 
+         return bool(self.sessions)
+ 
+@@ -869,12 +872,12 @@ class Legacy:
+ 
+         client.add_event_handler(
+             dispatcher.handle_incoming,
+-            events.NewMessage,
++            events.NewMessage(incoming=True),
+         )
+ 
+         client.add_event_handler(
+             dispatcher.handle_incoming,
+-            events.ChatAction,
++            events.ChatAction(),
+         )
+ 
+         client.add_event_handler(
+diff --git a/legacy/modules/legacy_backup.py b/legacy/modules/legacy_backup.py
+index c1230e7..0998dfd 100644
+--- a/legacy/modules/legacy_backup.py
++++ b/legacy/modules/legacy_backup.py
+@@ -15,7 +15,6 @@ import time
+ import zipfile
+ from pathlib import Path
+ 
+-from legacytl.tl.types import Message
+ 
+ from .. import loader, utils, main
+ from ..inline.types import BotInlineCall
+@@ -32,7 +31,7 @@ class LegacyBackupMod(loader.Module):
+             await self.inline.bot.send_photo(
+                 self.tg_id,
+                 photo="https://i.postimg.cc/8PPXPyK5/legacy-unit-alpha.png",
+-                caption=self.strings("period"),
++                caption=self.strings["period"],
+                 reply_markup=self.inline.generate_markup(
+                     utils.chunks(
+                         [
+@@ -82,26 +81,26 @@ class LegacyBackupMod(loader.Module):
+         self.set("last_backup", round(time.time()))
+ 
+         await call.answer(
+-            self.strings("saved").format(self.get_prefix()),
++            self.strings["saved"].format(self.get_prefix()),
+             show_alert=True,
+         )
+         await call.delete()
+ 
+     @loader.command()
+-    async def set_backup_period(self, message: Message):
++    async def set_backup_period(self, message):
+         if (
+             not (args := utils.get_args_raw(message))
+             or not args.isdigit()
+             or int(args) not in range(200)
+         ):
+-            await utils.answer(message, self.strings("invalid_args"))
++            await utils.answer(message, self.strings["invalid_args"])
+             return
+ 
+         if not int(args):
+             self.set("period", "disabled")
+             await utils.answer(
+                 message,
+-                self.strings("never").format(self.get_prefix(message.sender_id)),
++                self.strings["never"].format(self.get_prefix(message.sender_id)),
+             )
+             return
+ 
+@@ -109,7 +108,7 @@ class LegacyBackupMod(loader.Module):
+         self.set("period", period)
+         self.set("last_backup", round(time.time()))
+         await utils.answer(
+-            message, self.strings("saved").format(self.get_prefix(message.sender_id))
++            message, self.strings["saved"].format(self.get_prefix(message.sender_id))
+         )
+ 
+     @loader.loop(interval=1, autostart=True)
+@@ -150,7 +149,7 @@ class LegacyBackupMod(loader.Module):
+             await self.inline.bot.send_document(
+                 int(f"-100{self._backup_channel.id}"),
+                 outfile,
+-                caption=self.strings("backup_caption").format(
++                caption=self.strings["backup_caption"].format(
+                     prefix=self.get_prefix(),
+                     num_of_modules=f"{len([m for m in self.allmodules.modules if getattr(m, '__origin__', None) != '<core>'])}",
+                 ),
+@@ -158,7 +157,7 @@ class LegacyBackupMod(loader.Module):
+                     [
+                         [
+                             {
+-                                "text": self.strings("restore_this"),
++                                "text": self.strings["restore_this"],
+                                 "data": "legacy/backup/restore/confirm",
+                             },
+                         ],
+@@ -181,16 +180,16 @@ class LegacyBackupMod(loader.Module):
+         if call.data == "legacy/backup/restore/confirm":
+             await utils.answer(
+                 call,
+-                self.strings("confirm"),
++                self.strings["confirm"],
+                 reply_markup=[
+                     {
+-                        "text": self.strings("_btn_yes"),
++                        "text": self.strings["_btn_yes"],
+                         "data": "legacy/backup/restore",
+                     },
+                     {
+-                        "text": self.strings("_btn_no"),
++                        "text": self.strings["_btn_no"],
+                         "data": "legacy/backup/restore/cancel",
+-                    }
++                    },
+                 ],
+             )
+             return
+@@ -234,11 +233,11 @@ class LegacyBackupMod(loader.Module):
+             logger.exception("Unable to restore backup")
+             return
+ 
+-        await call.answer(self.strings("backup_restored"), show_alert=True)
++        await call.answer(self.strings["backup_restored"], show_alert=True)
+         await self.invoke("restart", "-f", peer=self.inline.bot_id)
+ 
+     @loader.command()
+-    async def backup(self, message: Message):
++    async def backup(self, message):
+         db_dump = ujson.dumps(self._db).encode()
+ 
+         result = io.BytesIO()
+@@ -258,7 +257,7 @@ class LegacyBackupMod(loader.Module):
+         backup_msg = await self.inline.bot.send_document(
+             int(f"-100{self._backup_channel.id}"),
+             outfile,
+-            caption=self.strings("backup_caption").format(
++            caption=self.strings["backup_caption"].format(
+                 prefix=self.get_prefix(message.sender_id),
+                 num_of_modules=f"{len([m for m in self.allmodules.modules if getattr(m, '__origin__', None) != '<core>'])}",
+             ),
+@@ -266,7 +265,7 @@ class LegacyBackupMod(loader.Module):
+                 [
+                     [
+                         {
+-                            "text": self.strings("restore_this"),
++                            "text": self.strings["restore_this"],
+                             "data": "legacy/backup/restore/confirm",
+                         },
+                     ],
+@@ -276,15 +275,15 @@ class LegacyBackupMod(loader.Module):
+ 
+         await utils.answer(
+             message,
+-            self.strings("backup_sent").format(
++            self.strings["backup_sent"].format(
+                 f"https://t.me/c/{self._backup_channel.id}/{backup_msg.message_id}"
+             ),
+         )
+ 
+     @loader.command()
+-    async def restore(self, message: Message):
++    async def restore(self, message):
+         if not (reply := await message.get_reply_message()) or not reply.media:
+-            await utils.answer(message, self.strings("reply_to_file"))
++            await utils.answer(message, self.strings["reply_to_file"])
+             return
+ 
+         logger.info("📚 Trying to restore backup")
+@@ -318,8 +317,8 @@ class LegacyBackupMod(loader.Module):
+                         path.write_bytes(module.read())
+         except Exception:
+             logger.exception("Unable to restore backup")
+-            await utils.answer(message, self.strings("reply_to_file"))
++            await utils.answer(message, self.strings["reply_to_file"])
+             return
+ 
+-        await utils.answer(message, self.strings("backup_restored"))
++        await utils.answer(message, self.strings["backup_restored"])
+         await self.invoke("restart", "-f", peer=message.peer_id)
+diff --git a/legacy/modules/quickstart.py b/legacy/modules/quickstart.py
+index 1e6f442..73b0747 100644
+--- a/legacy/modules/quickstart.py
++++ b/legacy/modules/quickstart.py
+@@ -21,7 +21,7 @@ class Quickstart(loader.Module):
+         self.mark = lambda: [
+             [
+                 {
+-                    "text": self.strings("btn_support"),
++                    "text": self.strings["btn_support"],
+                     "url": "https://t.me/legacy_help",
+                 }
+             ],
+diff --git a/legacy/tl_cache.py b/legacy/tl_cache.py
+index d728d10..0b71e0b 100644
+--- a/legacy/tl_cache.py
++++ b/legacy/tl_cache.py
+@@ -22,7 +22,6 @@ from legacytl.tl.functions.users import GetFullUserRequest
+ from legacytl.tl.tlobject import TLRequest
+ from legacytl.tl.types import (
+     ChannelFull,
+-    Message,
+     Updates,
+     UpdatesCombined,
+     UpdateShort,
+@@ -212,7 +211,6 @@ class CustomTelegramClient(TelegramClient):
+ 
+     async def force_get_entity(self, *args, **kwargs):
+         """Forcefully makes a request to Telegram to get the entity."""
+-
+         return await self.get_entity(*args, force=True, **kwargs)
+ 
+     async def get_entity(
+@@ -375,9 +373,9 @@ class CustomTelegramClient(TelegramClient):
+                 resolved_perms,
+                 exp,
+             )
+-            self._legacy_perms_cache.setdefault(hashable_entity, {})[
+-                hashable_user
+-            ] = cache_record
++            self._legacy_perms_cache.setdefault(hashable_entity, {})[hashable_user] = (
++                cache_record
++            )
+             logger.debug("Saved hashable_entity %s perms to cache", hashable_entity)
+ 
+             def save_user(key: typing.Union[str, int]):
+@@ -389,9 +387,9 @@ class CustomTelegramClient(TelegramClient):
+                     self._legacy_perms_cache.setdefault(key, {})[
+                         f"@{user.username}"
+                     ] = cache_record
+-                    self._legacy_perms_cache.setdefault(key, {})[
+-                        user.username
+-                    ] = cache_record
++                    self._legacy_perms_cache.setdefault(key, {})[user.username] = (
++                        cache_record
++                    )
+ 
+             if getattr(entity, "id", None):
+                 logger.debug("Saved resolved_entity id %s perms to cache", entity.id)
+@@ -451,7 +449,7 @@ class CustomTelegramClient(TelegramClient):
+         ):
+             return self._legacy_fullchannel_cache[hashable_entity].full_channel
+ 
+-        result = await self(GetFullChannelRequest(channel=entity))
++        result = await self._call(self._sender, GetFullChannelRequest(channel=entity))
+         self._legacy_fullchannel_cache[hashable_entity] = CacheRecordFullChannel(
+             hashable_entity,
+             result,
+@@ -503,7 +501,7 @@ class CustomTelegramClient(TelegramClient):
+         ):
+             return self._legacy_fulluser_cache[hashable_entity].full_user
+ 
+-        result = await self(GetFullUserRequest(entity))
++        result = await self._call(self._sender, GetFullUserRequest(entity))
+         self._legacy_fulluser_cache[hashable_entity] = CacheRecordFullUser(
+             hashable_entity,
+             result,
+@@ -511,18 +509,6 @@ class CustomTelegramClient(TelegramClient):
+         )
+         return result
+ 
+-    async def send_file(self, *args, **kwargs) -> Message:
+-        return await super().send_file(
+-            *args,
+-            **kwargs,
+-        )
+-
+-    async def send_message(self, *args, **kwargs) -> Message:
+-        return await super().send_message(
+-            *args,
+-            **kwargs,
+-        )
+-
+     async def _call(
+         self,
+         sender: MTProtoSender,
+diff --git a/legacy/types.py b/legacy/types.py
+index 3f008ed..4455bb4 100644
+--- a/legacy/types.py
++++ b/legacy/types.py
+@@ -33,10 +33,10 @@ from legacytl.tl.types import (
+ )
+ 
+ from ._reference_finder import replace_all_refs
++from aiogram.types import Message as BotMessage
+ from .inline.types import (
+     BotInlineCall,
+     BotInlineMessage,
+-    BotMessage,
+     InlineCall,
+     InlineMessage,
+     InlineQuery,
+diff --git a/legacy/web/core.py b/legacy/web/core.py
+index d6c0e31..9604e3e 100644
+--- a/legacy/web/core.py
++++ b/legacy/web/core.py
+@@ -26,6 +26,7 @@ import asyncio
+ import contextlib
+ import inspect
+ import logging
++import socket
+ import os
+ import requests
+ 
+@@ -86,18 +87,30 @@ class Web(root.Web):
+                 )
+ 
+         if not url:
+-            # вырезана проверка на докер
+             platform = utils.get_named_platform()
+ 
+             if any(keyword in platform for keyword in ["WSL", "UserLand"]):
+                 ip = "127.0.0.1"
+             else:
+                 try:
++                    original_getaddrinfo = socket.getaddrinfo
++
++                    def getaddrinfo_ipv4_only(
++                        host, port, family=0, type=0, proto=0, flags=0
++                    ):
++                        return original_getaddrinfo(
++                            host, port, socket.AF_INET, type, proto, flags
++                        )
++
++                    socket.getaddrinfo = getaddrinfo_ipv4_only
++
+                     resp = requests.get("http://ifconfig.me/ip", timeout=5)
+                     resp.raise_for_status()
+                     ip = resp.text.strip()
+-                except (requests.exceptions.RequestException, ValueError):
++                except (requests.exceptions.RequestException, ValueError) as e:
+                     ip = "127.0.0.1"
++                finally:
++                    socket.getaddrinfo = original_getaddrinfo
+ 
+             url = f"http://{ip}:{self.port}"
+ 
+diff --git a/legacy/web/root.py b/legacy/web/root.py
+index 109ec6a..ac98554 100644
+--- a/legacy/web/root.py
++++ b/legacy/web/root.py
+@@ -13,7 +13,6 @@ import logging
+ import re
+ import string
+ import time
+-import socket
+ import os
+ 
+ import aiohttp_jinja2
+@@ -226,7 +225,9 @@ class Web:
+         self._qr_login = True
+ 
+     async def init_qr_login(self, request: web.Request) -> web.Response:
+-        if self.client_data and ("SHARKHOST" in os.environ or "HIKKAHOST" in os.environ):
++        if self.client_data and (
++            "SHARKHOST" in os.environ or "HIKKAHOST" in os.environ
++        ):
+             return web.Response(status=403, body="Forbidden by SharkHost EULA")
+ 
+         if not self._check_session(request):
+@@ -289,7 +290,9 @@ class Web:
+         )
+ 
+     async def can_add(self, request: web.Request) -> web.Response:
+-        if self.client_data and ("SHARKHOST" in os.environ or "HIKKAHOST" in os.environ):
++        if self.client_data and (
++            "SHARKHOST" in os.environ or "HIKKAHOST" in os.environ
++        ):
+             return web.Response(status=403, body="Forbidden by SharkHost EULA")
+ 
+         return web.Response(status=200, body="Yes")
+@@ -298,7 +301,9 @@ class Web:
+         if not self._check_session(request):
+             return web.Response(status=401, body="Authorization required")
+ 
+-        if self.client_data and ("SHARKHOST" in os.environ or "HIKKAHOST" in os.environ):
++        if self.client_data and (
++            "SHARKHOST" in os.environ or "HIKKAHOST" in os.environ
++        ):
+             return web.Response(status=403, body="Forbidden by SharkHost EULA")
+ 
+         if self._pending_client:
