@@ -872,7 +872,7 @@ class Legacy:
 
         client.add_event_handler(
             dispatcher.handle_incoming,
-            events.NewMessage(incoming=True),
+            events.NewMessage(),
         )
 
         client.add_event_handler(

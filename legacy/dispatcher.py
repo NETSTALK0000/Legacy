@@ -475,12 +475,12 @@ class CommandDispatcher:
             "no_channels": lambda: not getattr(m, "is_channel", False),
             "no_groups": (
                 lambda: not getattr(m, "is_group", False)
-                or getattr(m, "private", False)
+                or getattr(m, "is_private", False)
                 or getattr(m, "is_channel", False)
             ),
             "only_groups": (
                 lambda: getattr(m, "is_group", False)
-                or not getattr(m, "private", False)
+                or not getattr(m, "is_private", False)
                 and not getattr(m, "is_channel", False)
             ),
             "no_pm": lambda: not getattr(m, "is_private", False),
