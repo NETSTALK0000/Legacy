@@ -181,7 +181,7 @@ class CoreMod(loader.Module):
             await utils.answer(
                 message,
                 self.strings["aliases"]
-                + "<blockquote>"
+                + "<blockquote expandable>"
                 + "\n".join(
                     [
                         (self.config["alias_emoji"] + f" <code>{i}</code> &lt;- {y}")

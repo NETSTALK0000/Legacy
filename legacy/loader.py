@@ -804,12 +804,17 @@ class Modules:
     def lookup(
         self,
         modname: str,
-    ) -> typing.Union[bool, Module, Library, typing.List[typing.Union[Module, Library]]]:
-        lib_matches = [lib for lib in self.libraries if lib.name.lower() == modname.lower()]
+    ) -> typing.Union[
+        bool, Module, Library, typing.List[typing.Union[Module, Library]]
+    ]:
+        lib_matches = [
+            lib for lib in self.libraries if lib.name.lower() == modname.lower()
+        ]
         mod_matches = [
-            mod for mod in self.modules
+            mod
+            for mod in self.modules
             if mod.__class__.__name__.lower() == modname.lower()
-            or (hasattr(mod, 'name') and mod.name.lower() == modname.lower())
+            or (hasattr(mod, "name") and mod.name.lower() == modname.lower())
         ]
         all_matches = lib_matches + mod_matches
         if not all_matches:
@@ -883,6 +888,8 @@ class Modules:
                 aliases := getattr(_command, "aliases", None)
             ):
                 aliases = [_command.alias]
+            if getattr(_command, "aliases", None):
+                aliases = _command.aliases
 
             if not aliases:
                 continue

@@ -89,6 +89,8 @@ class Help(loader.Module):
             aliases := getattr(_command, "aliases", None)
         ):
             aliases = [_command.alias]
+        if getattr(_command, "aliases", None):
+            aliases = _command.aliases
 
         return aliases or []
 
@@ -336,7 +338,9 @@ class Help(loader.Module):
         full_list = (
             core_ + plain_ + no_commands_
             if force
-            else hidden_mods + no_commands_ if only_hidden else core_ + plain_
+            else hidden_mods + no_commands_
+            if only_hidden
+            else core_ + plain_
         )
         await utils.answer(
             message,
