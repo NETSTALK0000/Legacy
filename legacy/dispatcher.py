@@ -116,7 +116,9 @@ class CommandDispatcher:
             )
         ]
 
-        self._cached_usernames.extend(getattr(self._client.legacy_me, "usernames", []))
+        self._cached_usernames.extend(
+            getattr(self._client.legacy_me, "usernames", None) or []
+        )
 
         self.raw_handlers = []
 
