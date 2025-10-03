@@ -850,7 +850,7 @@ async def asset_channel(
         await client(SetHistoryTTLRequest(peer=peer, period=ttl))
 
     if _folder:
-        folders = await client(GetDialogFiltersRequest()).filters
+        folders = (await client(GetDialogFiltersRequest())).filters
 
         try:
             folder = next(
