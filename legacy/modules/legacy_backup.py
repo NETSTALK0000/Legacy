@@ -61,7 +61,6 @@ class LegacyBackupMod(loader.Module):
             "legacy-backups",
             "📼 Your database backups will appear here",
             silent=True,
-            archive=True,
             avatar=f"{main.BACKUPS_PATH}",
             _folder="legacy",
             invite_bot=True,

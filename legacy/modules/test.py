@@ -426,6 +426,7 @@ class TestMod(loader.Module):
             silent=True,
             invite_bot=True,
             avatar=f"{main.LOGS_PATH}",
+            _folder="legacy",
         )
 
         self.logchat = int(f"-100{chat.id}")

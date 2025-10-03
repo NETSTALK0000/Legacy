@@ -850,18 +850,19 @@ async def asset_channel(
         await client(SetHistoryTTLRequest(peer=peer, period=ttl))
 
     if _folder:
-        if _folder != "legacy":
-            # finish later
-            _folder = "legacy"
-
-        folders = await client(GetDialogFiltersRequest())
+        folders = await client(GetDialogFiltersRequest()).filters
 
         try:
-            folder = next(folder for folder in folders if folder.title == "legacy")
+            folder = next(
+                folder
+                for folder in folders
+                if not isinstance(folder, legacytl.tl.types.DialogFilterDefault)
+                and folder.title.text.lower() == _folder.lower()
+            )
         except Exception:
             folder = None
 
-        if folder is not None and not any(
+        if folder and not any(
             peer.id == getattr(folder_peer, "channel_id", None)
             for folder_peer in folder.include_peers
         ):

@@ -67,8 +67,8 @@ class Database(dict):
                 self._client,
                 "legacy-assets",
                 "🌆 Your Legacy assets will be stored here",
-                archive=True,
                 avatar=f"{main.ASSETS_PATH}",
+                _folder="legacy",
             )
         except ChannelsTooMuchError:
             self._assets = None
