@@ -886,10 +886,23 @@ class LoaderMod(loader.Module):
             instance.commands.items(),
             key=lambda x: x[0],
         ):
-            modhelp += "\n{} <code>{}{}</code> {}".format(
+            modhelp += "\n{} <code>{}{}</code>{} {}".format(
                 "<emoji document_id=5197195523794157505>▫️</emoji>",
-                utils.escape_html(self.get_prefix()),
+                utils.escape_html(self.get_prefix(message.sender_id)),
                 _name,
+                (
+                    " ({})".format(
+                        ", ".join(
+                            "<code>{}{}</code>".format(
+                                utils.escape_html(self.get_prefix(message.sender_id)),
+                                alias,
+                            )
+                            for alias in self.lookup("help").find_aliases(_name)
+                        )
+                    )
+                    if self.lookup("help").find_aliases(_name)
+                    else ""
+                ),
                 (
                     utils.escape_html(inspect.getdoc(fun))
                     if fun.__doc__
