@@ -859,6 +859,7 @@ async def asset_channel(
                 if not isinstance(folder, legacytl.tl.types.DialogFilterDefault)
                 and folder.title.text.lower() == _folder.lower()
             )
+            print(folder)
         except Exception:
             folder = None
 
@@ -866,7 +867,9 @@ async def asset_channel(
             peer.id == getattr(folder_peer, "channel_id", None)
             for folder_peer in folder.include_peers
         ):
-            folder.include_peers += [await client.get_input_entity(peer)]
+            print(len(folder.include_peers))
+            folder.include_peers.append(await client.get_input_entity(peer))
+            print(len(folder.include_peers))
 
             await client(
                 UpdateDialogFilterRequest(
