@@ -34,7 +34,7 @@
 - Blockquotes added in aliasescmd
 - Sharkhost platform added
 - Reworked rollbackcmd
-- Added new keyword {label} to LegacyHelp
+- Added new keyword {label} to LegacyInfo
 - Added the ability to specify a token for an inline bot via arguments and 'ch_bot_token' cmd
 - utils.answer and utils.answer_file methods have been updated
 - New CLI banner
@@ -51,4 +51,4 @@
 - Fixed configs
 - Updated LegacyInfoMod
 - Updatel Legacy-TL-New
-
+- Dispatcher refactoring
