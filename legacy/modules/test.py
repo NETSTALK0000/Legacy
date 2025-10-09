@@ -14,7 +14,7 @@ from io import BytesIO
 import platform as lib_platform
 import getpass
 
-from legacytl.tl.types import Message
+from legacytl.tl.types import Message, InputMediaWebPage
 
 from .. import loader, main, utils
 from ..inline.types import InlineCall
@@ -72,7 +72,7 @@ class TestMod(loader.Module):
                 on_change=self._pass_config_to_logger,
             ),
             loader.ConfigValue(
-                "Text_Of_Ping",
+                "ping_text",
                 "<emoji document_id=5920515922505765329>⚡️</emoji> <b>𝙿𝚒𝚗𝚐: </b><code>{ping}</code><b> 𝚖𝚜 </b>\n<emoji document_id=5900104897885376843>🕓</emoji><b> 𝚄𝚙𝚝𝚒𝚖𝚎: </b><code>{uptime}</code>",
                 lambda: self.strings["configping"],
                 validator=loader.validators.String(),
@@ -88,6 +88,15 @@ class TestMod(loader.Module):
                 "<emoji document_id=5253521692008917018>🌙</emoji>",
                 lambda: self.strings["ping_emoji"],
                 validator=loader.validators.String(),
+            ),
+            loader.ConfigValue(
+                "banner_url",
+                None,
+                "Banner url",
+                validator=loader.validators.Union(
+                    loader.validators.String(),
+                    loader.validators.NoneType()
+                ),
             ),
         )
 
@@ -407,7 +416,7 @@ class TestMod(loader.Module):
 
         await utils.answer(
             message,
-            self.config["Text_Of_Ping"].format(
+            self.config["ping_text"].format(
                 ping=f"{round((time.perf_counter_ns() - start) / 10**6, 3)}",
                 uptime=f"{utils.formatted_uptime()}",
                 ping_hint=(
@@ -416,6 +425,12 @@ class TestMod(loader.Module):
                 hostname=lib_platform.node(),
                 user=getpass.getuser(),
             ),
+            media=(
+                InputMediaWebPage(self.config["banner_url"])
+                if self.config["banner_url"]
+                else None
+            ),
+            invert_media=True,
         )
 
     async def client_ready(self):
