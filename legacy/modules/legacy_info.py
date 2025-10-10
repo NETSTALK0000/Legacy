@@ -28,6 +28,11 @@ class LegacyInfoMod(loader.Module):
                 "https://i.postimg.cc/9MTZgB2j/legacy-info.gif",
                 lambda: self.strings["_cfg_banner"],
             ),
+            loader.ConfigValue(
+                "hide_platform_emoji",
+                False,
+                validator=loader.validators.Boolean(),
+            ),
         )
 
     async def _render_info(self, args: list, custom_prefix: str) -> str:
@@ -52,23 +57,27 @@ class LegacyInfoMod(loader.Module):
 
         platform = utils.get_named_platform()
 
-        for emoji, icon in [
-            ("🍊", "<emoji document_id=5449599833973203438>🧡</emoji>"),
-            ("🍇", "<emoji document_id=5449468596952507859>💜</emoji>"),
-            ("🍀", "<emoji document_id=5395325195542078574>🍀</emoji>"),
-            ("🚂", "<emoji document_id=5359595190807962128>🚂</emoji>"),
-            ("🐳", "<emoji document_id=5431815452437257407>🐳</emoji>"),
-            ("🕶", "<emoji document_id=5407025283456835913>📱</emoji>"),
-            ("💎", "<emoji document_id=5471952986970267163>💎</emoji>"),
-            ("🛡", "<emoji document_id=5422712776059534305>🌩</emoji>"),
-            ("☕️", "<emoji document_id=6025967359716497965>☕️</emoji>"),
-            ("🌼", "<emoji document_id=5224219153077914783>❤️</emoji>"),
-            ("🎡", "<emoji document_id=5226711870492126219>🎡</emoji>"),
-            ("🐧", "<emoji document_id=5361541227604878624>🐧</emoji>"),
-            ("🦊", "<emoji document_id=5283051451889756068>🦊</emoji>"),
-            ("🧨", "<emoji document_id=5379774338733994368>🧨</emoji>"),
-        ]:
-            platform = platform.replace(emoji, icon)
+        if not self.config["hide_platform_emoji"]:
+            for emoji, icon in [
+                ("🍊", "<emoji document_id=5449599833973203438>🧡</emoji>"),
+                ("🍇", "<emoji document_id=5449468596952507859>💜</emoji>"),
+                ("🍀", "<emoji document_id=5395325195542078574>🍀</emoji>"),
+                ("🚂", "<emoji document_id=5359595190807962128>🚂</emoji>"),
+                ("🐳", "<emoji document_id=5431815452437257407>🐳</emoji>"),
+                ("🕶", "<emoji document_id=5407025283456835913>📱</emoji>"),
+                ("💎", "<emoji document_id=5471952986970267163>💎</emoji>"),
+                ("🛡", "<emoji document_id=5422712776059534305>🌩</emoji>"),
+                ("☕️", "<emoji document_id=6025967359716497965>☕️</emoji>"),
+                ("🌼", "<emoji document_id=5224219153077914783>❤️</emoji>"),
+                ("🎡", "<emoji document_id=5226711870492126219>🎡</emoji>"),
+                ("🐧", "<emoji document_id=5361541227604878624>🐧</emoji>"),
+                ("🦊", "<emoji document_id=5283051451889756068>🦊</emoji>"),
+                ("🧨", "<emoji document_id=5379774338733994368>🧨</emoji>"),
+            ]:
+                platform = platform.replace(emoji, icon)
+        else:
+            platform = platform[2:]
+
         return (
             self.config["custom_message"].format(
                 me=me,
