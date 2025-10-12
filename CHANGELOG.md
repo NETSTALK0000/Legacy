@@ -52,3 +52,9 @@
 - Updated LegacyInfoMod
 - Updatel Legacy-TL-New
 - Dispatcher refactoring
+
+## 🌙 Legacy: Incendium
+
+- Added banner for ping
+- Added new configs
+- Improved strings
