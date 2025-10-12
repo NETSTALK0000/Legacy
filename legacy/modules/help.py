@@ -49,6 +49,19 @@ class Help(loader.Module):
                 lambda: "If the blockquote will be expandable",
                 validator=loader.validators.Boolean(),
             ),
+            loader.ConfigValue(
+                "hide_core_modules",
+                False,
+                lambda: "Hide all core modules",
+                on_change=lambda: (
+                    self.set("hide", (
+                        list({*self.get("hide", []), *[m.__class__.__name__ for m in self.allmodules.modules if getattr(m, "__origin__", None) == "<core>"]})
+                        if self.config["hide_core_modules"]
+                        else [m for m in self.get("hide", []) if getattr(self.lookup(m), "__origin__") != "<core>"]
+                    ))
+                ),
+                validator=loader.validators.Boolean(),
+            ),
         )
 
     @loader.command()
@@ -61,7 +74,12 @@ class Help(loader.Module):
         hidden, shown = [], []
         for module in filter(lambda module: self.lookup(module), modules):
             module = self.lookup(module)
+            module_origin = module.__origin__
             module = module.__class__.__name__
+
+            if self.config["hide_core_modules"] and module_origin == '<core>':
+                continue
+
             if module in currently_hidden:
                 currently_hidden.remove(module)
                 shown += [module]
