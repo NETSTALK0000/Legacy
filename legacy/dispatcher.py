@@ -130,6 +130,9 @@ class CommandDispatcher:
             message.message = re.sub(r"\|\| ?grep", "| grep", message.message)
             return message
 
+        if getattr(message, "legacy_grepped", False):
+            return message
+
         grep = False
         if not re.search(r".+\| ?grep (.+)", message.raw_text):
             return message
