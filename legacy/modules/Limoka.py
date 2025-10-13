@@ -11,32 +11,31 @@ import random
 import logging
 import os
 import html
-import ujson
+import json
 from datetime import datetime
 import asyncio
 
 from telethon.types import Message
 from telethon.errors.rpcerrorlist import WebpageMediaEmptyError
-
 try:
     from aiogram.utils.exceptions import BadRequest
 except ImportError:
-    from aiogram.exceptions import (
-        TelegramBadRequest as BadRequest,
-    )  # essential crutch for aiogram 3 in heroku 1.7.0
+    from aiogram.exceptions import TelegramBadRequest as BadRequest  # essential crutch for aiogram 3 in heroku 1.7.0 
 
 from .. import utils, loader
 from ..types import InlineQuery, InlineCall
 
 logger = logging.getLogger("Limoka")
 
-__version__ = (1, 1, 0)
+__version__ = (1, 1, 1)
 
 
 class Search:
     def __init__(self, query, ix):
         self.schema = Schema(
-            title=TEXT(stored=True), path=ID(stored=True), content=TEXT(stored=True)
+            title=TEXT(stored=True), 
+            path=ID(stored=True), 
+            content=TEXT(stored=True)
         )
         self.query = query
         self.ix = ix
@@ -59,7 +58,7 @@ class LimokaAPI:
     async def get_all_modules(self, url):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
-                return ujson.loads(await response.text())
+                return json.loads(await response.text())
 
 
 @loader.tds
@@ -68,6 +67,7 @@ class Limoka(loader.Module):
 
     strings = {
         "name": "Limoka",
+        "_cls_doc": "Hikka modules are now in one place with easy searching!",
         "wait": (
             "Just wait\n"
             "<emoji document_id=5404630946563515782>🔍</emoji> A search is underway among {count} modules "
@@ -89,6 +89,16 @@ class Limoka(loader.Module):
             "{commands}\n"
             "<emoji document_id=5411143117711624172>🪄</emoji> <code>{prefix}dlm {url}{module_path}</code>\n\n"
             "<i>Updates daily at midnight!</i>"
+        ),
+        "found_header": (
+            "<emoji document_id=5413334818047940135>🔍</emoji> Found the module <b>{name}</b> "
+            "by query: <b>{query}</b>\n\n"
+        ),
+        "description_line": (
+            "<b><emoji document_id=5418376169055602355>ℹ️</emoji> Description:</b> {description}\n"
+        ),
+        "developer_line": (
+            "<b><emoji document_id=5418299289141004396>🧑‍💻</emoji> Developer:</b> {username}\n\n"
         ),
         "command_template": "{emoji} <code>{prefix}{command}</code> {description}\n",
         "emojis": {
@@ -123,33 +133,57 @@ class Limoka(loader.Module):
         "clear_filters": "🗑 Clear Filters",
         "back_to_results": "🔙 Back to Results",
         "empty_history": "<emoji document_id=5879939498149679716>🔎</emoji> <b>Your search history is empty!</b>",
+        "no_categories": "No categories found in the module database!",
+        "last_page": "This is the last page!",
+        "first_page": "This is the first page!",
+        "dotd_error": "Error loading module of the day!",
+        "select_categories": "Select categories for query: <code>{query}</code>\n(You can select multiple)",
+        "no_query": "No query",
+        "something_wrong": "Something went wrong...",
+        "no_results": "No results",
+        "prev_page": "⏪ Previous",
+        "next_page": "⏩ Next",
+        "disabled_nav": "🚫 Disabled",
+        "back_button": "🔙 Back",
+        "pagination": "{page} of {total}",
+        "filters_text": "Categories: {categories}",
+        "no_filters": "None",
+        "ellipsis": "…",
+        "filters_button": "🔍 Filters",
+        "selected_category_prefix": "✅ ",
     }
 
     strings_ru = {
+        "_cls_doc": "Модули Hikka теперь собраны в одном месте с удобным поиском!",
         "wait": (
-            "Подождите"
-            "\n<emoji document_id=5404630946563515782>🔍</emoji> Идёт поиск среди {count} модулей по запросу: <code>{query}</code>"
-            "\n"
-            "\n<i>{fact}</i>"
+            "Подождите\n"
+            "<emoji document_id=5404630946563515782>🔍</emoji> Идёт поиск среди {count} модулей по запросу: <code>{query}</code>\n\n"
+            "<i>{fact}</i>"
         ),
         "found": (
-            "<emoji document_id=5413334818047940135>🔍</emoji> Найден модуль <b>{name}</b> по запросу: <b>{query}</b>"
-            "\n"
-            "\n<b><emoji document_id=5418376169055602355>ℹ️</emoji> Описание:</b> {description}"
-            "\n<b><emoji document_id=5418299289141004396>🧑‍💻</emoji> Разработчик:</b> {username}"
-            "\n"
-            "\n{commands}"
-            "\n"
-            "\n<emoji document_id=5411143117711624172>🪄</emoji> <code>{prefix}dlm {url}{module_path}</code>"
+            "<emoji document_id=5413334818047940135>🔍</emoji> Найден модуль <b>{name}</b> по запросу: <b>{query}</b>\n\n"
+            "<b><emoji document_id=5418376169055602355>ℹ️</emoji> Описание:</b> {description}\n"
+            "<b><emoji document_id=5418299289141004396>🧑‍💻</emoji> Разработчик:</b> {username}\n\n"
+            "{commands}\n"
+            "<emoji document_id=5411143117711624172>🪄</emoji> <code>{prefix}dlm {url}{module_path}</code>"
         ),
         "dotd": (
             "<emoji document_id=5436049557150655576>🌟</emoji> <b>Модуль дня</b>\n\n"
             "<emoji document_id=5413334818047940135>🔍</emoji> <b>{name}</b>\n"
             "<b><emoji document_id=5418376169055602355>ℹ️</emoji> Описание:</b> {description}\n"
-            "<b><emoji document_id=5418299289141004396>🧑‍💻</emoji> Developer:</b> {username}\n\n"
+            "<b><emoji document_id=5418299289141004396>🧑‍💻</emoji> Разработчик:</b> {username}\n\n"
             "{commands}\n"
             "<emoji document_id=5411143117711624172>🪄</emoji> <code>{prefix}dlm {url}{module_path}</code>\n\n"
             "<i>Обновляется ежедневно в полночь!</i>"
+        ),
+        "found_header": (
+            "<emoji document_id=5413334818047940135>🔍</emoji> Найден модуль <b>{name}</b> по запросу: <b>{query}</b>\n\n"
+        ),
+        "description_line": (
+            "<b><emoji document_id=5418376169055602355>ℹ️</emoji> Описание:</b> {description}\n"
+        ),
+        "developer_line": (
+            "<b><emoji document_id=5418299289141004396>🧑‍💻</emoji> Разработчик:</b> {username}\n\n"
         ),
         "command_template": "{emoji} <code>{prefix}{command}</code> {description}\n",
         "404": "<emoji document_id=5210952531676504517>❌</emoji> <b>Не найдено по запросу: <i>{query}</i></b>",
@@ -173,15 +207,33 @@ class Limoka(loader.Module):
         "clear_filters": "🗑 Очистить фильтры",
         "back_to_results": "🔙 Вернуться к результатам",
         "empty_history": "<emoji document_id=5879939498149679716>🔎</emoji> <b>Ваша история поиска пуста!</b>",
+        "no_categories": "Категории в базе данных модулей не найдены!",
+        "last_page": "Это последняя страница!",
+        "first_page": "Это первая страница!",
+        "dotd_error": "Ошибка загрузки модуля дня!",
+        "select_categories": "Выберите категории для запроса: <code>{query}</code>\n(Можно выбрать несколько)",
+        "no_query": "Нет запроса",
+        "something_wrong": "Что-то пошло не так...",
+        "no_results": "Нет результатов",
+        "prev_page": "⏪ Назад",
+        "next_page": "⏩ Вперед",
+        "disabled_nav": "🚫 Недоступно",
+        "back_button": "🔙 Назад",
+        "pagination": "{page} из {total}",
+        "filters_text": "Категории: {categories}",
+        "no_filters": "Нет",
+        "ellipsis": "…",
+        "filters_button": "🔍 Фильтры",
+        "selected_category_prefix": "✅ ",
     }
 
     def __init__(self):
         self.api = LimokaAPI()
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
-                "url_limoka",
-                "https://raw.githubusercontent.com/MuRuLOSE/limoka-mirror/refs/heads/main/",
-                lambda: "Mirror: https://raw.githubusercontent.com/MuRuLOSE/limoka-mirror/refs/heads/main/ (This is a mirror, so mirror link by default)",
+                "limokaurl",
+                "https://raw.githubusercontent.com/MuRuLOSE/limoka/refs/heads/main/",
+                lambda: "Mirror: https://raw.githubusercontent.com/MuRuLOSE/limoka-mirror/refs/heads/main/ (Dont work)",
                 validator=loader.validators.String(),
             )
         )
@@ -194,7 +246,9 @@ class Limoka(loader.Module):
         self.db = db
         self.api = LimokaAPI()
         self.schema = Schema(
-            title=TEXT(stored=True), path=ID(stored=True), content=TEXT(stored=True)
+            title=TEXT(stored=True), 
+            path=ID(stored=True), 
+            content=TEXT(stored=True)
         )
 
         os.makedirs("limoka_search", exist_ok=True)
@@ -205,11 +259,9 @@ class Limoka(loader.Module):
         )
 
         self._history = self.pointer("history", [])
-        self._daily_module_storage = self.pointer(
-            "daily_module", {"date": None, "path": None}
-        )
+        self._daily_module_storage = self.pointer("daily_module", {"date": None, "path": None})
         self.modules = await self.api.get_all_modules(
-            f"{self.config['url_limoka']}modules.json"
+            f"{self.config['limokaurl']}modules.json"
         )
         await self._update_index()
         await self._check_daily_module()
@@ -219,15 +271,21 @@ class Limoka(loader.Module):
         for module_path, module_data in self.modules.items():
             for content in [module_data["name"], module_data["description"]]:
                 writer.add_document(
-                    title=module_data["name"], path=module_path, content=content
+                    title=module_data["name"],
+                    path=module_path,
+                    content=content
                 )
             for func in module_data["commands"]:
                 for command, description in func.items():
                     writer.add_document(
-                        title=module_data["name"], path=module_path, content=command
+                        title=module_data["name"],
+                        path=module_path,
+                        content=command
                     )
                     writer.add_document(
-                        title=module_data["name"], path=module_path, content=description
+                        title=module_data["name"],
+                        path=module_path,
+                        content=description
                     )
         writer.commit()
 
@@ -250,30 +308,27 @@ class Limoka(loader.Module):
         """Проверяет и обновляет модуль дня если требуется"""
         current_date = datetime.now().date()
         stored_date = self._daily_module_storage.get("date")
-
-        if (
-            not stored_date
-            or datetime.strptime(stored_date, "%Y-%m-%d").date() != current_date
-        ):
+        
+        if not stored_date or datetime.strptime(stored_date, "%Y-%m-%d").date() != current_date:
             all_paths = list(self.modules.keys())
             random_path = random.choice(all_paths)
             self._daily_module = {
                 "path": random_path,
-                "info": self.modules[random_path],
+                "info": self.modules[random_path]
             }
             self._daily_module_storage["date"] = current_date.strftime("%Y-%m-%d")
             self._daily_module_storage["path"] = random_path
         else:
             self._daily_module = {
                 "path": self._daily_module_storage["path"],
-                "info": self.modules[self._daily_module_storage["path"]],
+                "info": self.modules[self._daily_module_storage["path"]]
             }
 
     def generate_commands(self, module_info):
         commands = []
         for i, func in enumerate(module_info["commands"], 1):
             if i > 9:
-                commands.append("…")
+                commands.append(self.strings["ellipsis"])
                 break
             for command, description in func.items():
                 emoji = self.strings["emojis"].get(i, "")
@@ -287,101 +342,67 @@ class Limoka(loader.Module):
                 )
         return commands
 
-    async def _display_filter_menu(
-        self, call: InlineCall, query: str, current_filters: dict
-    ):
+    async def _display_filter_menu(self, call: InlineCall, query: str, current_filters: dict):
         markup = [
             [
-                {
-                    "text": self.strings["filter_cat"],
-                    "callback": self._select_category,
-                    "args": (query, current_filters),
-                },
+                {"text": self.strings["filter_cat"], "callback": self._select_category, "args": (query, current_filters)},
             ],
             [
-                {
-                    "text": self.strings["apply_filters"],
-                    "callback": self._apply_filters,
-                    "args": (query, current_filters),
-                },
-                {
-                    "text": self.strings["clear_filters"],
-                    "callback": self._clear_filters,
-                    "args": (query,),
-                },
+                {"text": self.strings["apply_filters"], "callback": self._apply_filters, "args": (query, current_filters)},
+                {"text": self.strings["clear_filters"], "callback": self._clear_filters, "args": (query,)},
             ],
             [
-                {
-                    "text": self.strings["back_to_results"],
-                    "callback": self._show_results,
-                    "args": (query, {}),
-                },
-            ],
+                {"text": self.strings["back_to_results"], "callback": self._show_results, "args": (query, {})},
+            ]
         ]
-
+        
         categories = current_filters.get("category", [])
-        filters_text = f"Categories: {', '.join(categories) if categories else 'None'}"
+        filters_text = self.strings["filters_text"].format(
+            categories=', '.join(categories) if categories else self.strings["no_filters"]
+        )
         await call.edit(
             self.strings["filter_menu"].format(query=query) + f"\n{filters_text}",
-            reply_markup=markup,
+            reply_markup=markup
         )
 
-    async def _select_category(
-        self, call: InlineCall, query: str, current_filters: dict
-    ):
+    async def _select_category(self, call: InlineCall, query: str, current_filters: dict):
         all_categories = set()
         for module_data in self.modules.values():
             all_categories.update(module_data.get("category", []))
         categories = sorted(all_categories)
 
         if not categories:
-            await call.edit(
-                "No categories found in the module database!", reply_markup=[]
-            )
+            await call.edit(self.strings["no_categories"], reply_markup=[])
             return
 
         selected_categories = current_filters.get("category", [])
         markup = [
-            [
-                {
-                    "text": f"{'✅ ' if cat in selected_categories else ''}{cat}",
-                    "callback": self._toggle_category,
-                    "args": (query, current_filters, cat),
-                }
-            ]
+            [{"text": f"{self.strings['selected_category_prefix'] if cat in selected_categories else ''}{cat}", 
+              "callback": self._toggle_category, 
+              "args": (query, current_filters, cat)}]
             for cat in categories
         ]
-        markup.append(
-            [
-                {
-                    "text": "🔙 Back",
-                    "callback": self._display_filter_menu,
-                    "args": (query, current_filters),
-                }
-            ]
-        )
-
+        markup.append([{"text": self.strings["back_button"], "callback": self._display_filter_menu, "args": (query, current_filters)}])
+        
         await call.edit(
-            f"Select categories for query: <code>{query}</code>\n(You can select multiple)",
-            reply_markup=markup,
+            self.strings["select_categories"].format(query=query),
+            reply_markup=markup
         )
 
-    async def _toggle_category(
-        self, call: InlineCall, query: str, current_filters: dict, category: str
-    ):
+    async def _toggle_category(self, call: InlineCall, query: str, current_filters: dict, category: str):
         new_filters = current_filters.copy()
         selected_categories = new_filters.get("category", [])
-
+        
         if category in selected_categories:
             selected_categories.remove(category)
         else:
             selected_categories.append(category)
-
+        
         if selected_categories:
             new_filters["category"] = selected_categories
         else:
             new_filters.pop("category", None)
-
+        
         await self._select_category(call, query, new_filters)
 
     async def _apply_filters(self, call: InlineCall, query: str, filters: dict):
@@ -390,9 +411,7 @@ class Limoka(loader.Module):
     async def _clear_filters(self, call: InlineCall, query: str):
         await self._show_results(call, query, {}, from_filters=True)
 
-    async def _show_results(
-        self, call: InlineCall, query: str, filters: dict, from_filters: bool = False
-    ):
+    async def _show_results(self, call: InlineCall, query: str, filters: dict, from_filters: bool = False):
         searcher = Search(query.lower(), self.ix)
         try:
             result = searcher.search_module()
@@ -402,63 +421,33 @@ class Limoka(loader.Module):
 
         if not result or result == 0:
             if from_filters:
-                markup = [
-                    [
-                        {
-                            "text": "🔙 Back",
-                            "callback": self._display_filter_menu,
-                            "args": (query, filters),
-                        }
-                    ]
-                ]
-                await call.edit(
-                    self.strings["404"].format(query=query), reply_markup=markup
-                )
+                markup = [[{"text": self.strings["back_button"], "callback": self._display_filter_menu, "args": (query, filters)}]]
+                await call.edit(self.strings["404"].format(query=query), reply_markup=markup)
             else:
-                await call.edit(
-                    self.strings["404"].format(query=query), reply_markup=[]
-                )
+                await call.edit(self.strings["404"].format(query=query), reply_markup=[])
             return
 
         if filters.get("category"):
             filtered_result = [
-                path
-                for path in result
-                if any(
-                    cat in self.modules.get(path, {}).get("category", [])
-                    for cat in filters["category"]
-                )
+                path for path in result 
+                if any(cat in self.modules.get(path, {}).get("category", []) for cat in filters["category"])
             ]
         else:
             filtered_result = result
 
         if not filtered_result:
             if from_filters:
-                markup = [
-                    [
-                        {
-                            "text": "🔙 Back",
-                            "callback": self._display_filter_menu,
-                            "args": (query, filters),
-                        }
-                    ]
-                ]
-                await call.edit(
-                    self.strings["404"].format(query=query), reply_markup=markup
-                )
+                markup = [[{"text": self.strings["back_button"], "callback": self._display_filter_menu, "args": (query, filters)}]]
+                await call.edit(self.strings["404"].format(query=query), reply_markup=markup)
             else:
-                await call.edit(
-                    self.strings["404"].format(query=query), reply_markup=[]
-                )
+                await call.edit(self.strings["404"].format(query=query), reply_markup=[])
             return
 
         module_path = filtered_result[0]
         module_info = self.modules[module_path]
-        await self._display_module(
-            call, module_info, module_path, query, filtered_result, 0, filters
-        )
+        await self._display_module(call, module_info, module_path, query, filtered_result, 0, filters)
 
-    @loader.command()
+    @loader.command(ru_doc="[запрос] - Поиск модуля с опциями фильтрации")
     async def limokacmd(self, message: Message):
         """[query] - Search module with filter options"""
         args = utils.get_args_raw(message)
@@ -492,38 +481,35 @@ class Limoka(loader.Module):
 
         module_path = result[0]
         module_info = self.modules[module_path]
-        await self._display_module(
-            message, module_info, module_path, args, result, 0, {}
-        )
+        await self._display_module(message, module_info, module_path, args, result, 0, {})
 
-    @loader.command()
+    @loader.command(ru_doc=" - Показать последние 10 запросов")
     async def lshistorycmd(self, message: Message):
-        """- Showing the last 10 requests"""
+        """ - Showing the last 10 requests"""
         if not self._history:
             await utils.answer(message, self.strings["empty_history"])
             return
 
-        formatted_history = [
-            f"{i + 1}. <code>{history}</code>"
-            for i, history in enumerate(self._history)
-        ]
+        formatted_history = [f"{i+1}. <code>{history}</code>" for i, history in enumerate(self._history)]
         await utils.answer(
-            message,
-            self.strings["history"].format(history="\n".join(formatted_history)),
+            message, 
+            self.strings["history"].format(
+                history='\n'.join(formatted_history)
+            )
         )
 
-    @loader.command()
+    @loader.command(ru_doc="- Показать модуль дня")
     async def limokadotd(self, message: Message):
         """- Show the Module of the Day"""
         await self._check_daily_module()
-
+        
         if not self._daily_module:
-            await utils.answer(message, "Error loading module of the day!")
+            await utils.answer(message, self.strings["dotd_error"])
             return
 
         module_info = self._daily_module["info"]
         module_path = self._daily_module["path"]
-
+        
         dev_username = module_info["meta"].get("developer", "Unknown")
         name = module_info["name"] or self.strings["no_info"]
         description = html.escape(module_info["description"] or self.strings["no_info"])
@@ -533,7 +519,7 @@ class Limoka(loader.Module):
         formatted_message = self.strings["dotd"].format(
             name=name,
             description=description,
-            url=self.config["url_limoka"],
+            url=self.config["limokaurl"],
             username=dev_username,
             commands="".join(commands),
             prefix=self.get_prefix(),
@@ -541,13 +527,19 @@ class Limoka(loader.Module):
         )
 
         try:
-            await self.inline.form(formatted_message, message, photo=banner or None)
+            await self.inline.form(
+                formatted_message,
+                message,
+                photo=banner or None
+            )
         except (BadRequest, WebpageMediaEmptyError) as e:
-            await self.inline.form(formatted_message, message, photo=None)
+            await self.inline.form(
+                formatted_message,
+                message,
+                photo=None
+            )
 
-    async def _display_module(
-        self, message_or_call, module_info, module_path, query, result, index, filters
-    ):
+    async def _display_module(self, message_or_call, module_info, module_path, query, result, index, filters):
         dev_username = module_info["meta"].get("developer", "Unknown")
         name = module_info["name"] or self.strings["no_info"]
         description = html.escape(module_info["description"] or self.strings["no_info"])
@@ -555,13 +547,13 @@ class Limoka(loader.Module):
         commands = self.generate_commands(module_info)
         page = index + 1
 
-        clean_module_path = module_path.replace("\\", "/")
+        clean_module_path = module_path.replace('\\', '/')
 
         formatted_message = self.strings["found"].format(
             query=query,
             name=name,
             description=description,
-            url=self.config["url_limoka"],
+            url=self.config["limokaurl"],
             username=dev_username,
             commands="".join(commands),
             prefix=self.get_prefix(),
@@ -569,59 +561,46 @@ class Limoka(loader.Module):
         )
 
         categories = filters.get("category", [])
-        filters_text = f"Categories: {', '.join(categories) if categories else 'None'}"
+        filters_text = self.strings["filters_text"].format(
+            categories=', '.join(categories) if categories else self.strings["no_filters"]
+        )
 
         full_message = formatted_message + f"\n{filters_text}"
         if len(full_message) > 1024:
-            download_command = f"<emoji document_id=5411143117711624172>🪄</emoji> <code>{self.get_prefix()}dlm {self.config['url_limoka']}{clean_module_path}</code>"
-            max_content_length = (
-                1024 - len(f"\n{download_command}\n{filters_text}") - 50
-            )
+            download_command = f"<emoji document_id=5411143117711624172>🪄</emoji> <code>{self.get_prefix()}dlm {self.config['limokaurl']}{clean_module_path}</code>"
+            max_content_length = 1024 - len(f"\n{download_command}\n{filters_text}") - 50
             if max_content_length < 100:
                 max_content_length = 100
-
-            description = (
-                (description[: max_content_length // 2] + html.escape("..."))
-                if len(description) > max_content_length // 2
-                else description
-            )
+            
+            description = (description[:max_content_length//2] + html.escape(self.strings["ellipsis"])) if len(description) > max_content_length//2 else description
             commands = commands[:3] if len(commands) > 3 else commands
             formatted_message = (
-                f"<emoji document_id=5413334818047940135>🔍</emoji> Found the module <b>{name}</b> "
-                f"by query: <b>{query}</b>\n\n"
-                f"<b><emoji document_id=5418376169055602355>ℹ️</emoji> Description:</b> {description}\n"
-                f"<b><emoji document_id=5418299289141004396>🧑‍💻</emoji> Developer:</b> {dev_username}\n\n"
-                f"{''.join(commands)}\n"
+                self.strings["found_header"].format(name=name, query=query) +
+                self.strings["description_line"].format(description=description) +
+                self.strings["developer_line"].format(username=dev_username) +
+                "".join(commands)
             ).strip()
-            full_message = f"{formatted_message[:max_content_length]}{'...' if len(formatted_message) > max_content_length else ''}\n\n{download_command}\n{filters_text}"
+            full_message = f"{formatted_message[:max_content_length]}{self.strings['ellipsis'] if len(formatted_message) > max_content_length else ''}\n\n{download_command}\n{filters_text}"
         else:
             full_message = formatted_message + f"\n{filters_text}"
 
         markup = [
             [
                 {
-                    "text": "⏪" if index > 0 else "🚫",
+                    "text": self.strings["prev_page"] if index > 0 else self.strings["disabled_nav"],
                     "callback": self._previous_page if index > 0 else self._inline_void,
                     "args": (result, index, query, filters) if index > 0 else (),
                 },
-                {"text": f"{page}/{len(result)}", "callback": self._inline_void},
+                {"text": self.strings["pagination"].format(page=page, total=len(result)), "callback": self._inline_void},
                 {
-                    "text": "⏩" if index + 1 < len(result) else "🚫",
-                    "callback": self._next_page
-                    if index + 1 < len(result)
-                    else self._inline_void,
-                    "args": (result, index, query, filters)
-                    if index + 1 < len(result)
-                    else (),
+                    "text": self.strings["next_page"] if index + 1 < len(result) else self.strings["disabled_nav"],
+                    "callback": self._next_page if index + 1 < len(result) else self._inline_void,
+                    "args": (result, index, query, filters) if index + 1 < len(result) else (),
                 },
             ],
             [
-                {
-                    "text": "🔍 Filters",
-                    "callback": self._display_filter_menu,
-                    "args": (query, filters),
-                },
-            ],
+                {"text": self.strings["filters_button"], "callback": self._display_filter_menu, "args": (query, filters)},
+            ]
         ]
 
         try:
@@ -630,49 +609,48 @@ class Limoka(loader.Module):
                     full_message,
                     message_or_call,
                     reply_markup=markup,
-                    photo=banner or None,
+                    photo=banner or None
                 )
             else:
                 await message_or_call.edit(
-                    full_message, reply_markup=markup, photo=banner or None
+                    full_message,
+                    reply_markup=markup,
+                    photo=banner or None
                 )
         except (BadRequest, WebpageMediaEmptyError) as e:
             if isinstance(message_or_call, Message):
                 await self.inline.form(
-                    full_message, message_or_call, reply_markup=markup, photo=None
+                    full_message,
+                    message_or_call,
+                    reply_markup=markup,
+                    photo=None
                 )
             else:
                 await message_or_call.edit(
-                    full_message, reply_markup=markup, photo=None
+                    full_message,
+                    reply_markup=markup,
+                    photo=None
                 )
 
-    async def _next_page(
-        self, call: InlineCall, result: list, index: int, query: str, filters: dict
-    ):
+    async def _next_page(self, call: InlineCall, result: list, index: int, query: str, filters: dict):
         if index + 1 >= len(result):
-            await call.answer("This is the last page!")
+            await call.answer(self.strings["last_page"])
             return
 
         index += 1
         module_path = result[index]
         module_info = self.modules[module_path]
-        await self._display_module(
-            call, module_info, module_path, query, result, index, filters
-        )
+        await self._display_module(call, module_info, module_path, query, result, index, filters)
 
-    async def _previous_page(
-        self, call: InlineCall, result: list, index: int, query: str, filters: dict
-    ):
+    async def _previous_page(self, call: InlineCall, result: list, index: int, query: str, filters: dict):
         if index - 1 < 0:
-            await call.answer("This is the first page!")
+            await call.answer(self.strings["first_page"])
             return
 
         index -= 1
         module_path = result[index]
         module_info = self.modules[module_path]
-        await self._display_module(
-            call, module_info, module_path, query, result, index, filters
-        )
+        await self._display_module(call, module_info, module_path, query, result, index, filters)
 
     async def _inline_void(self, call: InlineCall):
         await call.answer()
@@ -682,7 +660,7 @@ class Limoka(loader.Module):
         """[query] - Inline search modules"""
         if not query.args:
             return {
-                "title": "No query",
+                "title": self.strings["no_query"],
                 "description": self.strings["inlinenoargs"],
                 "thumb": "https://img.icons8.com/?size=100&id=NIWYFnJlcBfr&format=png&color=000000",
                 "message": self.strings["inlinenoargs"],
@@ -693,7 +671,7 @@ class Limoka(loader.Module):
             results = searcher.search_module()
         except IndexError:
             return {
-                "title": "Something went wrong...",
+                "title": self.strings["something_wrong"],
                 "description": self.strings["inline?"],
                 "thumb": "https://img.icons8.com/?size=100&id=rUSWMuGVdxJj&format=png&color=000000",
                 "message": self.strings["inline?"],
@@ -701,7 +679,7 @@ class Limoka(loader.Module):
 
         if not results:
             return {
-                "title": "No results",
+                "title": self.strings["no_results"],
                 "description": self.strings["inline404"],
                 "thumb": "https://img.icons8.com/?size=100&id=olDsW0G3zz22&format=png&color=000000",
                 "message": self.strings["inline404"],
@@ -713,23 +691,18 @@ class Limoka(loader.Module):
             if module_info and module_info.get("commands"):
                 banner = await self._validate_url(module_info["meta"].get("banner"))
                 thumb = await self._validate_url(
-                    module_info["meta"].get(
-                        "pic",
-                        "https://img.icons8.com/?size=100&id=olDsW0G3zz22&format=png&color=000000",
-                    )
+                    module_info["meta"].get("pic", "https://img.icons8.com/?size=100&id=olDsW0G3zz22&format=png&color=000000")
                 )
                 inline_results.append(
                     {
                         "title": utils.escape_html(module_info["name"]),
                         "description": utils.escape_html(module_info["description"]),
-                        "thumb": thumb
-                        or "https://img.icons8.com/?size=100&id=olDsW0G3zz22&format=png&color=000000",
-                        "photo": banner
-                        or "https://habrastorage.org/getpro/habr/upload_files/9c7/5fa/c54/9c75fac54ebb0beaf89abd7d86b4787c.jpg",
+                        "thumb": thumb or "https://img.icons8.com/?size=100&id=olDsW0G3zz22&format=png&color=000000",
+                        "photo": banner or "https://habrastorage.org/getpro/habr/upload_files/9c7/5fa/c54/9c75fac54ebb0beaf89abd7d86b4787c.jpg",
                         "message": self.strings["found"].format(
                             name=module_info["name"],
                             query=query.args,
-                            url=self.config["url_limoka"],
+                            url=self.config["limokaurl"],
                             description=module_info["description"],
                             username=module_info["meta"].get("developer", "Unknown"),
                             commands="".join(self.generate_commands(module_info)),
