@@ -859,7 +859,6 @@ async def asset_channel(
                 if not isinstance(folder, legacytl.tl.types.DialogFilterDefault)
                 and folder.title.text.lower() == _folder.lower()
             )
-            print(folder)
         except Exception:
             folder = None
 

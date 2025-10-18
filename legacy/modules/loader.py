@@ -474,13 +474,13 @@ class LoaderMod(loader.Module):
         if any(
             line.replace(" ", "") == "#scope:ffmpeg" for line in doc.splitlines()
         ) and os.system("ffmpeg -version 1>/dev/null 2>/dev/null"):
-            return self.strings("ffmpeg_required")
+            return await utils.answer(message, self.strings("ffmpeg_required"))
 
         if (
             any(line.replace(" ", "") == "#scope:inline" for line in doc.splitlines())
             and not self.inline.init_complete
         ):
-            return self.strings["inline_init_failed"]
+            return await utils.answer(message, self.strings["inline_init_failed"])
 
         developer = re.search(r"# ?meta developer: ?(.+)", doc)
         developer = developer.group(1) if developer else False
@@ -631,10 +631,13 @@ class LoaderMod(loader.Module):
                 with contextlib.suppress(Exception):
                     self.allmodules.modules.remove(instance)
                 return f"<emoji document_id=5454225457916420314>😖</emoji> <b>{utils.escape_html(str(e))}</b>"
+            except Exception as e:
+                logger.exception("Loading external module failed due to %s", e)
+                return await utils.answer(message, self.strings("load_failed"))
         except Exception as e:
             logger.exception("Loading external module failed due to %s", e)
 
-            return self.strings("load_failed")
+            return await utils.answer(message, self.strings("load_failed"))
 
         if hasattr(instance, "__version__") and isinstance(instance.__version__, tuple):
             version = (
