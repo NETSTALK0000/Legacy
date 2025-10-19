@@ -58,3 +58,7 @@
 - Added banner for ping
 - Added new configs
 - Improved strings
+- Fixed grep
+- Fixed loadmod output
+- Updated Limoka (v1.1.1)
+- Removed SharkHost (a.k.a TeaHost) support
