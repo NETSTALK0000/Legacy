@@ -13,9 +13,8 @@
 <hr>
 <h2><img src="https://img.icons8.com/?size=100&id=Jd0d5Iz2TZIb&format=png&color=000000" height="54" align="center" style="margin-right: 7px;">Installation</h2>
 
-<a href="https://t.me/SharkHostBot"><img src="https://i.postimg.cc/hjW6NZj0/install-sharkhost.png" height="40"></a>
-
 <b>⚙ Manual installation (no script):</b><br>
+
 ```bash
 apt update && apt install git python3 -y && git clone https://github.com/Crayz310/Legacy && cd Legacy && pip install -r requirements.txt && python3 -m legacy
 ```
@@ -128,7 +127,7 @@ Check out <a href="https://web.archive.org/dev.hikka.pw">dev.hikka.pw</a> for de
 
 ### Warning
 
-> This project is provided as-is. Developer doesn't take ANY responsibility over any problems, caused by userbot. By installing Legacy you take all risks on you. This is but not limited to account bans, deleted (by Telegram algorithms) messages, SCAM-modules, leaked sessions (due to SCAM-modules). It is **highly** recommended to enable the API Flood protection (.api_fw_protection) and not to install many modules at once. By using Legacy you give your consent to any actions made by your account in background in purposes of automatization. Please, consider reading https://core.telegram.org/api/terms for more information.
+> This project is provided as-is. Developer doesn't take ANY responsibility over any problems, caused by userbot. By installing Legacy you take all risks on you. This is but not limited to account bans, deleted (by Telegram algorithms) messages, SCAM-modules, leaked sessions (due to SCAM-modules). It is **highly** recommended to enable the API Flood protection (.api_fw_protection) and not to install many modules at once. By using Legacy you give your consent to any actions made by your account in background in purposes of automatization. Please, consider reading <https://core.telegram.org/api/terms> for more information.
 
 <hr>
 <h2><img src="https://img.icons8.com/?size=100&id=haPxINLo0tRS&format=png&color=000000" height="54" align="center" style="margin-right: 7px;">Special thanks to:</h2>

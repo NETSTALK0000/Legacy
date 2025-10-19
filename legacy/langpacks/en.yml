@@ -215,8 +215,6 @@ settings:
   vds: "💎 VDS"
   docker: "🐳 Docker"
   railway: "🚂 Railway"
-  sharkhost: "🦈 Sharkhost"
-  sharkhost_install: "🌙 <b>Installation on 🦈 Sharkhost:</b>\n\n<b>Go to @SharkHostBot and follow the further instructions</b>"
   railway_install: "🌙 <b>Installation on 🚂 RailWay:</b>\n\n<b>Installation link:</b>\nhttps://railway.com/template/47hYUn?referralCode=PvevLV\n\n<i><u>Be careful! Any userbots are officially banned on RailWay, if your account is banned, neither the creator nor other people are to blame for this.</u></i>"
   main_menu: "◀ Choose another platform"
   vds_install: "<b>🚀 Legacy — Launch &amp; Command-Line Arguments</b>\n\n<b>🌙 Installation on 💎 VDS</b>\n<pre><code class='language-bash'>sudo apt update &amp;&amp; sudo apt upgrade -y &amp;&amp; sudo apt install git python3-pip &amp;&amp; git clone https://github.com/Crayz310/Legacy &amp;&amp; cd Legacy &amp;&amp; export AIOHTTP_NO_EXTENSIONS=1 &amp;&amp; pip install -r requirements.txt &amp;&amp; python3 -m legacy</code></pre>\n\n<b><i>⚡️ If you don’t have </i></b><code>sudo</code><b><i> access, just skip the initial steps.</i></b>\n\n<b>⚙️ Available Arguments</b>\n\n<code>--bot-token</code> or <code>-bt &lt;token&gt;</code> Provide your inline bot token directly.\n<code>--no-web</code> Run Legacy <b>directly in terminal</b> instead of using a web link for login.\n<code>--root</code> Allows running Legacy as root (disables security warnings).\n<code>--no-tty</code> Disable colorful ANSI output (plain text only)."

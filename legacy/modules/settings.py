@@ -291,10 +291,6 @@ class CoreMod(loader.Module):
                     "text": self.strings["railway"],
                     "callback": self._railway_installation,
                 },
-                {
-                    "text": self.strings["sharkhost"],
-                    "callback": self._sharkhost_installation,
-                },
             ],
             [{"text": self.strings["close_btn"], "action": "close"}],
         ]
@@ -325,9 +321,6 @@ class CoreMod(loader.Module):
     async def _railway_installation(self, call: InlineCall):
         await self._installation_handler(call, "railway")
 
-    async def _sharkhost_installation(self, call: InlineCall):
-        await self._installation_handler(call, "sharkhost")
-
     @loader.command()
     async def installation(self, message: Message):
         args = utils.get_args(message)
@@ -336,8 +329,6 @@ class CoreMod(loader.Module):
             "--vds": "vds_install",
             "-r": "railway_install",
             "--railway": "railway_install",
-            "-sh": "sharkhost_install",
-            "--sharkhost": "sharkhost_install",
             "-d": "docker_install",
             "--docker": "docker_install",
         }
@@ -354,10 +345,6 @@ class CoreMod(loader.Module):
                 {
                     "text": self.strings["railway"],
                     "callback": self._railway_installation,
-                },
-                {
-                    "text": self.strings["sharkhost"],
-                    "callback": self._sharkhost_installation,
                 },
             ],
             [{"text": self.strings["close_btn"], "action": "close"}],

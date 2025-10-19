@@ -225,10 +225,8 @@ class Web:
         self._qr_login = True
 
     async def init_qr_login(self, request: web.Request) -> web.Response:
-        if self.client_data and (
-            "SHARKHOST" in os.environ or "HIKKAHOST" in os.environ
-        ):
-            return web.Response(status=403, body="Forbidden by SharkHost EULA")
+        if self.client_data and "HIKKAHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by EULA")
 
         if not self._check_session(request):
             return web.Response(status=401)
@@ -290,10 +288,8 @@ class Web:
         )
 
     async def can_add(self, request: web.Request) -> web.Response:
-        if self.client_data and (
-            "SHARKHOST" in os.environ or "HIKKAHOST" in os.environ
-        ):
-            return web.Response(status=403, body="Forbidden by SharkHost EULA")
+        if self.client_data and "HIKKAHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by EULA")
 
         return web.Response(status=200, body="Yes")
 
@@ -301,10 +297,8 @@ class Web:
         if not self._check_session(request):
             return web.Response(status=401, body="Authorization required")
 
-        if self.client_data and (
-            "SHARKHOST" in os.environ or "HIKKAHOST" in os.environ
-        ):
-            return web.Response(status=403, body="Forbidden by SharkHost EULA")
+        if self.client_data and "HIKKAHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by EULA")
 
         if self._pending_client:
             return web.Response(status=208, body="Already pending")
