@@ -13,6 +13,7 @@ import aiohttp
 from legacytl.errors.rpcerrorlist import YouBlockedUserError
 from legacytl.tl.functions.contacts import UnblockRequest
 
+from ..hostings import host_manager
 from .. import loader, utils
 from ..inline.types import BotInlineMessage
 from ..auth_manager import AuthManager
@@ -154,6 +155,14 @@ class InlineStuff(loader.Module):
     async def iauth(self, message, force: bool = False):
         args = utils.get_args_raw(message)
         force = force or "-f" in args
+        current_platform = host_manager.get_current_hosting()
+        if current_platform:
+            forbidden = current_platform.is_eula_forbidden()
+            if forbidden:
+                return await utils.answer(
+                    message,
+                    self.strings["forbid"].format(current_platform.display_name),
+                )
 
         if not force:
             try:

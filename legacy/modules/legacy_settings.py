@@ -14,7 +14,8 @@ from legacytl.tl.functions.messages import (
 from legacytl.tl.types import Message
 from legacytl.utils import get_display_name
 
-from .. import loader, log, main, utils
+from ..hostings import host_manager
+from .. import loader, main, utils
 from .._internal import fw_protect, restart
 from ..inline.types import InlineCall
 from ..web import core
@@ -689,6 +690,14 @@ class LegacySettingsMod(loader.Module):
         arguments = main.parse_arguments()
         if getattr(arguments, "disable_web", False):
             return await utils.answer(message, self.strings("web_disabled"))
+        current_platform = host_manager.get_current_hosting()
+        if current_platform:
+            forbidden = current_platform.is_eula_forbidden()
+            if forbidden:
+                return await utils.answer(
+                    message,
+                    self.strings["forbid"].format(current_platform.display_name),
+                )
         if (
             not force
             and not message.is_private

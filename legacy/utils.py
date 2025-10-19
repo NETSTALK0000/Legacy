@@ -102,6 +102,7 @@ from ._internal import fw_protect
 from .inline.types import BotInlineCall, InlineCall, InlineMessage
 from .tl_cache import CustomTelegramClient
 from .types import LegacyReplyMarkup, ListLike, Module
+from .hostings import host_manager
 
 FormattingEntity = typing.Union[
     MessageEntityUnknown,
@@ -946,39 +947,10 @@ def get_named_platform() -> str:
     Returns formatted platform name
     :return: Platform name
     """
-    from . import main
 
-    with contextlib.suppress(Exception):
-        if os.path.isfile("/proc/device-tree/model"):
-            with open("/proc/device-tree/model") as f:
-                model = f.read()
-                if "Orange" in model:
-                    return f"🍊 {model}"
-
-                return f"🍇 {model}" if "Raspberry" in model else f"❓ {model}"
-
-    if main.IS_WSL:
-        return "🍀 WSL"
-
-    if main.IS_USERLAND:
-        return "🐧 UserLand"
-
-    if main.IS_AEZA:
-        return "🛡 Aeza"
-
-    if main.IS_RAILWAY:
-        return "🚂 Railway"
-
-    if main.IS_HIKKAHOST:
-        return "🌼 HikkaHost"
-
-    if main.IS_ORACLE:
-        return "🧨 Oracle"
-
-    if main.IS_DOCKER:
-        return "🐳 Docker"
-
-    return "💎 VDS"
+    current_platform = host_manager.get_current_hosting()
+    if current_platform:
+        return f"{current_platform.emoji} {current_platform.display_name}"
 
 
 def get_platform_emoji() -> str:
@@ -986,8 +958,6 @@ def get_platform_emoji() -> str:
     Returns custom emoji for current platform
     :return: Emoji entity in string
     """
-    from . import main
-
     BASE = "".join(
         (
             "<emoji document_id={}>🌙</emoji>",
@@ -996,23 +966,9 @@ def get_platform_emoji() -> str:
             "<emoji document_id=5456290924868954389>🌙</emoji>",
         )
     )
-
-    if main.IS_HIKKAHOST:
-        return BASE.format(5458807006905264299)
-
-    if main.IS_USERLAND:
-        return BASE.format(5458508523858062696)
-
-    if main.IS_RAILWAY:
-        return BASE.format(5456525163795344370)
-
-    if main.IS_ORACLE:
-        return BASE.format(5380110961090788815)
-
-    if main.IS_DOCKER:
-        return BASE.format(5456574628933693253)
-
-    return BASE.format(5467541303938019154)
+    current_platform = host_manager.get_current_hosting()
+    if current_platform:
+        return BASE.format(current_platform.emoji_document_id)
 
 
 def uptime() -> int:
