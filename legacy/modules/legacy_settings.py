@@ -14,7 +14,7 @@ from legacytl.tl.functions.messages import (
 from legacytl.tl.types import Message
 from legacytl.utils import get_display_name
 
-from ..hostings import host_manager
+from ..platforms import host_manager
 from .. import loader, main, utils
 from .._internal import fw_protect, restart
 from ..inline.types import InlineCall

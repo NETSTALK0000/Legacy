@@ -10,7 +10,7 @@ class BaseHost(ABC):
     display_name: str = ""
     emoji: str = ""
     emoji_document_id: int = 0
-    multiple_sessions_per_acc: bool = False
+    multiple_sessions_per_acc: bool = True
 
     def __init__(self):
         if (
@@ -41,7 +41,6 @@ class VDS(BaseHost):
     display_name = "VDS"
     emoji = "💎"
     emoji_document_id = 5467541303938019154
-    multiple_sessions_per_acc = True
 
 
 class Railway(BaseHost):
@@ -49,7 +48,6 @@ class Railway(BaseHost):
     display_name = "Railway"
     emoji = "🚂"
     emoji_document_id = 5456525163795344370
-    multiple_sessions_per_acc = True
 
 
 class Userland(BaseHost):
@@ -57,7 +55,6 @@ class Userland(BaseHost):
     display_name = "Userland"
     emoji = "🐧"
     emoji_document_id = 5458508523858062696
-    multiple_sessions_per_acc = True
 
 
 class Oracle(BaseHost):
@@ -65,7 +62,6 @@ class Oracle(BaseHost):
     display_name = "Oracle"
     emoji = "🧨"
     emoji_document_id = 5380110961090788815
-    multiple_sessions_per_acc = True
 
 
 class Aeza(BaseHost):
@@ -73,7 +69,6 @@ class Aeza(BaseHost):
     display_name = "Aeza"
     emoji = "🛡"
     emoji_document_id = 5467637896789538823
-    multiple_sessions_per_acc = True
 
 
 class WSL(BaseHost):
@@ -81,7 +76,6 @@ class WSL(BaseHost):
     display_name = "WSL"
     emoji = "🍀"
     emoji_document_id = 5467729112632330243
-    multiple_sessions_per_acc = True
 
 
 class Docker(BaseHost):
@@ -89,7 +83,6 @@ class Docker(BaseHost):
     display_name = "Docker"
     emoji = "🐳"
     emoji_document_id = 5456574628933693253
-    multiple_sessions_per_acc = True
 
 
 class HikkaHost(BaseHost):
@@ -105,7 +98,6 @@ class OrangePi(BaseHost):
     display_name = "Orange Pi"
     emoji_document_id = 5467811234567890123
     emoji = "🍊"
-    multiple_sessions_per_acc = True
 
 
 class RaspberryPi(BaseHost):
@@ -113,7 +105,6 @@ class RaspberryPi(BaseHost):
     display_name = "Raspberry Pi"
     emoji = "🍇"
     emoji_document_id = 5467892345678901234
-    multiple_sessions_per_acc = True
 
 
 class HostManager:

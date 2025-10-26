@@ -102,7 +102,7 @@ from ._internal import fw_protect
 from .inline.types import BotInlineCall, InlineCall, InlineMessage
 from .tl_cache import CustomTelegramClient
 from .types import LegacyReplyMarkup, ListLike, Module
-from .hostings import host_manager
+from .platforms import host_manager
 
 FormattingEntity = typing.Union[
     MessageEntityUnknown,

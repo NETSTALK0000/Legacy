@@ -13,7 +13,7 @@ import aiohttp
 from legacytl.errors.rpcerrorlist import YouBlockedUserError
 from legacytl.tl.functions.contacts import UnblockRequest
 
-from ..hostings import host_manager
+from ..platforms import host_manager
 from .. import loader, utils
 from ..inline.types import BotInlineMessage
 from ..auth_manager import AuthManager
