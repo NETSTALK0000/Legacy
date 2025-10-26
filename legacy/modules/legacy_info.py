@@ -5,6 +5,7 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import git
+from git import config
 from legacytl.types import InputMediaWebPage
 from legacytl.utils import get_display_name
 from .. import loader, utils, version
@@ -27,6 +28,12 @@ class LegacyInfoMod(loader.Module):
                 "banner_url",
                 "https://i.postimg.cc/9MTZgB2j/legacy-info.gif",
                 lambda: self.strings["_cfg_banner"],
+            ),
+            loader.ConfigValue(
+                "media_quote",
+                True,
+                lambda: self.strings["_cfg_media_quote"],
+                validator=loader.validators.Boolean(),
             ),
             loader.ConfigValue(
                 "hide_platform_emoji",
@@ -134,16 +141,19 @@ class LegacyInfoMod(loader.Module):
     async def infocmd(self, message):
         args = utils.get_args(message)
         custom_prefix = self.get_prefix(message.sender_id)
-        await utils.answer(
-            message,
-            await self._render_info(args, custom_prefix),
-            media=(
-                InputMediaWebPage(self.config["banner_url"])
-                if self.config["banner_url"]
-                else None
-            ),
-            invert_media=True,
-        )
+        media = self.config["banner_url"]
+        if self.config["media_quote"]:
+            media = InputMediaWebPage(media)
+            await utils.answer(
+                message,
+                await self._render_info(args, custom_prefix),
+                media=media,
+                invert_media=True,
+            )
+        else:
+            await utils.answer(
+                message, await self._render_info(args, custom_prefix), file=media
+            )
 
     @loader.command()
     async def ubinfo(self, message):
