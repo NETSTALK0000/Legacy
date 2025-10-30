@@ -1697,24 +1697,3 @@ async def send_reaction(
     except Exception as e:
         logger.error(f"Unable to send reaction to the specified message: {e}")
         return
-
-def parseopts(text: str, options: typing.List[str]) -> typing.Dict[str, str]:
-    """
-    Parses string and returns dictionary with flags and their values
-
-    :param text: String for parsing
-    :param options: List of available flags (f.e ['-foo', '-bar', '-buzz'])
-    :return: Dictionary with flags and values
-    """
-
-    result = {}
-    pattern = r'(-[a-zA-Z])\s*(\S*)'
-
-    matches = re.findall(pattern, text)
-
-    for flag, value in matches:
-        if flag in options:
-            result[flag] = value if value else True
-
-    return result
-
