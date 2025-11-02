@@ -421,6 +421,7 @@ help:
   not_exact: "<emoji document_id=5355133243773435190>☝️</emoji> <b>No exact match occured, so the closest result is shown instead</b>"
   request_join: "You requested link for Legacy support chat"
   core_notice: "<emoji document_id=5355133243773435190>☝️</emoji> <b>This is a core module. You can't unload it nor replace</b>"
+  lib_help: "<emoji document_id=6021375494216226506>📁</emoji> <b>This is the <code>{}</code> library.\n\nNo help is provided for libraries.</b>"
   _cmd_doc_support: "| link for support chat"
   _cmd_doc_helphide: "[args] | hide your modules"
   _cmd_doc_help: "[-f] [-h] | help with your modules!"
