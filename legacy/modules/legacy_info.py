@@ -109,30 +109,30 @@ class LegacyInfoMod(loader.Module):
             )
             if self.config["custom_message"] and "-d" not in args
             else (
-                f"<b>{{}}</b>\n\n<b>{{}} {self.strings('owner')}:</b> {me}\n\n<b>{{}}"
+                f"<blockquote><b>{{}}</b></blockquote>\n\n<blockquote><b>{{}} {self.strings('owner')}:</b> {me}</blockquote>\n\n<blockquote><b>{{}}"
                 f" {self.strings['version']}:</b> {_version} {build}\n<b>{{}}"
                 f" {self.strings['branch']}:"
-                f"</b> <code>{version.branch}</code>\n{upd}\n\n<b>{{}}"
+                f"</b> <code>{version.branch}</code>\n{upd}</blockquote>\n\n<blockquote><b>{{}}"
                 f" {self.strings['prefix']}:</b> {prefix}\n<b>{{}}"
                 f" {self.strings['uptime']}:"
-                f"</b> {utils.formatted_uptime()}\n\n<b>{{}}"
+                f"</b> {utils.formatted_uptime()}</blockquote>\n\n<blockquote><b>{{}}"
                 f" {self.strings['cpu_usage']}:"
                 f"</b> <i>~{await utils.get_cpu_usage_async()} %</i>\n<b>{{}}"
                 f" {self.strings['ram_usage']}:"
-                f"</b> <i>~{utils.get_ram_usage()} MB</i>\n<b>{{}}</b>"
+                f"</b> <i>~{utils.get_ram_usage()} MB</i></blockquote>\n\n<blockquote><b>{{}}</b></blockquote>"
             ).format(
                 (
                     utils.get_platform_emoji()
                     if self._client.legacy_me.premium
                     else "🌙 Legacy"
                 ),
-                "<emoji document_id=5373141891321699086>😎</emoji>",
-                "<emoji document_id=5469741319330996757>💫</emoji>",
-                "<emoji document_id=5449918202718985124>🌳</emoji>",
-                "<emoji document_id=5472111548572900003>⌨️</emoji>",
-                "<emoji document_id=5451646226975955576>⌛️</emoji>",
-                "<emoji document_id=5431449001532594346>⚡️</emoji>",
-                "<emoji document_id=5359785904535774578>💼</emoji>",
+                "<emoji document_id=4904565554943099861>👾</emoji>",
+                "<emoji document_id=4904936030232117798>⚙️</emoji>",
+                "<emoji document_id=5172453033245672405>🌱</emoji>",
+                "<emoji document_id=5220053623211305785>❓</emoji>",
+                "<emoji document_id=5123230779593196220>⏰</emoji>",
+                "<emoji document_id=5085022089103016925>⚡️</emoji>",
+                "<emoji document_id=5118686540985271080>💼</emoji>",
                 platform,
             )
         )
