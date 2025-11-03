@@ -78,6 +78,12 @@ class Help(loader.Module):
                 ),
                 validator=loader.validators.Boolean(),
             ),
+            loader.ConfigValue(
+                "show_cmds",
+                True,
+                lambda: "Displays a short list of commands next to the module",
+                validator=loader.validators.Boolean(),
+            ),
         )
 
     @loader.command()
@@ -307,12 +313,13 @@ class Help(loader.Module):
                 if await self.allmodules.check_security(message, func) or force
             ]
 
-            for cmd in commands:
-                if first:
-                    tmp += f": ( {cmd}"
-                    first = False
-                else:
-                    tmp += f" | {cmd}"
+            if self.config["show_cmds"]:
+                for cmd in commands:
+                    if first:
+                        tmp += f": ( {cmd}"
+                        first = False
+                    else:
+                        tmp += f" | {cmd}"
 
             icommands = [
                 name
@@ -324,17 +331,18 @@ class Help(loader.Module):
                 or force
             ]
 
-            for cmd in icommands:
-                if first:
-                    tmp += (
-                        f": ( <emoji document_id=6030400221232501136>🤖</emoji> {cmd}"
-                    )
-                    first = False
-                else:
-                    tmp += f" | <emoji document_id=6030400221232501136>🤖</emoji> {cmd}"
+            if self.config["show_cmds"]:
+                for cmd in icommands:
+                    if first:
+                        tmp += (
+                            f": ( <emoji document_id=6030400221232501136>🤖</emoji> {cmd}"
+                        )
+                        first = False
+                    else:
+                        tmp += f" | <emoji document_id=6030400221232501136>🤖</emoji> {cmd}"
 
             if commands or icommands:
-                tmp += " )\n"
+                tmp += " )\n" if self.config["show_cmds"] else "\n"
                 if core:
                     core_ += [tmp]
                 else:
