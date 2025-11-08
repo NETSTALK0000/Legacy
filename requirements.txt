@@ -1,4 +1,4 @@
-Legacy-TL-New==1.7.5
+Legacy-TL-New==1.8.0
 aiofile==3.8.1
 meval==2.5
 aiohttp_jinja2==1.5
