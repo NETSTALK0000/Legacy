@@ -402,8 +402,6 @@ api_protection:
   _cfg_forbidden_methods: "Forbid specified methods from being executed throughout external modules"
   btn_no: "🚫 No"
   btn_yes: "✅ Yes"
-  web_pin: "🔓 <b>Click the button below to show Werkzeug debug PIN. Do not give it to anyone.</b>"
-  web_pin_btn: "🐞 Show Werkzeug PIN"
   proxied_url: "🌐 Proxied URL"
   local_url: "🏠 Local URL"
   _cmd_doc_api_fw_protection: "Toggle API Ratelimiter"
