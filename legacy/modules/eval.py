@@ -174,8 +174,11 @@ class Evaluator(loader.Module):
                     utils.escape_html(result),
                 )
                 + (
-                    self.strings("result").format("c" if c else "cpp", utils.escape_html(result))
-                    if result and not error else ""
+                    self.strings("result").format(
+                        "c" if c else "cpp", utils.escape_html(result)
+                    )
+                    if result and not error
+                    else ""
                 ),
             )
 
@@ -228,8 +231,11 @@ class Evaluator(loader.Module):
                     utils.escape_html(result),
                 )
                 + (
-                    self.strings("result").format("javascript", utils.escape_html(result))
-                    if result and not error else ""
+                    self.strings("result").format(
+                        "javascript", utils.escape_html(result)
+                    )
+                    if result and not error
+                    else ""
                 ),
             )
 
@@ -279,7 +285,8 @@ class Evaluator(loader.Module):
                 )
                 + (
                     self.strings("result").format("php", utils.escape_html(result))
-                    if result and not error else ""
+                    if result and not error
+                    else ""
                 ),
             )
 
@@ -329,7 +336,8 @@ class Evaluator(loader.Module):
                 )
                 + (
                     self.strings("result").format("ruby", utils.escape_html(result))
-                    if result and not error else ""
+                    if result and not error
+                    else ""
                 ),
             )
 
@@ -369,7 +377,6 @@ class Evaluator(loader.Module):
             "hikkatl": legacytl,
             "utils": utils,
             "loader": loader,
-            "f": legacytl.tl.functions,
             "c": self._client,
             "m": message,
             "lookup": self.lookup,
@@ -378,6 +385,8 @@ class Evaluator(loader.Module):
             "os": os,
             "sys": sys,
             "subprocess": subprocess,
+            **self.get_sub(legacytl.tl.types),
+            **self.get_sub(legacytl.tl.functions),
         }
 
     def get_sub(self, obj: typing.Any, _depth: int = 1) -> dict:
