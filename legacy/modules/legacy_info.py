@@ -5,7 +5,6 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import git
-from git import config
 from legacytl.types import InputMediaWebPage
 from legacytl.utils import get_display_name
 from .. import loader, utils, version
@@ -143,7 +142,7 @@ class LegacyInfoMod(loader.Module):
         custom_prefix = self.get_prefix(message.sender_id)
         media = self.config["banner_url"]
         if self.config["media_quote"]:
-            media = InputMediaWebPage(media)
+            media = InputMediaWebPage(media, optional=True)
             await utils.answer(
                 message,
                 await self._render_info(args, custom_prefix),

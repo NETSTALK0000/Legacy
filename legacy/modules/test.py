@@ -100,8 +100,7 @@ class TestMod(loader.Module):
                 None,
                 "Banner url",
                 validator=loader.validators.Union(
-                    loader.validators.String(),
-                    loader.validators.NoneType()
+                    loader.validators.String(), loader.validators.NoneType()
                 ),
             ),
         )
@@ -433,7 +432,7 @@ class TestMod(loader.Module):
                     user=getpass.getuser(),
                 ),
                 media=(
-                    InputMediaWebPage(self.config["banner_url"])
+                    InputMediaWebPage(self.config["banner_url"], optional=True)
                     if self.config["banner_url"]
                     else None
                 ),
