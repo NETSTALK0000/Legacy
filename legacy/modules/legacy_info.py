@@ -5,6 +5,7 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import git
+import legacytl
 from legacytl.types import InputMediaWebPage
 from legacytl.utils import get_display_name
 from .. import loader, utils, version
@@ -85,6 +86,7 @@ class LegacyInfoMod(loader.Module):
             self.config["custom_message"].format(
                 me=me,
                 version=_version,
+                tlversion=f"<i>{legacytl.__version__}</i>",
                 build=build,
                 prefix=prefix,
                 platform=platform,
