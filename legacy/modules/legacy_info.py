@@ -67,17 +67,14 @@ class LegacyInfoMod(loader.Module):
             for emoji, icon in [
                 ("🍊", "<emoji document_id=5449599833973203438>🧡</emoji>"),
                 ("🍇", "<emoji document_id=5449468596952507859>💜</emoji>"),
+                ("🍌", "<emoji document_id=5091424266138682339>🍌</emoji>"),
                 ("🍀", "<emoji document_id=5395325195542078574>🍀</emoji>"),
                 ("🚂", "<emoji document_id=5359595190807962128>🚂</emoji>"),
                 ("🐳", "<emoji document_id=5431815452437257407>🐳</emoji>"),
-                ("🕶", "<emoji document_id=5407025283456835913>📱</emoji>"),
-                ("💎", "<emoji document_id=5471952986970267163>💎</emoji>"),
+                ("💎", "<emoji document_id=5983589445687841895>🖥</emoji>"),
                 ("🛡", "<emoji document_id=5422712776059534305>🌩</emoji>"),
-                ("☕️", "<emoji document_id=6025967359716497965>☕️</emoji>"),
                 ("🌼", "<emoji document_id=5224219153077914783>❤️</emoji>"),
-                ("🎡", "<emoji document_id=5226711870492126219>🎡</emoji>"),
                 ("🐧", "<emoji document_id=5361541227604878624>🐧</emoji>"),
-                ("🦊", "<emoji document_id=5283051451889756068>🦊</emoji>"),
                 ("🧨", "<emoji document_id=5379774338733994368>🧨</emoji>"),
             ]:
                 platform = platform.replace(emoji, icon)
@@ -108,7 +105,7 @@ class LegacyInfoMod(loader.Module):
             )
             if self.config["custom_message"] and "-d" not in args
             else (
-                f"<blockquote><b>{{}}</b></blockquote>\n\n<blockquote><b>{{}} {self.strings('owner')}:</b> {me}</blockquote>\n\n<blockquote><b>{{}}"
+                f"<blockquote><b>{{}}</b></blockquote>\n\n<blockquote><b>{{}} {self.strings['owner']}:</b> {me}</blockquote>\n\n<blockquote><b>{{}}"
                 f" {self.strings['version']}:</b> {_version} {build}\n<b>{{}}"
                 f" {self.strings['branch']}:"
                 f"</b> <code>{version.branch}</code>\n{upd}</blockquote>\n\n<blockquote><b>{{}}"
@@ -156,12 +153,12 @@ class LegacyInfoMod(loader.Module):
 
     @loader.command()
     async def ubinfo(self, message):
-        await utils.answer(message, self.strings("desc"))
+        await utils.answer(message, self.strings["desc"])
 
     @loader.command()
     async def setinfo(self, message):
         if not (args := utils.get_args_html(message)):
-            return await utils.answer(message, self.strings("setinfo_no_args"))
+            return await utils.answer(message, self.strings["setinfo_no_args"])
 
         self.config["custom_message"] = args
-        await utils.answer(message, self.strings("setinfo_success"))
+        await utils.answer(message, self.strings["setinfo_success"])
