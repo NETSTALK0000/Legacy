@@ -181,3 +181,7 @@ unknown_errors.txt
 
 # Ruff Format
 .ruff_cache/
+
+# tests folder
+
+tests
