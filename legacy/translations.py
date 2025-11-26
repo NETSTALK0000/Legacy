@@ -218,7 +218,7 @@ class Strings:
                 else self._base_strings
             ).get(
                 key,
-                self._base_strings.get(key, "Unknown strings"),
+                self._base_strings.get(key, f"Unknown string ({key})"),
             )
         )
 
