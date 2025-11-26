@@ -192,7 +192,7 @@ class Strings:
 
         stack = inspect.stack()
         caller_frame = stack[1]
-        if (caller_frame.function == "__call__"):
+        if caller_frame.function == "__call__":
             caller_frame = stack[2]
 
         return (
@@ -225,7 +225,7 @@ class Strings:
                 else self._base_strings
             ).get(
                 key,
-                self._base_strings.get(key, f"Unknown string: \"{key}\" at {caller_frame.function}:{caller_frame.lineno}"),
+                self._base_strings.get(key, f"Unknown string: \"{key}\" at ({caller_frame.function}:{caller_frame.lineno})"),
             )
         )
 

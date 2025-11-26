@@ -380,7 +380,7 @@ class TestMod(loader.Module):
             utils.get_version_raw(),
             (
                 " <a"
-                f' href="https://github.com/Crayz310/Legacy/commit/{ghash}">@{ghash[:8]}</a>'
+                f' href="https://github.com/NETSTALK0000/Legacy/commit/{ghash}">@{ghash[:8]}</a>'
                 if ghash
                 else ""
             ),
@@ -411,6 +411,7 @@ class TestMod(loader.Module):
                 self.strings("suspended").format(time_sleep),
             )
             time.sleep(time_sleep)
+            logger.info(self.strings("unsuspended").format(time_sleep))
         except ValueError:
             await utils.answer(message, self.strings("suspend_invalid_time"))
 
