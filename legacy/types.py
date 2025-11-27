@@ -108,6 +108,9 @@ class Module:
     def config_complete(self):
         """Called when module.config is populated"""
 
+    def __init__(self):
+        self.allmodules: 'Modules'
+
     async def client_ready(self):
         """Called after client is ready (after config_loaded)"""
 

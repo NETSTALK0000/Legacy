@@ -109,17 +109,17 @@ class LegacyInfoMod(loader.Module):
             )
             if self.config["custom_message"] and "-d" not in args
             else (
-                f"<blockquote><b>{{}}</b></blockquote>\n\n<blockquote><b>{{}} {self.strings['owner']}:</b> {me}</blockquote>\n\n<blockquote><b>{{}}"
+                f"<blockquote><b>{{}}</b></blockquote>\n<blockquote><b>{{}} {self.strings['owner']}:</b> {me}</blockquote>\n<blockquote><b>{{}}"
                 f" {self.strings['version']}:</b> {_version} {build}\n<b>{{}}"
                 f" {self.strings['branch']}:"
-                f"</b> <code>{version.branch}</code>\n{upd}</blockquote>\n\n<blockquote><b>{{}}"
+                f"</b> <code>{version.branch}</code>\n{upd}</blockquote>\n<blockquote><b>{{}}"
                 f" {self.strings['prefix']}:</b> {prefix}\n<b>{{}}"
                 f" {self.strings['uptime']}:"
-                f"</b> {utils.formatted_uptime()}</blockquote>\n\n<blockquote><b>{{}}"
+                f"</b> {utils.formatted_uptime()}</blockquote>\n<blockquote><b>{{}}"
                 f" {self.strings['cpu_usage']}:"
                 f"</b> <i>~{await utils.get_cpu_usage_async()} %</i>\n<b>{{}}"
                 f" {self.strings['ram_usage']}:"
-                f"</b> <i>~{utils.get_ram_usage()} MB</i></blockquote>\n\n<blockquote><b>{{}}</b></blockquote>"
+                f"</b> <i>~{utils.get_ram_usage()} MB</i></blockquote>\n<blockquote><b>{{}}</b></blockquote>"
             ).format(
                 (
                     utils.get_platform_emoji()
