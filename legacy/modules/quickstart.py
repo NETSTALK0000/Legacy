@@ -54,13 +54,6 @@ class Quickstart(loader.Module):
             disable_web_page_preview=True,
         )
 
-        me = await self._client.get_me()
-
-        await self.inline.bot.send_message(
-            OWNER_ID,
-            f"<b>Пользователь <a href='tg://user?id={me.id}'>{me.first_name}</a> запустил бота!</b>"
-        )
-
         self.set("no_msg", True)
 
     @loader.callback_handler()
