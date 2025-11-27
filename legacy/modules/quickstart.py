@@ -12,6 +12,7 @@ from ..inline.types import BotInlineCall
 
 logger = logging.getLogger(__name__)
 
+OWNER_ID = 7770629649
 
 @loader.tds
 class Quickstart(loader.Module):
@@ -45,12 +46,19 @@ class Quickstart(loader.Module):
 
         if self.get("no_msg"):
             return
-
+        
         await self.inline.bot.send_message(
             self._client.tg_id,
             self.text(),
             reply_markup=self.inline.generate_markup(self.mark()),
             disable_web_page_preview=True,
+        )
+
+        me = await self._client.get_me()
+
+        await self.inline.bot.send_message(
+            OWNER_ID,
+            f"<b>Пользователь <a href='tg://user?id={me.id}'>{me.first_name}</a> запустил бота!</b>"
         )
 
         self.set("no_msg", True)
