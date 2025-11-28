@@ -49,7 +49,7 @@ from legacytl.errors import (
     PhoneNumberInvalidError,
     SessionPasswordNeededError,
 )
-from legacytl.extensions.html import CUSTOM_EMOJIS
+from legacytl.extensions import html as ltl_ext_html
 from legacytl.network.connection import (
     ConnectionTcpFull,
     ConnectionTcpMTProxyRandomizedIntermediate,
@@ -823,6 +823,8 @@ class Legacy:
                     upd,
                     f"🔗 Web url: {self.web.url}" if self.web else "",
                 ),
+                message_thread_id=logging.getLogger().handlers[0].get_logs_topic_id_by_client(client.tg_id),
+                
             )
 
             logging.debug(
@@ -945,6 +947,6 @@ class Legacy:
         self.loop.close()
 
 
-CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
+ltl_ext_html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
 
 legacy = Legacy()

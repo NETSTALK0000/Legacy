@@ -56,6 +56,9 @@ from legacytl.tl.functions.channels import (
     EditAdminRequest,
     EditPhotoRequest,
     InviteToChannelRequest,
+    GetForumTopicsByIDRequest,
+    CreateForumTopicRequest,
+    EditForumTopicRequest,
 )
 from legacytl.tl.functions.messages import (
     GetDialogFiltersRequest,
@@ -99,6 +102,8 @@ from legacytl.tl.types import (
     ReactionEmoji,
     UpdateNewChannelMessage,
     User,
+    ForumTopic,
+    ForumTopicDeleted,
 )
 
 from ._internal import fw_protect
@@ -698,6 +703,8 @@ async def set_avatar(
                 avatar,
             )
         ).content
+    elif isinstance(avatar, str) and os.path.exists(avatar):
+        f = avatar
     elif isinstance(avatar, bytes):
         f = avatar
     else:
@@ -772,6 +779,7 @@ async def asset_channel(
     avatar: typing.Optional[str] = None,
     ttl: typing.Optional[int] = None,
     forum: bool = False,
+    hide_general: bool = False,
     _folder: typing.Optional[str] = None,
 ) -> typing.Tuple[Channel, bool]:
     """
@@ -786,6 +794,7 @@ async def asset_channel(
     :param avatar: Url to an avatar to set as pfp of created peer
     :param ttl: Time to live for messages in channel
     :param forum: Whether to create a forum channel
+    :param hide_general: Hide '#General' topic
     :return: Peer and bool: is channel new or pre-existent
     """
     if not hasattr(client, "_channels_cache"):
@@ -846,6 +855,10 @@ async def asset_channel(
         await fw_protect()
         await set_avatar(client, peer, avatar)
 
+    if hide_general and forum:
+        await fw_protect()
+        await client(EditForumTopicRequest(channel=peer, topic_id=1, hidden=True))
+
     if ttl:
         await fw_protect()
         await client(SetHistoryTTLRequest(peer=peer, period=ttl))
@@ -881,6 +894,73 @@ async def asset_channel(
     client._channels_cache[title] = {"peer": peer, "exp": int(time.time())}
     return peer, True
 
+if typing.TYPE_CHECKING:
+    from .database import Database
+
+async def asset_forum_topic(
+    client: CustomTelegramClient,
+    db: 'Database',
+    peer: hints.Entity,
+    title: str,
+    description: typing.Optional[str] = None,
+    icon_emoji_id: typing.Optional[int] = None,
+) -> ForumTopic:
+    entity = await client.get_entity(peer)
+
+    if not isinstance(entity, Channel):
+        raise TypeError(f"Expected entity to be 'Channel', but got '{type(entity).__name__}'")
+    
+    async def create_topic() -> ForumTopic:
+        result = await client(CreateForumTopicRequest(
+            channel=entity,
+            title=title,
+            icon_emoji_id=(icon_emoji_id if client.legacy_me.premium else None)
+        ))
+
+        await fw_protect()
+
+        await client.send_message(entity=entity, message=(description if description else f"<emoji document_id=5258503720928288433>ℹ️</emoji> <b>Content related to <i>'{title}'</i> will be here</b>"), reply_to=result.updates[0].id)
+
+        await fw_protect()
+
+        result = await client(GetForumTopicsByIDRequest(channel=entity, topics=[result.updates[0].id]))
+
+        return result.topics[0]
+    
+    forums_cache = db.get("legacy.forums", "forums_cache", {})
+
+    if (topic_id := forums_cache.get(entity.title, {}).get(title)):
+        await fw_protect()
+        topic = await client(GetForumTopicsByIDRequest(channel=entity, topics=[topic_id]))
+        topic = topic.topics[0]
+
+        if not isinstance(topic, ForumTopicDeleted):
+            return topic
+        else:
+            logger.warning(f"Topic: '{title}' was found in the database but does not exist in the channel and will be recreated")
+            await fw_protect()
+            new_topic = await create_topic()
+            forums_cache[entity.title][title] = new_topic.id
+            
+    else:
+        await fw_protect()
+        new_topic = await create_topic()
+        forums_cache.setdefault(entity.title, {})[title] = new_topic.id
+    
+    db.set("legacy.forums", "forums_cache", forums_cache)
+
+    return new_topic
+
+async def wait_for_content_channel(db: 'Database', delay: float = 10) -> int:
+    cid = db.get("legacy.forums", "channel_id", None)
+    
+    while not cid:
+        logger.warning("Legacy content channel not found in database. Sleeping 10 seconds...")
+        await asyncio.sleep(delay)
+        cid = db.get("legacy.forums", "channel_id", None)
+    
+    return cid
+    
 
 async def dnd(
     client: CustomTelegramClient,
