@@ -1033,14 +1033,14 @@ class LoaderMod(loader.Module):
         if not (args := utils.get_args_split_by(message, ["\n", ","])):
             return await utils.answer(message, self.strings("no_class"))
 
-        instances = [self.lookup(arg) for arg in args]
+        instances = {arg: self.lookup(arg) for arg in args}
         msg = []
         reply_markup = []
         self.unloaded = []
         successful_unload = []
         failed_unload = []
 
-        for instance in instances:
+        for instance in instances.values():
             if isinstance(instance, list):
                 reply_markup.append([])
                 for i in instance:
@@ -1078,6 +1078,14 @@ class LoaderMod(loader.Module):
                 successful_unload.append(instance.__class__.__name__)
             elif not isinstance(instance, bool):
                 failed_unload.append(instance.__class__.__name__)
+
+        if not successful_unload and not failed_unload:
+            msg.append(
+                self.strings["not_found_mul" if len(instances) > 1 else "not_found"].format(
+                    ', '.join(instances.keys())
+                )
+            )
+
         if successful_unload:
             msg.append(
                 self.strings["unloaded"].format(

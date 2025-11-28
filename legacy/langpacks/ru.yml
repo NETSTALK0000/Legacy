@@ -466,6 +466,8 @@ loader:
   no_class: "<b>А что выгружать то?</b>"
   unloaded: "{} <b>Модуль {} выгружен.</b>"
   not_unloaded: "{} <b>Модуль {} не выгружен.</b>"
+  not_found: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Не удалось найти модуль {}!</b>"
+  not_found_mul: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Не удалось найти модули: {}!</b>"
   requirements_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Ошибка установки зависимостей</b>"
   requirements_installing: "<blockquote><emoji document_id=5316770651720137011>🚀</emoji> <b>Устанавливаю зависимости:</blockquote>\n\n<blockquote>{}</blockquote></b></b>"
   requirements_restart: "<emoji document_id=5875145601682771643>🚀</emoji> <b>Зависимости установлены, но нужна перезагрузка для применения</b> <code>{}</code>"
