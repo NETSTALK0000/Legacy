@@ -1008,11 +1008,24 @@ class LoaderMod(loader.Module):
             + "\n\n"
             + self.strings["not_unloaded"]
         )
-        buttons = call._units.get(call.unit_id).get("buttons")
-        for button in buttons:
-            for b in button:
-                if b.get("text") == selected_mod:
-                    buttons.remove(button)
+        
+        all_rows = call._units.get(call.unit_id).get("buttons")
+
+        buttons = []
+        for row in all_rows:
+            new_row = []
+            for button in row:
+                if not button:
+                    continue
+
+                if button.get("text") == selected_mod:
+                    continue
+
+                new_row.append(button)
+            
+            if new_row:
+                buttons.append(new_row)
+
         if isinstance(lookup, list):
             for mod in lookup:
                 if mod.__class__.__name__ == selected_mod:
