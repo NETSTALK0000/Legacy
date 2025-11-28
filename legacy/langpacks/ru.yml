@@ -250,6 +250,7 @@ settings:
 
 legacy_config:
   choose_core: "⚙️ <b>Выбери категорию</b>"
+  no_modules: "⚠️ <b>Нет модулей для настройки!</b>"
   configure: "⚙️ <b>Выбери модуль для настройки</b>"
   configure_lib: "📦 <b>Выбери библиотеку для настройки</b>"
   configuring_mod: "⚙️ <b>Выбери параметр для модуля</b> <code>{}</code>\n\n<b>Текущие настройки:</b>\n\n{}"
