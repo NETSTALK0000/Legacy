@@ -153,12 +153,17 @@ def get_args(message: typing.Union[Message, str]) -> typing.List[str]:
     :param message: Message or string to get arguments from
     :return: List of arguments
     """
+    prefix = message.client.loader.get_prefix(message.sender_id)
+
     if not (message := getattr(message, "message", message)):
         return False
 
+    if message.startswith(prefix):
+        message = message[len(prefix):].strip()
+
     if len(message := message.split(maxsplit=1)) <= 1:
         return []
-
+    
     message = message[1]
 
     try:
@@ -175,8 +180,13 @@ def get_args_raw(message: typing.Union[Message, str]) -> str:
     :param message: Message or string to get arguments from
     :return: Raw string of arguments
     """
+    prefix = message.client.loader.get_prefix(message.sender_id)
+    
     if not (message := getattr(message, "message", message)):
         return False
+    
+    if message.startswith(prefix):
+        message = message[len(prefix):].strip()
 
     return args[1] if len(args := message.split(maxsplit=1)) > 1 else ""
 
@@ -904,6 +914,7 @@ async def asset_forum_topic(
     title: str,
     description: typing.Optional[str] = None,
     icon_emoji_id: typing.Optional[int] = None,
+    invite_bot: bool = False,
 ) -> ForumTopic:
     entity = await client.get_entity(peer)
 
@@ -948,6 +959,17 @@ async def asset_forum_topic(
         forums_cache.setdefault(entity.title, {})[title] = new_topic.id
     
     db.set("legacy.forums", "forums_cache", forums_cache)
+
+    if invite_bot:
+        await fw_protect()
+        if all(
+            p.id != client.loader.inline.bot_id
+            for p in await client.get_participants(
+                entity, limit=20
+            )
+        ):
+            await fw_protect()
+            await invite_inline_bot(client, entity)
 
     return new_topic
 

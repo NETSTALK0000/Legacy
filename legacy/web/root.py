@@ -293,7 +293,8 @@ class Web:
         )
 
     async def can_add(self, request: web.Request) -> web.Response:
-        if self.client_data:
+        host = utils.get_current_platform() or utils._hosts.get("vds")
+        if self.client_data and host.get("single_session", False):
             return web.Response(status=403, body="Forbidden by EULA")
 
         return web.Response(status=200, body="Yes")
@@ -463,10 +464,10 @@ class Web:
 
         token = utils.rand(8)
 
-        markup = InlineKeyboardMarkup()
-        markup.add(
+        markup = InlineKeyboardMarkup(inline_keyboard=[[]])
+        markup.inline_keyboard[0].append(
             InlineKeyboardButton(
-                "🔓 Authorize user",
+                text="🔓 Authorize user",
                 callback_data=f"authorize_web_{token}",
             )
         )
@@ -518,8 +519,8 @@ class Web:
             try:
                 bot = user[0].inline.bot
                 msg = await bot.send_message(
-                    user[1].tg_id,
-                    (
+                    chat_id=user[1].tg_id,
+                    text=(
                         "🌙🔐 <b>Click button below to confirm web application"
                         f" ops</b>\n\n<b>Client IP</b>: {ips}\n{cities}\n<i>If you did"
                         " not request any codes, simply ignore this message</i>"

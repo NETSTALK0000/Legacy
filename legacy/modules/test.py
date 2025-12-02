@@ -457,6 +457,8 @@ class TestMod(loader.Module):
     async def client_ready(self):
         self._content_channel_id = await utils.wait_for_content_channel(self._db)
 
+        await utils.fw_protect()
+        
         self._logs_topic = await utils.asset_forum_topic(
             client=self._client,
             db=self._db,
@@ -464,6 +466,7 @@ class TestMod(loader.Module):
             title="Logs",
             description="🌙 Your Legacy logs will appear in this topic",
             icon_emoji_id=5256230583717079814,
+            invite_bot=True,
         )
 
         self.logchat = int(f"-100{self._content_channel_id}")

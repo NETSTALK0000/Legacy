@@ -226,7 +226,16 @@ settings:
   alias_removed: "<emoji document_id=5197474765387864959>👍</emoji> <b>Аліас</b> <code>{}</code> <b>видалено</b>."
   no_alias: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Аліаса</b> <code>{}</code> <b>не існує</b>"
   db_cleared: "<emoji document_id=5197474765387864959>👍</emoji> <b>Базу очищена</b>"
-  legacy: "<blockquote>{}</blockquote>\n<blockquote><emoji document_id=6028346797368283073>✈️</emoji><b> Legacy-Tl-New:</b> {}\n<emoji document_id=5289608677244811430>📁</emoji> <b>Python:</b> {}</blockquote>\n<blockquote><emoji document_id=5316692281451887373>⭐️</emoji> <b>Особлива подяка</b></blockquote>\n<blockquote>@xdesai — виправлення, функції, оптимізація\n@undef1nn3d — виправлення, функції, оптимізація\n@Admt_450 — пошук помилок\n@Itachi_Uchiha_sss — пошук помилок</blockquote>"
+  legacy: |
+    <blockquote>{}</blockquote>
+    <blockquote><emoji document_id=5217890643321300022>✈️</emoji><b> Legacy-Tl-New:</b> {}
+    <blockquote><b><emoji document_id=5258391003806584549>🧃</emoji> <b>Aiogram:</b> <i>{}</i>
+    <emoji document_id=5289608677244811430>📁</emoji> <b>Python:</b> {}</blockquote>
+    <blockquote><emoji document_id=5316692281451887373>⭐️</emoji> <b>Особлива подяка</b></blockquote>
+    <blockquote>@xdesai — виправлення, функції, оптимізація
+    @undef1nn3d — виправлення, функції, оптимізація
+    @Admt_450 — пошук помилок
+    @Itachi_Uchiha_sss — пошук помилок</blockquote>
   _cls_doc: "Керування базовими налаштуваннями юзербота"
   confirm_cleardb: "⚠️ <b>Ви впевнені, що хочете зкинути базу даних?</b>"
   cleardb_confirm: "🗑 Очистити базу"
@@ -289,7 +298,7 @@ inline_stuff:
   bot_updated: "<emoji document_id=6318792204118656433>🎉</emoji> <b>Налаштування збережені. Для їх застосування треба перезавантажити юзербота</b>"
   this_is_legacy: "🌙 <b>Привіт! Це Legacy — потужний модульний Telegram юзербот. Ви можете встановити його на свій акаунт!</b>\n\n<b>🌍 <a href=\"https://github.com/Crayz310/Legacy\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/legacy_help\">Чат підтримки</a></b>"
   token_not_provided: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Токен бота не вказано</b>"
-  token_changed: "<emoji document_id=5427009714745517609>✅</emoji> <b>Токен бота змінено. Перезавантажте юзербот"
+  token_changed: "<emoji document_id=5427009714745517609>✅</emoji> <b>Токен бота змінено."
   invalid_token_format: "<emoji document_id=5240241223632954241>🚫</emoji> <b>Невірний токен!</b>"
   privacy_leak_nowarn: "<b>⚠️ Ця команда дає доступ до авторизації у твоєму Legacy. Її виконання в публічних чатах є загрозою безпеці. Виконай</b> <code>{}</code> <b>щоб вимкнути це попередження</b>"
   privacy_leak: "<b>⚠️ Ця команда надає доступ до авторизації у твоєму Legacy. Її виконання в публічних чатах є загрозою безпеці</b>"
