@@ -243,7 +243,7 @@ class Events(InlineUnit):
                 except Exception:
                     logger.exception("Error on running callback watcher!")
                     await call.answer(
-                        "Error occured while processing request. More info in logs",
+                        "Произошла ошибка при обработке запроса. Больше информации в логах",
                         show_alert=True,
                     )
                     continue
@@ -302,10 +302,7 @@ class Events(InlineUnit):
                     except Exception:
                         logger.exception("Error on running callback watcher!")
                         await call.answer(
-                            (
-                                "Error occurred while processing request. More info in"
-                                " logs"
-                            ),
+                            "Произошла ошибка при обработке запроса. Больше информации в логах",
                             show_alert=True,
                         )
                         return
