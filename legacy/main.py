@@ -823,8 +823,6 @@ class Legacy:
                     upd,
                     f"🔗 Web url: {self.web.url}" if self.web else "",
                 ),
-                message_thread_id=logging.getLogger().handlers[0].get_logs_topic_id_by_client(client.tg_id),
-                
             )
 
             logging.debug(

@@ -27,10 +27,7 @@ logger = logging.getLogger(__name__)
 class LegacyBackupMod(loader.Module):
     strings = {"name": "LegacyBackup"}
 
-    async def client_ready(self, client, db):
-        self._client = client
-        self._db = db
-        
+    async def client_ready(self):
         if not self.get("period"):
             await self.inline.bot.send_photo(
                 self.tg_id,
@@ -60,17 +57,14 @@ class LegacyBackupMod(loader.Module):
                 ),
             )
 
-        self._content_channel_id = await utils.wait_for_content_channel(self._db)
-
-        await utils.fw_protect()
-        
-        self._backup_topic = await utils.asset_forum_topic(
-            client=self._client,
-            db=self._db,
-            peer=self._content_channel_id,
-            title="Backups",
-            description="📼 Your database backups will appear here",
-            icon_emoji_id=6024106569430472546,
+        self._backup_channel, _ = await utils.asset_channel(
+            self._client,
+            "legacy-backups",
+            "📼 Your database backups will appear here",
+            silent=True,
+            avatar=f"{main.BACKUPS_PATH}",
+            _folder="legacy",
+            invite_bot=True,
         )
 
     async def _set_backup_period(self, call: BotInlineCall, value: int):
@@ -153,7 +147,7 @@ class LegacyBackupMod(loader.Module):
             outfile.name = f"legacy-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
 
             await self.inline.bot.send_document(
-                int(f"-100{self._content_channel_id}"),
+                int(f"-100{self._backup_channel.id}"),
                 BufferedInputFile(outfile.getvalue(), outfile.name),
                 caption=self.strings["backup_caption"].format(
                     prefix=self.get_prefix(),
@@ -168,7 +162,6 @@ class LegacyBackupMod(loader.Module):
                         ],
                     ],
                 ),
-                message_thread_id=self._backup_topic.id,
             )
 
             self.set("last_backup", round(time.time()))
@@ -217,7 +210,7 @@ class LegacyBackupMod(loader.Module):
 
         file = await (
             await self._client.get_messages(
-                self._content_channel_id, ids=call.message.message_id
+                self._backup_channel, ids=call.message.message_id
             )
         ).download_media(bytes)
 
@@ -272,7 +265,7 @@ class LegacyBackupMod(loader.Module):
         outfile.name = f"legacy-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
 
         backup_msg = await self.inline.bot.send_document(
-            int(f"-100{self._content_channel_id}"),
+            int(f"-100{self._backup_channel.id}"),
             BufferedInputFile(outfile.getvalue(), outfile.name),
             caption=self.strings["backup_caption"].format(
                 prefix=self.get_prefix(message.sender_id),
@@ -287,13 +280,12 @@ class LegacyBackupMod(loader.Module):
                     ],
                 ],
             ),
-            message_thread_id=self._backup_topic.id,
         )
 
         await utils.answer(
             message,
             self.strings["backup_sent"].format(
-                f"https://t.me/c/{self._content_channel_id}/{self._backup_topic.id}/{backup_msg.message_id}"
+                f"https://t.me/c/{self._backup_channel.id}/{backup_msg.message_id}"
             ),
         )
 

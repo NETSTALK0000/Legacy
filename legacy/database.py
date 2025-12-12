@@ -13,7 +13,7 @@ import time
 import typing
 
 from legacytl.errors.rpcerrorlist import ChannelsTooMuchError
-from legacytl.tl.types import Message, User, ForumTopic
+from legacytl.tl.types import Message, User
 
 from . import main, utils
 from .pointers import (
@@ -50,7 +50,7 @@ class Database(dict):
         self._client: CustomTelegramClient = client
         self._next_revision_call: int = 0
         self._revisions: typing.List[dict] = []
-        self._assets_topic: typing.Optional[ForumTopic] = None
+        self._assets: int = None
         self._me: User = None
         self._saving_task: asyncio.Future = None
 
@@ -63,35 +63,21 @@ class Database(dict):
         self.read()
 
         try:
-            self._content_channel, _ = await utils.asset_channel(
-                client=self._client,
-                title='legacy-userbot',
-                description='🌙 Content related to legacy will be here',
-                silent=True,
-                avatar=f"{main.AVATAR_PATH}",
-                forum=True,
-                hide_general=True,
-                _folder='legacy',
+            self._assets, _ = await utils.asset_channel(
+                self._client,
+                "legacy-assets",
+                "🌆 Your Legacy assets will be stored here",
+                avatar=f"{main.ASSETS_PATH}",
+                _folder="legacy",
             )
-
-            self.set("legacy.forums", "channel_id", self._content_channel.id)
-
-            await utils.fw_protect()
-
-            self._assets_topic = await utils.asset_forum_topic(
-                client=self._client,
-                db=self,
-                peer=self._content_channel.id,
-                title="Assets",
-                description="🌆 Your Legacy assets will be stored here",
-                icon_emoji_id=5805550320985578625,
-            )
-        except Exception:
-            self._assets_topic = None
+        except ChannelsTooMuchError:
+            self._assets = None
             logger.error(
-                "Can't find and/or create assets topic\n"
+                "Can't find and/or create assets folder\n"
                 "This may cause several consequences, such as:\n"
-                "- Non working assets feature (e.g. notes)\n\n"
+                "- Non working assets feature (e.g. notes)\n"
+                "- This error will occur every restart\n\n"
+                "You can solve this by leaving some channels/groups"
             )
 
     def read(self):
@@ -181,30 +167,29 @@ class Database(dict):
         Save assets
         returns asset_id as integer
         """
-        if not self._assets_topic:
-            raise NoAssetsChannel("Tried to save asset to non-existing asset topic")
+        if not self._assets:
+            raise NoAssetsChannel("Tried to save asset to non-existing asset channel")
 
         return (
-            (await self._client.send_message(self._content_channel.id, message, reply_to=self._assets_topic.id)).id
+            (await self._client.send_message(self._assets, message)).id
             if isinstance(message, Message)
             else (
                 await self._client.send_message(
-                    self._content_channel.id,
+                    self._assets,
                     file=message,
                     force_document=True,
-                    message_thread_id=self._assets_topic.id
                 )
             ).id
         )
 
     async def fetch_asset(self, asset_id: int) -> typing.Optional[Message]:
         """Fetch previously saved asset by its asset_id"""
-        if not self._assets_topic:
+        if not self._assets:
             raise NoAssetsChannel(
-                "Tried to fetch asset from non-existing asset topic"
+                "Tried to fetch asset from non-existing asset channel"
             )
 
-        asset = await self._client.get_messages(self._content_channel.id, ids=[asset_id])
+        asset = await self._client.get_messages(self._assets, ids=[asset_id])
 
         return asset[0] if asset else None
 

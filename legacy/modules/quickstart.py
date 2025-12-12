@@ -18,7 +18,7 @@ OWNER_ID = 7770629649
 class Quickstart(loader.Module):
     strings = {"name": "Quickstart"}
 
-    async def client_ready(self, client, db):
+    async def client_ready(self):
         self.mark = lambda: [
             [
                 {
