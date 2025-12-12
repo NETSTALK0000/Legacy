@@ -1077,6 +1077,7 @@ class LoaderMod(loader.Module):
                 )
             except CoreUnloadError as e:
                 msg.append(self.strings["unload_core"].format(e.module))
+                failed_unload.append(instance.__class__.__name__)
                 continue
 
             self.set(
