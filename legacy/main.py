@@ -794,6 +794,7 @@ class Legacy:
                 "           |___/            |___/\n\n"
                 f"• Build: {build[:7]}\n"
                 f"• Version: {__version__}\n"
+                f"• Branch: {version.branch}\n"
                 f"• {upd}\n"
             )
 
