@@ -41,28 +41,28 @@ def start():
         and all(trigger not in os.environ for trigger in {"DOCKER", "GOORM", "NO_SUDO"})
     ):
         print("🚫" * 15)
-        print("You attempted to run Legacy on behalf of root user")
-        print("Please, create a new user and restart script")
-        print("If this action was intentional, pass --root argument instead")
+        print("Вы попытались запустить Legacy от имени пользователя root")
+        print("Пожалуйста, создайте нового пользователя и перезапустите скрипт")
+        print("Если это действие было преднамеренным, передайте аргумент --root вместо этого")
         print("🚫" * 15)
         print()
-        print("Type force_insecure to ignore this warning")
-        print("Type no_sudo if your system has no sudo (Debian vibes)")
+        print("Введите force_insecure, чтобы проигнорировать это предупреждение")
+        print("Введите no_sudo, если в вашей системе нет sudo (привет, Debian)")
         inp = input("> ").lower()
         if inp != "force_insecure":
             sys.exit(1)
         elif inp == "no_sudo":
             os.environ["NO_SUDO"] = "1"
-            print("Added NO_SUDO in your environment variables")
+            print("Добавлена переменная NO_SUDO в ваши переменные окружения")
             restart()
 
     if sys.version_info < (3, 8, 0):
-        print("🚫 Error: you must use at least Python version 3.8.0")
+        print("🚫 Ошибка: вы должны использовать как минимум Python версии 3.8.0")
         sys.exit(1)
 
     if __package__ != "legacy":
         print(
-            "🚫 Error: you cannot run this as a script; you must execute as a package"
+            "🚫 Ошибка: вы не можете запустить это как скрипт; вы должны выполнить это как пакет"
         )
         sys.exit(1)
 
@@ -86,16 +86,16 @@ def start():
 try:
     start()
 except ImportError as e:
-    print("📦 Trying to install missing dependencies from requirements.txt...")
+    print("📦 Пытаюсь установить недостающие зависимости из requirements.txt...")
     try:
         deps()
     except subprocess.CalledProcessError as deps_err:
-        print("❌ Failed to install requirements")
+        print("❌ Не удалось установить зависимости")
         raise deps_err
 
     start()
 except Exception as e2:
-    print("❌ Failed to start Legacy")
+    print("❌ Не удалось запустить Legacy")
     print(e2)
 
     if "DOCKER" in os.environ:
