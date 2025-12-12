@@ -11,6 +11,7 @@ import string
 import aiohttp
 from legacytl.errors.rpcerrorlist import YouBlockedUserError
 from legacytl.tl.functions.contacts import UnblockRequest
+from legacytl.tl.custom import Message
 
 from .. import loader, utils
 from ..auth_manager import AuthManager
@@ -157,8 +158,10 @@ class InlineStuff(loader.Module):
         host = utils.get_current_platform() or utils._platforms.get("vds")
         if host.get("single_session", False):
             return await utils.answer(message, self.strings["forbid"])
-        args = utils.get_args_raw(message)
-        force = force or "-f" in args
+
+        if not force and isinstance(message, Message):
+            args = utils.get_args_raw(message)
+            force = '-f' in args
 
         if not force:
             try:
