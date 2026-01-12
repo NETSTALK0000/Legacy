@@ -579,8 +579,10 @@ class Legacy:
             return False
 
         if not self.web:
+            session = MemorySession()
+            session.set_dc(2, '149.154.167.50', 443)
             client = CustomTelegramClient(
-                MemorySession(),
+                session,
                 self.api_token.ID,
                 self.api_token.HASH,
                 connection=self.conn,
