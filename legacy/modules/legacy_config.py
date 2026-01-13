@@ -1002,36 +1002,46 @@ class LegacyConfigMod(loader.Module):
             ]
         else:
             to_config = [
-                lib.name for lib in self.allmodules.libraries if hasattr(lib, "config")  # type: ignore
+                lib.name
+                for lib in self.allmodules.libraries
+                if hasattr(lib, "config")  # type: ignore
             ]
-
-        to_config.sort()  # type: ignore
 
         kb = []
-        for mod_row in utils.chunks(
-            to_config[page * 5 * 3 : (page + 1) * 5 * 3],
-            3,
-        ):
-            row = [
-                {
-                    "text": btn,
-                    "callback": self.inline__configure,
-                    "args": (btn,),
-                    "kwargs": {"obj_type": obj_type},
-                }
-                for btn in mod_row
-                if self.lookup(btn) is not False
-            ]
-            kb += [row]
 
-        if len(to_config) > 5 * 3:
-            kb += self.inline.build_pagination(
-                callback=functools.partial(
-                    self.inline__global_config, obj_type=obj_type
-                ),
-                total_pages=ceil(len(to_config) / (5 * 3)),
-                current_page=page + 1,
-            )
+        if to_config:
+            text = self.strings[
+                "configure" if isinstance(obj_type, bool) else "configure_lib"
+            ]
+
+            to_config.sort()  # type: ignore
+
+            for mod_row in utils.chunks(
+                to_config[page * 5 * 3 : (page + 1) * 5 * 3],
+                3,
+            ):
+                row = [
+                    {
+                        "text": btn,
+                        "callback": self.inline__configure,
+                        "args": (btn,),
+                        "kwargs": {"obj_type": obj_type},
+                    }
+                    for btn in mod_row
+                    if self.lookup(btn) is not False
+                ]
+                kb += [row]
+
+            if len(to_config) > 5 * 3:
+                kb += self.inline.build_pagination(
+                    callback=functools.partial(
+                        self.inline__global_config, obj_type=obj_type
+                    ),
+                    total_pages=ceil(len(to_config) / (5 * 3)),
+                    current_page=page + 1,
+                )
+        else:
+            text = self.strings["no_modules"]
 
         kb += [
             [
@@ -1043,12 +1053,7 @@ class LegacyConfigMod(loader.Module):
             ]
         ]
 
-        await call.edit(
-            self.strings[
-                "configure" if isinstance(obj_type, bool) else "configure_lib"
-            ],
-            reply_markup=kb,
-        )
+        await call.edit(text, reply_markup=kb)
 
     @loader.command(alias="cfg")
     async def configcmd(self, message: Message):

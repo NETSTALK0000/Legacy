@@ -28,23 +28,25 @@ import contextlib
 import functools
 import inspect
 import io
-import ujson
 import logging
 import os
 import random
 import re
 import shlex
 import signal
+import socket
 import string
 import time
 import typing
 from datetime import timedelta
+from platform import uname
 from urllib.parse import urlparse
 
 import git
 import grapheme
 import legacytl
 import requests
+import ujson
 from aiogram.types import Message as AiogramMessage
 from legacytl import hints
 from legacytl.tl.custom.message import Message
@@ -54,29 +56,33 @@ from legacytl.tl.functions.channels import (
     EditAdminRequest,
     EditPhotoRequest,
     InviteToChannelRequest,
+    GetForumTopicsByIDRequest,
+    CreateForumTopicRequest,
+    EditForumTopicRequest,
 )
 from legacytl.tl.functions.messages import (
     GetDialogFiltersRequest,
+    SendReactionRequest,
     SetHistoryTTLRequest,
     UpdateDialogFilterRequest,
-    SendReactionRequest,
 )
 from legacytl.tl.types import (
     Channel,
     Chat,
     ChatAdminRights,
     InputDocument,
+    InputMediaWebPage,
     InputPeerNotifySettings,
     MessageEntityBankCard,
     MessageEntityBlockquote,
     MessageEntityBold,
     MessageEntityBotCommand,
     MessageEntityCashtag,
+    TypeInputMedia,
     MessageEntityCode,
+    MessageEntityCustomEmoji,
     MessageEntityEmail,
     MessageEntityHashtag,
-    InputMediaWebPage,
-    TypeInputMedia,
     MessageEntityItalic,
     MessageEntityMention,
     MessageEntityMentionName,
@@ -92,10 +98,12 @@ from legacytl.tl.types import (
     PeerChannel,
     PeerChat,
     PeerUser,
+    ReactionCustomEmoji,
+    ReactionEmoji,
     UpdateNewChannelMessage,
     User,
-    ReactionEmoji,
-    ReactionCustomEmoji,
+    ForumTopic,
+    ForumTopicDeleted,
 )
 
 from ._internal import fw_protect
@@ -145,12 +153,17 @@ def get_args(message: typing.Union[Message, str]) -> typing.List[str]:
     :param message: Message or string to get arguments from
     :return: List of arguments
     """
+    prefix = message.client.loader.get_prefix(message.sender_id)
+
     if not (message := getattr(message, "message", message)):
         return False
 
+    if message.startswith(prefix):
+        message = message[len(prefix):].strip()
+
     if len(message := message.split(maxsplit=1)) <= 1:
         return []
-
+    
     message = message[1]
 
     try:
@@ -167,8 +180,13 @@ def get_args_raw(message: typing.Union[Message, str]) -> str:
     :param message: Message or string to get arguments from
     :return: Raw string of arguments
     """
+    prefix = message.client.loader.get_prefix(message.sender_id)
+    
     if not (message := getattr(message, "message", message)):
         return False
+    
+    if message.startswith(prefix):
+        message = message[len(prefix):].strip()
 
     return args[1] if len(args := message.split(maxsplit=1)) > 1 else ""
 
@@ -445,8 +463,8 @@ async def answer(
     message: typing.Union[Message, InlineCall, InlineMessage],
     response: str,
     *,
-    media: typing.Optional[TypeInputMedia] = None,
     reply_markup: typing.Optional[LegacyReplyMarkup] = None,
+    file: typing.Optional[TypeInputMedia] = None,
     **kwargs,
 ) -> typing.Union[InlineCall, InlineMessage, Message]:
     """
@@ -526,9 +544,7 @@ async def answer(
                     raise
 
                 entities = [
-                    e
-                    for e in entities
-                    if not isinstance(e, legacytl.tl.types.MessageEntityBlockquote)
+                    e for e in entities if not isinstance(e, MessageEntityCustomEmoji)
                 ]
 
                 strings = list(smart_split(text, entities, 4096))
@@ -561,14 +577,14 @@ async def answer(
             result = await message.edit(
                 text,
                 parse_mode=lambda t: (t, entities),
-                media=media,
+                media=file if not isinstance(file, str) else None,
+                file=file if isinstance(file, str) else None,
                 **kwargs,
             )
         else:
             result = await message.respond(
                 text,
                 parse_mode=lambda t: (t, entities),
-                file=media,
                 **kwargs,
             )
     elif isinstance(response, Message):
@@ -629,7 +645,7 @@ async def get_target(message: Message, arg_no: int = 0) -> typing.Optional[int]:
 
     if any(
         isinstance(entity, MessageEntityMentionName)
-        for entity in (message.entities or [])
+        for entity in message.entities or []
     ):
         e = sorted(
             filter(lambda x: isinstance(x, MessageEntityMentionName), message.entities),
@@ -697,6 +713,8 @@ async def set_avatar(
                 avatar,
             )
         ).content
+    elif isinstance(avatar, str) and os.path.exists(avatar):
+        f = avatar
     elif isinstance(avatar, bytes):
         f = avatar
     else:
@@ -771,6 +789,7 @@ async def asset_channel(
     avatar: typing.Optional[str] = None,
     ttl: typing.Optional[int] = None,
     forum: bool = False,
+    hide_general: bool = False,
     _folder: typing.Optional[str] = None,
 ) -> typing.Tuple[Channel, bool]:
     """
@@ -785,6 +804,7 @@ async def asset_channel(
     :param avatar: Url to an avatar to set as pfp of created peer
     :param ttl: Time to live for messages in channel
     :param forum: Whether to create a forum channel
+    :param hide_general: Hide '#General' topic
     :return: Peer and bool: is channel new or pre-existent
     """
     if not hasattr(client, "_channels_cache"):
@@ -808,8 +828,8 @@ async def asset_channel(
             if invite_bot:
                 if all(
                     participant.id != client.loader.inline.bot_id
-                    for participant in (
-                        await client.get_participants(d.entity, limit=100)
+                    for participant in await client.get_participants(
+                        d.entity, limit=100
                     )
                 ):
                     await fw_protect()
@@ -844,6 +864,10 @@ async def asset_channel(
     if avatar:
         await fw_protect()
         await set_avatar(client, peer, avatar)
+
+    if hide_general and forum:
+        await fw_protect()
+        await client(EditForumTopicRequest(channel=peer, topic_id=1, hidden=True))
 
     if ttl:
         await fw_protect()
@@ -880,6 +904,74 @@ async def asset_channel(
     client._channels_cache[title] = {"peer": peer, "exp": int(time.time())}
     return peer, True
 
+if typing.TYPE_CHECKING:
+    from .database import Database
+
+async def asset_forum_topic(
+    client: CustomTelegramClient,
+    db: 'Database',
+    peer: hints.Entity,
+    title: str,
+    description: typing.Optional[str] = None,
+    icon_emoji_id: typing.Optional[int] = None,
+    invite_bot: bool = False,
+) -> ForumTopic:
+    entity = await client.get_entity(peer)
+
+    if not isinstance(entity, Channel):
+        raise TypeError(f"Expected entity to be 'Channel', but got '{type(entity).__name__}'")
+    
+    async def create_topic() -> ForumTopic:
+        result = await client(CreateForumTopicRequest(
+            channel=entity,
+            title=title,
+            icon_emoji_id=(icon_emoji_id if client.legacy_me.premium else None)
+        ))
+
+        await fw_protect()
+
+        await client.send_message(entity=entity, message=(description if description else f"<emoji document_id=5258503720928288433>ℹ️</emoji> <b>Content related to <i>'{title}'</i> will be here</b>"), reply_to=result.updates[0].id)
+
+        await fw_protect()
+
+        result = await client(GetForumTopicsByIDRequest(channel=entity, topics=[result.updates[0].id]))
+
+        return result.topics[0]
+    
+    forums_cache = db.get("legacy.forums", "forums_cache", {})
+
+    if (topic_id := forums_cache.get(entity.title, {}).get(title)):
+        await fw_protect()
+        topic = await client(GetForumTopicsByIDRequest(channel=entity, topics=[topic_id]))
+        topic = topic.topics[0]
+
+        if not isinstance(topic, ForumTopicDeleted):
+            return topic
+        else:
+            logger.warning(f"Topic: '{title}' was found in the database but does not exist in the channel and will be recreated")
+            await fw_protect()
+            new_topic = await create_topic()
+            forums_cache[entity.title][title] = new_topic.id
+            
+    else:
+        await fw_protect()
+        new_topic = await create_topic()
+        forums_cache.setdefault(entity.title, {})[title] = new_topic.id
+    
+    db.set("legacy.forums", "forums_cache", forums_cache)
+
+    if invite_bot:
+        await fw_protect()
+        if all(
+            p.id != client.loader.inline.bot_id
+            for p in await client.get_participants(
+                entity, limit=20
+            )
+        ):
+            await fw_protect()
+            await invite_inline_bot(client, entity)
+
+    return new_topic
 
 async def dnd(
     client: CustomTelegramClient,
@@ -946,39 +1038,123 @@ def get_named_platform() -> str:
     Returns formatted platform name
     :return: Platform name
     """
-    from . import main
 
-    with contextlib.suppress(Exception):
-        if os.path.isfile("/proc/device-tree/model"):
-            with open("/proc/device-tree/model") as f:
-                model = f.read()
-                if "Orange" in model:
-                    return f"🍊 {model}"
-
-                return f"🍇 {model}" if "Raspberry" in model else f"❓ {model}"
-
-    if main.IS_WSL:
-        return "🍀 WSL"
-
-    if main.IS_USERLAND:
-        return "🐧 UserLand"
-
-    if main.IS_AEZA:
-        return "🛡 Aeza"
-
-    if main.IS_RAILWAY:
-        return "🚂 Railway"
-
-    if main.IS_HIKKAHOST:
-        return "🌼 HikkaHost"
-
-    if main.IS_ORACLE:
-        return "🧨 Oracle"
-
-    if main.IS_DOCKER:
-        return "🐳 Docker"
-
+    host = get_current_platform() or _platforms.get("vds")
+    if host:
+        return f"{host.get('emoji')} {host.get('display_name')}"
     return "💎 VDS"
+
+
+_platforms = {
+    "raspberry": {
+        "display_name": "Raspberry Pi",
+        "emoji": "🍇",
+        "emoji_document_id": 5467541303938019154,
+    },
+    "banana": {
+        "display_name": "Banana Pi",
+        "emoji": "🍌",
+        "emoji_document_id": 5467541303938019154,
+    },
+    "orange": {
+        "display_name": "Orange Pi",
+        "emoji": "🍊",
+        "emoji_document_id": 5467541303938019154,
+    },
+    "hikkahost": {
+        "display_name": "HikkaHost",
+        "emoji": "🌼",
+        "emoji_document_id": 5458807006905264299,
+    },
+    "docker": {
+        "display_name": "Docker",
+        "emoji": "🐳",
+        "emoji_document_id": 5456574628933693253,
+    },
+    "wsl": {
+        "display_name": "WSL",
+        "emoji": "🍀",
+        "emoji_document_id": 5467541303938019154,
+    },
+    "aeza": {
+        "display_name": "Aeza",
+        "emoji": "🛡",
+        "emoji_document_id": 5467541303938019154,
+    },
+    "oracle": {
+        "display_name": "Oracle",
+        "emoji": "🧨",
+        "emoji_document_id": 5380110961090788815,
+    },
+    "userland": {
+        "display_name": "Userland",
+        "emoji": "🐧",
+        "emoji_document_id": 5458508523858062696,
+    },
+    "railway": {
+        "display_name": "Railway",
+        "emoji": "🚂",
+        "emoji_document_id": 5456525163795344370,
+    },
+    "vds": {
+        "display_name": "VDS",
+        "emoji": "💎",
+        "emoji_document_id": 5467541303938019154,
+    },
+}
+
+
+def get_platform(host_name):
+    return _platforms.get(host_name.lower())
+
+
+def _detect_by_uname():
+    for platform in _platforms:
+        if platform.lower() in uname().release.lower():
+            return get_platform(platform)
+    return None
+
+
+def _detect_by_device_tree():
+    if os.path.isfile("/proc/device-tree/model"):
+        with open("/proc/device-tree/model") as f:
+            model = f.read()
+            for platform in _platforms:
+                if platform.lower() in model.lower():
+                    return get_platform(platform)
+    return None
+
+
+def _detect_by_hostname():
+    for platform in _platforms:
+        if platform.lower() in socket.gethostname().lower():
+            return get_platform(platform)
+    return None
+
+
+def _detect_by_env_vars():
+    for platform in _platforms:
+        if os.environ.get(platform.upper()) or os.environ.get(platform.lower()):
+            return get_platform(platform)
+    return None
+
+
+def _get_default_platform():
+    return get_platform("vds")
+
+
+def get_current_platform():
+    detection_chain = [
+        _detect_by_uname,
+        _detect_by_device_tree,
+        _detect_by_hostname,
+        _detect_by_env_vars,
+        _get_default_platform,
+    ]
+    for detect in detection_chain:
+        host = detect()
+        if host:
+            return host
 
 
 def get_platform_emoji() -> str:
@@ -986,8 +1162,6 @@ def get_platform_emoji() -> str:
     Returns custom emoji for current platform
     :return: Emoji entity in string
     """
-    from . import main
-
     BASE = "".join(
         (
             "<emoji document_id={}>🌙</emoji>",
@@ -997,21 +1171,9 @@ def get_platform_emoji() -> str:
         )
     )
 
-    if main.IS_HIKKAHOST:
-        return BASE.format(5458807006905264299)
-
-    if main.IS_USERLAND:
-        return BASE.format(5458508523858062696)
-
-    if main.IS_RAILWAY:
-        return BASE.format(5456525163795344370)
-
-    if main.IS_ORACLE:
-        return BASE.format(5380110961090788815)
-
-    if main.IS_DOCKER:
-        return BASE.format(5456574628933693253)
-
+    host = get_current_platform()
+    if host:
+        return BASE.format(host.get("emoji_document_id", 5467541303938019154))
     return BASE.format(5467541303938019154)
 
 
@@ -1453,9 +1615,9 @@ def remove_html(text: str, escape: bool = False, keep_emojis: bool = False) -> s
     return (escape_html if escape else str)(
         re.sub(
             (
-                r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?blockquote.*?>)"
+                r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code>|<\/?strike>|<\/?del>|<\/?pre.*?>)"
                 if keep_emojis
-                else r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?emoji.*?>|<\/?blockquote.*?>)"
+                else r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?emoji.*?>)"
             ),
             "",
             text,

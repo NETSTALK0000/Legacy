@@ -25,22 +25,21 @@
 
 import argparse
 import asyncio
-import socket
 import collections
 import contextlib
 import importlib
-import ujson
 import logging
 import os
 import random
 import signal
+import socket
 import sqlite3
 import sys
 import typing
 from getpass import getpass
 from pathlib import Path
-from legacytl.extensions.html import CUSTOM_EMOJIS
 
+import ujson
 from legacytl import events
 from legacytl.errors import (
     ApiIdInvalidError,
@@ -50,6 +49,7 @@ from legacytl.errors import (
     PhoneNumberInvalidError,
     SessionPasswordNeededError,
 )
+from legacytl.extensions import html as ltl_ext_html
 from legacytl.network.connection import (
     ConnectionTcpFull,
     ConnectionTcpMTProxyRandomizedIntermediate,
@@ -88,23 +88,6 @@ BACKUPS_PATH = "https://raw.githubusercontent.com/Crayz310/Legacy/refs/heads/mas
 LOGS_PATH = "https://raw.githubusercontent.com/Crayz310/Legacy/refs/heads/master/assets/legacy-logs.png"
 AVATAR_PATH = os.path.join(os.getcwd(), "assets", "legacy-pfp.png")
 CONFIG_PATH = BASE_PATH / "config.json"
-
-IS_DOCKER = "DOCKER" in os.environ
-IS_RAILWAY = "RAILWAY" in os.environ
-IS_HIKKAHOST = "HIKKAHOST" in os.environ
-IS_AEZA = "aeza" in socket.gethostname()
-IS_USERLAND = "userland" in os.environ
-IS_SKIRIHOST = "SKIRIHOST" in os.environ
-IS_ORACLE = False
-IS_WSL = False
-with contextlib.suppress(Exception):
-    from platform import uname
-
-    if "oracle" in uname().release:
-        IS_ORACLE = True
-
-    if "microsoft-standard" in uname().release:
-        IS_WSL = True
 
 # fmt: off
 LATIN_MOCK = [
@@ -174,20 +157,12 @@ def generate_random_system_version():
     :example: "Windows 10.0.19042.1234" or "Ubuntu 20.04.19042.1234"
     """
     os_choices = [
-        ("Windows", "Vista"),
-        ("Windows", "XP"),
-        ("Windows", "7"),
-        ("Windows", "8"),
-        ("Windows", "10"),
-        ("Ubuntu", "20.04"),
-        ("Ubuntu", "24.04"),
-        ("Debian", "10"),
         ("Fedora", "33"),
         ("Fedora", "36"),
+        ("Fedora", "43"),
         ("Arch Linux", "2021.05"),
         ("Arch Linux", "2023.05"),
-        ("CentOS", "8"),
-        ("Kali Linux", "2023.4"),
+        ("Arch Linux", "2025.11.01"),
     ]
     os_name, os_version = random.choice(os_choices)
 
@@ -462,9 +437,9 @@ class Legacy:
             if not get_config_key("api_id"):
                 api_id, api_hash = (
                     line.strip()
-                    for line in (Path(BASE_DIR) / "api_token.txt")
-                    .read_text()
-                    .splitlines()
+                    for line in (
+                        (Path(BASE_DIR) / "api_token.txt").read_text().splitlines()
+                    )
                 )
                 save_config_key("api_id", int(api_id))
                 save_config_key("api_hash", api_hash)
@@ -604,8 +579,10 @@ class Legacy:
             return False
 
         if not self.web:
+            session = MemorySession()
+            session.set_dc(2, '149.154.167.50', 443)
             client = CustomTelegramClient(
-                MemorySession(),
+                session,
                 self.api_token.ID,
                 self.api_token.HASH,
                 connection=self.conn,
@@ -804,7 +781,10 @@ class Legacy:
             repo = git.Repo()
 
             build = utils.get_git_hash()
-            diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
+            try:
+                diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
+            except Exception:
+                diff = ""
             upd = "Update required" if diff else "Up-to-date"
 
             logo = (
@@ -816,6 +796,7 @@ class Legacy:
                 "           |___/            |___/\n\n"
                 f"• Build: {build[:7]}\n"
                 f"• Version: {__version__}\n"
+                f"• Branch: {version.branch}\n"
                 f"• {upd}\n"
             )
 
@@ -967,6 +948,6 @@ class Legacy:
         self.loop.close()
 
 
-CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
+ltl_ext_html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
 
 legacy = Legacy()

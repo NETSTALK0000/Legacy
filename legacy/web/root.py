@@ -10,10 +10,10 @@ import asyncio
 import collections
 import functools
 import logging
+import os
 import re
 import string
 import time
-import os
 
 import aiohttp_jinja2
 import requests
@@ -229,7 +229,8 @@ class Web:
         self._qr_login = True
 
     async def init_qr_login(self, request: web.Request) -> web.Response:
-        if self.client_data and "HIKKAHOST" in os.environ:
+        host = utils.get_current_platform() or utils._hosts.get("vds")
+        if self.client_data and host.get("single_session", False):
             return web.Response(status=403, body="Forbidden by EULA")
 
         if not self._check_session(request):
@@ -292,7 +293,8 @@ class Web:
         )
 
     async def can_add(self, request: web.Request) -> web.Response:
-        if self.client_data:
+        host = utils.get_current_platform() or utils._hosts.get("vds")
+        if self.client_data and host.get("single_session", False):
             return web.Response(status=403, body="Forbidden by EULA")
 
         return web.Response(status=200, body="Yes")
@@ -300,9 +302,6 @@ class Web:
     async def send_tg_code(self, request: web.Request) -> web.Response:
         if not self._check_session(request):
             return web.Response(status=401, body="Authorization required")
-
-        if self.client_data and "HIKKAHOST" in os.environ:
-            return web.Response(status=403, body="Forbidden by EULA")
 
         if self._pending_client:
             return web.Response(status=208, body="Already pending")
@@ -465,10 +464,10 @@ class Web:
 
         token = utils.rand(8)
 
-        markup = InlineKeyboardMarkup()
-        markup.add(
+        markup = InlineKeyboardMarkup(inline_keyboard=[[]])
+        markup.inline_keyboard[0].append(
             InlineKeyboardButton(
-                "🔓 Authorize user",
+                text="🔓 Authorize user",
                 callback_data=f"authorize_web_{token}",
             )
         )
@@ -520,8 +519,8 @@ class Web:
             try:
                 bot = user[0].inline.bot
                 msg = await bot.send_message(
-                    user[1].tg_id,
-                    (
+                    chat_id=user[1].tg_id,
+                    text=(
                         "🌙🔐 <b>Click button below to confirm web application"
                         f" ops</b>\n\n<b>Client IP</b>: {ips}\n{cities}\n<i>If you did"
                         " not request any codes, simply ignore this message</i>"

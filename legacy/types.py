@@ -22,6 +22,7 @@ from dataclasses import dataclass, field
 from importlib.abc import SourceLoader
 
 import requests
+from aiogram.types import Message as BotMessage
 from legacytl.hints import EntityLike
 from legacytl.tl.functions.account import UpdateNotifySettingsRequest
 from legacytl.tl.types import (
@@ -33,7 +34,6 @@ from legacytl.tl.types import (
 )
 
 from ._reference_finder import replace_all_refs
-from aiogram.types import Message as BotMessage
 from .inline.types import (
     BotInlineCall,
     BotInlineMessage,
@@ -107,6 +107,9 @@ class Module:
 
     def config_complete(self):
         """Called when module.config is populated"""
+
+    def __init__(self):
+        self.allmodules: 'Modules'
 
     async def client_ready(self):
         """Called after client is ready (after config_loaded)"""
@@ -626,7 +629,7 @@ class Library:
     ) -> JSONSerializable:
         return self._db.get(self.__class__.__name__, key, default)
 
-    def _lib_set(self, key: str, value: JSONSerializable) -> bool:
+    def _lib_set(self, key: str, value: JSONSerializable):
         self._db.set(self.__class__.__name__, key, value)
 
     def _lib_pointer(

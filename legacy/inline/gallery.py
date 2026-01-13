@@ -15,6 +15,8 @@ import traceback
 import typing
 from urllib.parse import urlparse
 
+from aiogram.exceptions import TelegramBadRequest as BadRequest
+from aiogram.exceptions import TelegramRetryAfter as RetryAfter
 from aiogram.types import (
     CallbackQuery,
     InlineKeyboardMarkup,
@@ -24,7 +26,6 @@ from aiogram.types import (
     InputMediaAnimation,
     InputMediaPhoto,
 )
-from aiogram.utils.exceptions import BadRequest, RetryAfter
 from legacytl.errors.rpcerrorlist import ChatSendInlineForbiddenError
 from legacytl.extensions.html import CUSTOM_EMOJIS
 from legacytl.tl.types import Message
@@ -462,7 +463,7 @@ class Gallery(InlineUnit):
             )
         except RetryAfter as e:
             await call.answer(
-                f"Got FloodWait. Wait for {e.timeout} seconds",
+                f"Got FloodWait. Wait for {e.retry_after} seconds",
                 show_alert=True,
             )
         except Exception:
@@ -558,7 +559,7 @@ class Gallery(InlineUnit):
             return await self._gallery_page(call, page, unit_id)
         except RetryAfter as e:
             await call.answer(
-                f"Got FloodWait. Wait for {e.timeout} seconds",
+                f"Got FloodWait. Wait for {e.retry_after} seconds",
                 show_alert=True,
             )
             return
@@ -688,7 +689,13 @@ class Gallery(InlineUnit):
                         return
 
                     await inline_query.answer(
-                        [InlineQueryResultPhoto(photo_url=unit["photo_url"], **args)],
+                        [
+                            InlineQueryResultPhoto(
+                                photo_url=unit["photo_url"],
+                                thumbnail_url=unit["photo_url"],
+                                **args,
+                            )
+                        ],
                         cache_time=0,
                     )
                 except Exception as e:

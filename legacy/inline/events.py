@@ -21,6 +21,7 @@ from aiogram.types import (
     InputTextMessageContent,
 )
 from aiogram.types import Message as AiogramMessage
+from aiogram.types import PreCheckoutQuery as AiogramPreCheckoutQuery
 
 from .. import utils
 from .types import BotInlineCall, InlineCall, InlineQuery, InlineUnit
@@ -29,8 +30,18 @@ logger = logging.getLogger(__name__)
 
 
 class Events(InlineUnit):
+    async def _pre_checkout_handler(self, query: AiogramPreCheckoutQuery):
+        await query.answer(ok=True)
+
     async def _message_handler(self, message: AiogramMessage):
         """Processes incoming messages"""
+        if sp := message.successful_payment:
+            amount = sp.total_amount
+            payload = sp.invoice_payload
+
+            logger.info(
+                f"User {message.from_user.id} paid {amount} stars for {payload}"
+            )
         if message.chat.type != "private" or message.text == "/start legacy init":
             return
 
@@ -58,7 +69,7 @@ class Events(InlineUnit):
             func=self._allmodules.inline_handlers[cmd],
             user=inline_query.from_user.id,
         ):
-            instance = InlineQuery(inline_query)
+            instance = InlineQuery(inline_query=inline_query)
 
             try:
                 if not (
@@ -108,8 +119,7 @@ class Events(InlineUnit):
                                 title=self.sanitise_text(res["title"]),
                                 description=self.sanitise_text(res.get("description")),
                                 input_message_content=InputTextMessageContent(
-                                    self.sanitise_text(res["message"]),
-                                    "HTML",
+                                    message_text=self.sanitise_text(res["message"]),
                                     disable_web_page_preview=True,
                                 ),
                                 thumb_url=res.get("thumb"),
@@ -203,6 +213,7 @@ class Events(InlineUnit):
         await self._form_inline_handler(inline_query)
         await self._gallery_inline_handler(inline_query)
         await self._list_inline_handler(inline_query)
+        await self._invoice_inline_handler(inline_query)
 
     async def _callback_query_handler(
         self,
@@ -232,7 +243,7 @@ class Events(InlineUnit):
                 except Exception:
                     logger.exception("Error on running callback watcher!")
                     await call.answer(
-                        "Error occured while processing request. More info in logs",
+                        "Произошла ошибка при обработке запроса. Больше информации в логах",
                         show_alert=True,
                     )
                     continue
@@ -273,7 +284,9 @@ class Events(InlineUnit):
                         + unit.get("always_allow", [])
                         + button.get("always_allow", [])
                     ):
-                        await call.answer(self.translator.getkey("inline.button403"), show_alert=True)
+                        await call.answer(
+                            self.translator.getkey("inline.button403"), show_alert=True
+                        )
                         return
 
                     try:
@@ -289,10 +302,7 @@ class Events(InlineUnit):
                     except Exception:
                         logger.exception("Error on running callback watcher!")
                         await call.answer(
-                            (
-                                "Error occurred while processing request. More info in"
-                                " logs"
-                            ),
+                            "Произошла ошибка при обработке запроса. Больше информации в логах",
                             show_alert=True,
                         )
                         return
@@ -325,7 +335,9 @@ class Events(InlineUnit):
                 and call.from_user.id
                 not in self._custom_map[call.data].get("always_allow", [])
             ):
-                await call.answer(self.translator.getkey("inline.button403"), show_alert=True)
+                await call.answer(
+                    self.translator.getkey("inline.button403"), show_alert=True
+                )
                 return
 
             await self._custom_map[call.data]["handler"](
@@ -412,13 +424,12 @@ class Events(InlineUnit):
                         title=self.translator.getkey("inline.command").format(name),
                         description=doc,
                         input_message_content=InputTextMessageContent(
-                            (
+                            message_text=(
                                 self.translator.getkey("inline.command_msg").format(
                                     utils.escape_html(name),
                                     utils.escape_html(doc),
                                 )
                             ),
-                            "HTML",
                             disable_web_page_preview=True,
                         ),
                         thumb_url=thumb,
@@ -446,8 +457,9 @@ class Events(InlineUnit):
                         title=self.translator.getkey("inline.show_inline_cmds"),
                         description=self.translator.getkey("inline.no_inline_cmds"),
                         input_message_content=InputTextMessageContent(
-                            self.translator.getkey("inline.no_inline_cmds_msg"),
-                            "HTML",
+                            message_text=self.translator.getkey(
+                                "inline.no_inline_cmds_msg"
+                            ),
                             disable_web_page_preview=True,
                         ),
                         thumb_url=(
@@ -470,12 +482,11 @@ class Events(InlineUnit):
                         self.translator.getkey("inline.inline_cmds").format(len(_help))
                     ),
                     input_message_content=InputTextMessageContent(
-                        (
+                        message_text=(
                             self.translator.getkey("inline.inline_cmds_msg").format(
                                 "\n".join(map(lambda x: x[1], _help))
                             )
                         ),
-                        "HTML",
                         disable_web_page_preview=True,
                     ),
                     thumb_url=(

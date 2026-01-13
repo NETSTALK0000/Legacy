@@ -4,17 +4,17 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+import getpass
 import inspect
 import logging
 import os
+import platform as lib_platform
 import random
 import time
 import typing
 from io import BytesIO
-import platform as lib_platform
-import getpass
 
-from legacytl.tl.types import Message, InputMediaWebPage
+from legacytl.tl.types import InputMediaWebPage, Message
 
 from .. import loader, main, utils
 from ..inline.types import InlineCall
@@ -90,12 +90,17 @@ class TestMod(loader.Module):
                 validator=loader.validators.String(),
             ),
             loader.ConfigValue(
+                "media_quote",
+                True,
+                lambda: self.strings["_cfg_media_quote"],
+                validator=loader.validators.Boolean(),
+            ),
+            loader.ConfigValue(
                 "banner_url",
                 None,
                 "Banner url",
                 validator=loader.validators.Union(
-                    loader.validators.String(),
-                    loader.validators.NoneType()
+                    loader.validators.String(), loader.validators.NoneType()
                 ),
             ),
         )
@@ -375,7 +380,7 @@ class TestMod(loader.Module):
             utils.get_version_raw(),
             (
                 " <a"
-                f' href="https://github.com/Crayz310/Legacy/commit/{ghash}">@{ghash[:8]}</a>'
+                f' href="https://github.com/NETSTALK0000/Legacy/commit/{ghash}">@{ghash[:8]}</a>'
                 if ghash
                 else ""
             ),
@@ -406,32 +411,48 @@ class TestMod(loader.Module):
                 self.strings("suspended").format(time_sleep),
             )
             time.sleep(time_sleep)
+            logger.info(self.strings("unsuspended").format(time_sleep))
         except ValueError:
             await utils.answer(message, self.strings("suspend_invalid_time"))
 
     @loader.command()
-    async def ping(self, message: Message):
+    async def ping(self, message):
         start = time.perf_counter_ns()
         message = await utils.answer(message, self.config["ping_emoji"])
 
-        await utils.answer(
-            message,
-            self.config["ping_text"].format(
-                ping=f"{round((time.perf_counter_ns() - start) / 10**6, 3)}",
-                uptime=f"{utils.formatted_uptime()}",
-                ping_hint=(
-                    (self.config["hint"]) if random.choice([0, 0, 1]) == 1 else ""
+        if self.config["media_quote"]:
+            await utils.answer(
+                message,
+                self.config["ping_text"].format(
+                    ping=f"{round((time.perf_counter_ns() - start) / 10**6, 3)}",
+                    uptime=f"{utils.formatted_uptime()}",
+                    ping_hint=(
+                        (self.config["hint"]) if random.choice([0, 0, 1]) == 1 else ""
+                    ),
+                    hostname=lib_platform.node(),
+                    user=getpass.getuser(),
                 ),
-                hostname=lib_platform.node(),
-                user=getpass.getuser(),
-            ),
-            media=(
-                InputMediaWebPage(self.config["banner_url"])
-                if self.config["banner_url"]
-                else None
-            ),
-            invert_media=True,
-        )
+                file=(
+                    InputMediaWebPage(self.config["banner_url"], optional=True)
+                    if self.config["banner_url"]
+                    else None
+                ),
+                invert_media=True,
+            )
+        else:
+            await utils.answer_file(
+                message,
+                self.config["banner_url"],
+                self.config["ping_text"].format(
+                    ping=f"{round((time.perf_counter_ns() - start) / 10**6, 3)}",
+                    uptime=f"{utils.formatted_uptime()}",
+                    ping_hint=(
+                        (self.config["hint"]) if random.choice([0, 0, 1]) == 1 else ""
+                    ),
+                    hostname=lib_platform.node(),
+                    user=getpass.getuser(),
+                ),
+            )
 
     async def client_ready(self):
         chat, _ = await utils.asset_channel(

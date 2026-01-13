@@ -13,8 +13,9 @@ from legacytl.tl.functions.messages import (
 )
 from legacytl.tl.types import Message
 from legacytl.utils import get_display_name
+from legacytl.extensions import html as ltl_ext_html
 
-from .. import loader, log, main, utils
+from .. import loader, main, utils
 from .._internal import fw_protect, restart
 from ..inline.types import InlineCall
 from ..web import core
@@ -461,7 +462,7 @@ class LegacySettingsMod(loader.Module):
     async def inline__setting(self, call: InlineCall, key: str, state: bool = False):
         if callable(key):
             key()
-            CUSTOM_EMOJIS = not main.get_config_key("disable_custom_emojis")
+            ltl_ext_html.CUSTOM_EMOJIS = not main.get_config_key("disable_custom_emojis")
         else:
             self._db.set(main.__name__, key, state)
 
@@ -686,6 +687,11 @@ class LegacySettingsMod(loader.Module):
 
     @loader.command()
     async def weburl(self, message: Message, force: bool = False):
+        host = utils.get_current_platform() or utils._platforms.get("vds")
+        if host.get("single_session"):
+            return await utils.answer(
+                message, self.lookup("InlineStuff").strings["forbid"]
+            )
         arguments = main.parse_arguments()
         if getattr(arguments, "disable_web", False):
             return await utils.answer(message, self.strings("web_disabled"))

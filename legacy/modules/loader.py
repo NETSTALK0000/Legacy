@@ -7,9 +7,9 @@
 import ast
 import asyncio
 import contextlib
+import difflib
 import functools
 import importlib
-import difflib
 import inspect
 import io
 import logging
@@ -54,18 +54,19 @@ class LoaderMod(loader.Module):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "MODULES_REPO",
-                "https://mods.xdesai.top/",
+                "https://raw.githubusercontent.com/xdesai96/modules/refs/heads/main/",
                 lambda: self.strings("repo_config_doc"),
                 validator=loader.validators.Link(),
             ),
             loader.ConfigValue(
                 "ADDITIONAL_REPOS",
-                [],
+                ["https://raw.githubusercontent.com/Crayz310/U-Mods/refs/heads/main/"],
                 lambda: self.strings("add_repo_config_doc"),
                 validator=loader.validators.Series(validator=loader.validators.Link()),
             ),
             loader.ConfigValue(
                 "share_link",
+                True,
                 doc=lambda: self.strings("share_link_doc"),
                 validator=loader.validators.Boolean(),
             ),
@@ -591,7 +592,7 @@ class LoaderMod(loader.Module):
                         self.strings("requirements_installing").format(
                             "\n".join(
                                 "<emoji"
-                                " document_id=4971987363145188045>▫️</emoji>"
+                                " document_id=5873225338984599714>▫️</emoji>"
                                 f" {req}"
                                 for req in requirements
                             )
@@ -691,7 +692,7 @@ class LoaderMod(loader.Module):
                 with contextlib.suppress(Exception):
                     self.allmodules.modules.remove(instance)
 
-                return "<emoji document_id=5454225457916420314>😖</emoji> <b>{utils.escape_html(str(e))}</b>"
+                return "<emoji document_id=5458497936763676259>😖</emoji> <b>{utils.escape_html(str(e))}</b>"
             except loader.SelfUnload as e:
                 logger.debug("Unloading %s, because it raised `SelfUnload`", instance)
                 with contextlib.suppress(Exception):
@@ -700,7 +701,7 @@ class LoaderMod(loader.Module):
                 with contextlib.suppress(Exception):
                     self.allmodules.modules.remove(instance)
 
-                return f"<emoji document_id=5454225457916420314>😖</emoji> <b>{utils.escape_html(str(e))}</b>"
+                return f"<emoji document_id=5458497936763676259>😖</emoji> <b>{utils.escape_html(str(e))}</b>"
             except loader.SelfSuspend as e:
                 logger.debug("Suspending %s, because it raised `SelfSuspend`", instance)
                 if message:
@@ -891,13 +892,25 @@ class LoaderMod(loader.Module):
         ):
             modhelp += "\n{} <code>{}{}</code>{} {}".format(
                 "<emoji document_id=5197195523794157505>▫️</emoji>",
-                utils.escape_html(self.get_prefix(message.sender_id)),
+                utils.escape_html(
+                    self.get_prefix(
+                        message.sender_id
+                        if not isinstance(message, InlineCall)
+                        else message.from_user.id
+                    )
+                ),
                 _name,
                 (
                     " ({})".format(
                         ", ".join(
                             "<code>{}{}</code>".format(
-                                utils.escape_html(self.get_prefix(message.sender_id)),
+                                utils.escape_html(
+                                    self.get_prefix(
+                                        message.sender_id
+                                        if not isinstance(message, InlineCall)
+                                        else message.from_user.id
+                                    )
+                                ),
                                 alias,
                             )
                             for alias in self.lookup("help").find_aliases(_name)
@@ -996,11 +1009,24 @@ class LoaderMod(loader.Module):
             + "\n\n"
             + self.strings["not_unloaded"]
         )
-        buttons = call._units.get(call.unit_id).get("buttons")
-        for button in buttons:
-            for b in button:
-                if b.get("text") == selected_mod:
-                    buttons.remove(button)
+        
+        all_rows = call._units.get(call.unit_id).get("buttons")
+
+        buttons = []
+        for row in all_rows:
+            new_row = []
+            for button in row:
+                if not button:
+                    continue
+
+                if button.get("text") == selected_mod:
+                    continue
+
+                new_row.append(button)
+            
+            if new_row:
+                buttons.append(new_row)
+
         if isinstance(lookup, list):
             for mod in lookup:
                 if mod.__class__.__name__ == selected_mod:
@@ -1021,12 +1047,14 @@ class LoaderMod(loader.Module):
         if not (args := utils.get_args_split_by(message, ["\n", ","])):
             return await utils.answer(message, self.strings("no_class"))
 
-        instances = [self.lookup(arg) for arg in args]
+        instances = {arg: self.lookup(arg) for arg in args}
         msg = []
         reply_markup = []
         self.unloaded = []
+        successful_unload = []
+        failed_unload = []
 
-        for instance in instances:
+        for instance in instances.values():
             if isinstance(instance, list):
                 reply_markup.append([])
                 for i in instance:
@@ -1041,14 +1069,15 @@ class LoaderMod(loader.Module):
                     )
                 continue
             if issubclass(instance.__class__, loader.Library):
-                msg.append(self.strings["cannot_unload_lib"])
-
+                self.allmodules.libraries.remove(instance)
+                successful_unload.append(instance.__class__.__name__)
             try:
                 worked = await self.allmodules.unload_module(
                     instance.__class__.__name__
                 )
             except CoreUnloadError as e:
                 msg.append(self.strings["unload_core"].format(e.module))
+                failed_unload.append(instance.__class__.__name__)
                 continue
 
             self.set(
@@ -1061,17 +1090,39 @@ class LoaderMod(loader.Module):
             )
 
             if worked:
-                msg.append(
-                    self.strings["unloaded"].format(
-                        "<emoji document_id=5784993237412351403>✅</emoji>",
-                        ", ".join([mod for mod in worked]),
-                    )
+                successful_unload.append(instance.__class__.__name__)
+            elif not isinstance(instance, bool):
+                failed_unload.append(instance.__class__.__name__)
+
+        if not successful_unload and not failed_unload:
+            msg.append(
+                self.strings["not_found_mul" if len(instances) > 1 else "not_found"].format(
+                    ', '.join(instances.keys())
                 )
-            else:
-                msg.append(self.strings["not_unloaded"])
+            )
+
+        if successful_unload:
+            msg.append(
+                self.strings["unloaded"].format(
+                    "<emoji document_id=5408832111773757273>🗑</emoji>",
+                    ", ".join([mod for mod in successful_unload]),
+                )
+            )
+        if failed_unload:
+            msg.append(
+                self.strings["not_unloaded"].format(
+                    "<emoji document_id=5348514879558926674>👎</emoji>",
+                    ", ".join([mod for mod in failed_unload]),
+                )
+            )
         if reply_markup:
             msg.append(self.strings["several_same_modules"])
-
+        if not msg:
+            msg.append(
+                self.strings["not_unloaded"].format(
+                    "<emoji document_id=5348514879558926674>👎</emoji>", "Unknown"
+                )
+            )
         await utils.answer(message, "\n".join(msg), reply_markup=reply_markup)
 
     @loader.command()

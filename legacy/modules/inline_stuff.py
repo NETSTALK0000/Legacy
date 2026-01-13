@@ -4,18 +4,18 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+import logging
 import re
 import string
-import logging
-import os
-import aiohttp
 
+import aiohttp
 from legacytl.errors.rpcerrorlist import YouBlockedUserError
 from legacytl.tl.functions.contacts import UnblockRequest
+from legacytl.tl.custom import Message
 
 from .. import loader, utils
-from ..inline.types import BotInlineMessage
 from ..auth_manager import AuthManager
+from ..inline.types import BotInlineMessage
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +135,10 @@ class InlineStuff(loader.Module):
                     if response.status == 200:
                         data = await response.json()
                         if data.get("ok"):
+                            await self.inline._stop()
+                            self.inline._token = args
                             self._db.set("legacy.inline", "bot_token", args)
+                            await self.inline.register_manager(ignore_token_checks=True)
                             return await utils.answer(
                                 message, self.strings["token_changed"]
                             )
@@ -152,8 +155,13 @@ class InlineStuff(loader.Module):
 
     @loader.command()
     async def iauth(self, message, force: bool = False):
-        args = utils.get_args_raw(message)
-        force = force or "-f" in args
+        host = utils.get_current_platform() or utils._platforms.get("vds")
+        if host.get("single_session", False):
+            return await utils.answer(message, self.strings["forbid"])
+
+        if not force and isinstance(message, Message):
+            args = utils.get_args_raw(message)
+            force = '-f' in args
 
         if not force:
             try:
@@ -185,6 +193,8 @@ class InlineStuff(loader.Module):
     async def aiogram_watcher(self, message: BotInlineMessage):
         user_id = message.from_user.id
         state = self.inline.gs(user_id)
+        if not message.text:
+            return
 
         if message.text == "/start":
             await message.answer_animation(
