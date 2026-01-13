@@ -90,7 +90,7 @@ except ImportError as e:
     try:
         deps()
     except subprocess.CalledProcessError as deps_err:
-        print("❌ Не удалось установить зависимости")
+        print("❌ Не удалось установить зависимости :(")
         raise deps_err
 
     start()
