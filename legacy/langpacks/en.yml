@@ -243,10 +243,7 @@ settings:
     <blockquote><b><emoji document_id=5258391003806584549>🧃</emoji> <b>Aiogram:</b> <i>{}</i>
     <emoji document_id=5289608677244811430>📁</emoji> <b>Python:</b> <i>{}</i></blockquote>
     <blockquote><emoji document_id=5316692281451887373>⭐️</emoji> <b>Special thanks</b></blockquote>
-    <blockquote>@xdesai — Fixes, features, optimization
-    @undef1nn3d — Fixes, features, design
-    @Admt_450 — Bug hunting
-    @Itachi_Uchiha_sss — Bug hunting</blockquote>
+    <blockquote>@Admt_450 — owner + fix + error detection and correction</blockquote>
   confirm_cleardb: "⚠️ <b>Are you sure, that you want to clear database?</b>"
   cleardb_confirm: "🗑 Clear database"
   cancel: "🚫 Cancel"
