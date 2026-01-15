@@ -20,8 +20,6 @@ COPY . /Legacy
 
 WORKDIR /Legacy
 
-RUN git pull --rebase
-
 RUN pip install --no-warn-script-location --no-cache-dir -r requirements.txt
 
 EXPOSE 8080
