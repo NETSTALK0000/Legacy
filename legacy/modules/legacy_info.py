@@ -162,12 +162,12 @@ async def infocmd(self, message):
         await utils.answer(message, text)
 
 
-@loader.command()
+    @loader.command()
 async def ubinfo(self, message):
     await utils.answer(message, self.strings["desc"])
 
 
-@loader.command()
+    @loader.command()
 async def setinfo(self, message):
     if not (args := utils.get_args_html(message)):
         return await utils.answer(message, self.strings["setinfo_no_args"])
