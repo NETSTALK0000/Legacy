@@ -659,7 +659,7 @@ class LegacySecurityMod(loader.Module):
     
         await utils.answer(
             message,
-            self.strings["owner_list"].format("\n\n".join(blocks)),
+            self.strings["owner_list"].format("\n".join(blocks)),
         )
 
     def _lookup(self, needle: str) -> str:
