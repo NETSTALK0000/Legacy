@@ -647,19 +647,20 @@ class LegacySecurityMod(loader.Module):
             await utils.answer(message, self.strings["no_owner"])
             return
     
-        blocks = []
-        for i in _resolved_users:
-            prefix = self._db.get(main.name, "command_prefix", {}).get(f"{i.id}") or "."
-            li = self.strings["li"].format(
-                i.id,
-                utils.escape_html(get_display_name(i)),
-                prefix,
-            )
-            blocks.append(f"<blockquote>{li}</blockquote>")
-    
         await utils.answer(
             message,
-            self.strings["owner_list"].format("\n\n".join(blocks)),
+            self.strings["owner_list"].format(
+                "\n\n".join(
+                    [
+                        f"<blockquote>{self.strings["li"].format(
+                            i.id,
+                            utils.escape_html(get_display_name(i)),
+                            self._db.get(main.__name__, "command_prefix", {}).get(f"{i.id}") or ".",
+                        )}</blockquote>"
+                        for i in _resolved_users
+                    ]
+                )
+            ),
         )
 
     def _lookup(self, needle: str) -> str:
