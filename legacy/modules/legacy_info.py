@@ -137,40 +137,39 @@ class LegacyInfoMod(loader.Module):
             )
         )
 
-    @loader.command()
-async def infocmd(self, message):
-    args = utils.get_args(message)
-    custom_prefix = self.get_prefix(message.sender_id)
-    media = self.config["banner_url"]
-    text = await self._render_info(args, custom_prefix)
+        @loader.command()
+    async def infocmd(self, message):
+        args = utils.get_args(message)
+        custom_prefix = self.get_prefix(message.sender_id)
+        media = self.config["banner_url"]
+        text = await self._render_info(args, custom_prefix)
 
-    if self.config["media_quote"] and media and media.startswith(("http://", "https://")):
-        try:
-            await utils.answer(
-                message,
-                text,
-                file=media,                  # пряме посилання → відправиться як фото/гіф
-                invert_media=True,           # текст під медіа (працює після оновлення legacy-tl-new)
-            )
-        except Exception as e:
-            # Якщо щось пішло не так (мертве посилання тощо) — відправимо без картинки
-            await utils.answer(
-                message,
-                text + f"\n\n<i>Не вдалося завантажити банер: {str(e)}</i>",
-            )
-    else:
-        await utils.answer(message, text)
-
-
-    @loader.command()
-async def ubinfo(self, message):
-    await utils.answer(message, self.strings["desc"])
+        if self.config["media_quote"] and media and media.startswith(("http://", "https://")):
+            try:
+                await utils.answer(
+                    message,
+                    text,
+                    file=media,
+                    invert_media=True,
+                )
+            except Exception as e:
+                await utils.answer(
+                    message,
+                    text + f"\n\n<i>Не вдалося завантажити банер: {str(e)}</i>",
+                )
+        else:
+            await utils.answer(message, text)
 
 
     @loader.command()
-async def setinfo(self, message):
-    if not (args := utils.get_args_html(message)):
-        return await utils.answer(message, self.strings["setinfo_no_args"])
+    async def ubinfo(self, message):
+        await utils.answer(message, self.strings["desc"])
 
-    self.config["custom_message"] = args
-    await utils.answer(message, self.strings["setinfo_success"])
+
+    @loader.command()
+    async def setinfo(self, message):
+        if not (args := utils.get_args_html(message)):
+            return await utils.answer(message, self.strings["setinfo_no_args"])
+
+        self.config["custom_message"] = args
+        await utils.answer(message, self.strings["setinfo_success"])
