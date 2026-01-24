@@ -637,30 +637,30 @@ class LegacySecurityMod(loader.Module):
         )
 
     @loader.command()
-async def ownerlist(self, message: Message):
-    _resolved_users = []
-    for user in set(self._client.dispatcher.security.owner + [self.tg_id]):
-        with contextlib.suppress(Exception):
-            _resolved_users += [await self._client.get_entity(user, exp=0)]
-
-    if not _resolved_users:
-        await utils.answer(message, self.strings["no_owner"])
-        return
-
-    blocks = []
-    for i in _resolved_users:
-        prefix = self._db.get(main.name, "command_prefix", {}).get(f"{i.id}") or "."
-        li = self.strings["li"].format(
-            i.id,
-            utils.escape_html(get_display_name(i)),
-            prefix,
+    async def ownerlist(self, message: Message):
+        _resolved_users = []
+        for user in set(self._client.dispatcher.security.owner + [self.tg_id]):
+            with contextlib.suppress(Exception):
+                _resolved_users += [await self._client.get_entity(user, exp=0)]
+    
+        if not _resolved_users:
+            await utils.answer(message, self.strings["no_owner"])
+            return
+    
+        blocks = []
+        for i in _resolved_users:
+            prefix = self._db.get(main.name, "command_prefix", {}).get(f"{i.id}") or "."
+            li = self.strings["li"].format(
+                i.id,
+                utils.escape_html(get_display_name(i)),
+                prefix,
+            )
+            blocks.append(f"<blockquote>{li}</blockquote>")
+    
+        await utils.answer(
+            message,
+            self.strings["owner_list"].format("\n\n".join(blocks)),
         )
-        blocks.append(f"<blockquote>{li}</blockquote>")
-
-    await utils.answer(
-        message,
-        self.strings["owner_list"].format("\n\n".join(blocks)),
-    )
 
     def _lookup(self, needle: str) -> str:
         return (
