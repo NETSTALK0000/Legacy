@@ -142,17 +142,17 @@ class LegacyInfoMod(loader.Module):
         args = utils.get_args(message)
         custom_prefix = self.get_prefix(message.sender_id)
         media = self.config["banner_url"]
-        if self.config["media_quote"]:
-            await utils.answer(
-                message,
-                await self._render_info(args, custom_prefix),
-                file=InputMediaWebPage(media, optional=True) if media else None,
-                invert_media=True,
-            )
-        else:
-            await utils.answer(
-                message, await self._render_info(args, custom_prefix), file=media
-            )
+text = await self._render_info(args, custom_prefix)
+
+if self.config["media_quote"] and media:
+    await utils.answer(
+        message,
+        text,
+        file=media,                  # просто URL как строка — отправится как фото/гифка
+        invert_media=True,           # текст окажется под картинкой
+    )
+else:
+    await utils.answer(message, text)
 
     @loader.command()
     async def ubinfo(self, message):
