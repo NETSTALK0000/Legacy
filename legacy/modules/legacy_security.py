@@ -637,35 +637,31 @@ class LegacySecurityMod(loader.Module):
         )
 
     @loader.command()
-    async def ownerlist(self, message: Message):
-        _resolved_users = []
-        for user in set(self._client.dispatcher.security.owner + [self.tg_id]):
-            with contextlib.suppress(Exception):
-                _resolved_users += [await self._client.get_entity(user, exp=0)]
+async def ownerlist(self, message: Message):
+    _resolved_users = []
+    for user in set(self._client.dispatcher.security.owner + [self.tg_id]):
+        with contextlib.suppress(Exception):
+            _resolved_users += [await self._client.get_entity(user, exp=0)]
 
-        if not _resolved_users:
-            await utils.answer(message, self.strings["no_owner"])
-            return
+    if not _resolved_users:
+        await utils.answer(message, self.strings["no_owner"])
+        return
 
-        await utils.answer(
-            message,
-            self.strings["owner_list"].format(
-                "\n".join(
-                    [
-                        self.strings["li"].format(
-                            i.id,
-                            utils.escape_html(get_display_name(i)),
-                            self._db.get(main.__name__, "command_prefix", {}).get(
-                                f"{i.id}"
-                            )
-                            or ".",
-                        )
-                        for i in _resolved_users
-                    ]
-                )
-            ),
-        )
-
+    await utils.answer(
+        message,
+        self.strings["owner_list"].format(
+            "\n\n".join(
+                [
+                    f"<blockquote>{self.strings["li"].format(
+                        i.id,
+                        utils.escape_html(get_display_name(i)),
+                        self._db.get(main.name, "command_prefix", {}).get(f"{i.id}") or ".",
+                    )}</blockquote>"
+                    for i in _resolved_users
+                ]
+            )
+        ),
+    )
     def _lookup(self, needle: str) -> str:
         return (
             (
