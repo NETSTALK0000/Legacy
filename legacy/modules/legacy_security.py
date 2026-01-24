@@ -664,7 +664,7 @@ class LegacySecurityMod(loader.Module):
                     ]
                 )
             ),
-
+        )
 
     def _lookup(self, needle: str) -> str:
         return (
