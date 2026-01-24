@@ -649,7 +649,7 @@ class LegacySecurityMod(loader.Module):
     
         blocks = []
         for i in _resolved_users:
-            prefix = self._db.get(main.name, "command_prefix", {}).get(str(i.id)) or "."
+            prefix = self._db.get(main.__name__, "command_prefix", {}).get(str(i.id)) or "."
             li = self.strings["li"].format(
                 i.id,
                 utils.escape_html(get_display_name(i)),
