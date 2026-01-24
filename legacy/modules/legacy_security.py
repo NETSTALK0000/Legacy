@@ -649,13 +649,13 @@ class LegacySecurityMod(loader.Module):
     
         blocks = []
         for i in _resolved_users:
-            prefix = self._db.get(main.__name__, "command_prefix", {}).get(str(i.id)) or "."
+            prefix = self._db.get(main.__name__, "command_prefix", {}).get(f"{i.id}") or "."
             li = self.strings["li"].format(
                 i.id,
                 utils.escape_html(get_display_name(i)),
-                f"<blockquote>{prefix}</blockquote>",
+                prefix,
             )
-            blocks.append(li)
+            blocks.append(f"<blockquote>{li}</blockquote>")
     
         await utils.answer(
             message,
