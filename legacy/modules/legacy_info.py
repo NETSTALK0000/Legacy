@@ -137,7 +137,7 @@ class LegacyInfoMod(loader.Module):
             )
         )
 
-        @loader.command()
+@loader.command()
     async def infocmd(self, message):
         args = utils.get_args(message)
         custom_prefix = self.get_prefix(message.sender_id)
