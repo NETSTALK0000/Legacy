@@ -42,7 +42,7 @@ legacy_security:
   no_tsec: "<emoji document_id=5251741320690551495>👎</emoji> <b>У вас немає жодного тсека.</b>"
   owner_target: "<emoji document_id=5447644880824181073>⚠️</emoji> <b>Этот пользователь - владелец, его права не могут управляться таргетированной безопасностью</b>"
   rules_removed: '<emoji document_id=5472308992514464048>🔐</emoji> <b>Правила таргетированной безопасности для <a href="{}">{}</a> удалены</b>'
-  rule_removed: '<emoji document_id=5472308992514464048>🔐</emoji> <b>Удалено правило безопасности для <a href="{}">{}</a> (</b><code>{}</code><b>)</b>'
+  rule_removed: '<emoji document_id=5472308992514464048>🔐</emoji> <b>Удалено правило безопасности (</b><code>{}</code><b>)</b> для <a href="{}">{}</a>'
   chat_inline: "⚠️ <b>Вы не можете создать правило inline-команды для чатов!</b>"
   for: "на"
   forever: "навсегда"
