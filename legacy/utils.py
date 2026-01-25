@@ -577,14 +577,22 @@ async def answer(
             result = await message.edit(
                 text,
                 parse_mode=lambda t: (t, entities),
-                media=file if not isinstance(file, str) else None,
-                file=file if isinstance(file, str) else None,
+                media=(
+                    file
+                    if not isinstance(file, MessageMediaWebPage)
+                    else InputMediaWebPage(url=file.webpage.url, optional=True)
+                ),
                 **kwargs,
             )
         else:
             result = await message.respond(
                 text,
                 parse_mode=lambda t: (t, entities),
+                file=(
+                    file
+                    if not isinstance(file, MessageMediaWebPage)
+                    else InputMediaWebPage(url=file.webpage.url, optional=True)
+                ),
                 **kwargs,
             )
     elif isinstance(response, Message):
