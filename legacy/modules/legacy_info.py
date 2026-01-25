@@ -137,34 +137,26 @@ class LegacyInfoMod(loader.Module):
             )
         )
 
-@loader.command()
+    @loader.command()
     async def infocmd(self, message):
         args = utils.get_args(message)
         custom_prefix = self.get_prefix(message.sender_id)
         media = self.config["banner_url"]
-        text = await self._render_info(args, custom_prefix)
-
-        if self.config["media_quote"] and media and media.startswith(("http://", "https://")):
-            try:
-                await utils.answer(
-                    message,
-                    text,
-                    file=media,
-                    invert_media=True,
-                )
-            except Exception as e:
-                await utils.answer(
-                    message,
-                    text + f"\n\n<i>Не вдалося завантажити банер: {str(e)}</i>",
-                )
+        if self.config["media_quote"]:
+            await utils.answer(
+                message,
+                await self._render_info(args, custom_prefix),
+                file=InputMediaWebPage(media, optional=True) if media else None,
+                invert_media=True,
+            )
         else:
-            await utils.answer(message, text)
-
+            await utils.answer(
+                message, await self._render_info(args, custom_prefix), file=media
+            )
 
     @loader.command()
     async def ubinfo(self, message):
         await utils.answer(message, self.strings["desc"])
-
 
     @loader.command()
     async def setinfo(self, message):
