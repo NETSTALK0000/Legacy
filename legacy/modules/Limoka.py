@@ -323,6 +323,7 @@ class Limoka(loader.Module):
 
         self.modules = await self.api.get_all_modules(
             f"{self.config['limokaurl']}modules.json"
+            self.modules = data.get("modules", {}) if isintanse(data, dict) else {}
         )
         await self._update_index()
 
