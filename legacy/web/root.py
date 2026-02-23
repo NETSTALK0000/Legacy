@@ -282,7 +282,7 @@ class Web:
             MemorySession(),
             self.api_token.ID,
             self.api_token.HASH,
-            connection=self.connection,
+            connection=(self.connection or None),
             proxy=self.proxy,
             connection_retries=None,
             device_model=main.get_app_name(),
