@@ -321,9 +321,8 @@ class Limoka(loader.Module):
 
         self._history = self.pointer("history", [])
 
-        self.modules = await self.api.get_all_modules(
-            f"{self.config['limokaurl']}modules.json"
-            self.modules = data.get("modules", {}) if isintanse(data, dict) else {}
+        data = await self.api.get_all_modules(self.config["limokaurl"] + "modules.json")
+self.modules = data.get("modules", {}) if isinstance(data, dict) else {}
         )
         await self._update_index()
 
