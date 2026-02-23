@@ -411,7 +411,7 @@ class Limoka(loader.Module):
         description = html.escape(
             module_info.get("description") or self.strings["no_info"]
         )
-        dev_username = html.escape(module_info["meta"].get("developer", "Unknown"))
+        dev_username = html.escape(str((module_info.get("meta") or {}).get("developer") or "Unknown"))
 
         # Prefer explicit module_path argument (caller provides the key),
         # otherwise fall back to module_info['path'] if present.
