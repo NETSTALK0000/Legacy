@@ -322,9 +322,8 @@ class Limoka(loader.Module):
         self._history = self.pointer("history", [])
 
         data = await self.api.get_all_modules(self.config["limokaurl"] + "modules.json")
-self.modules = data.get("modules", {}) if isinstance(data, dict) else {}
-            
-                await self._update_index()
+        self.modules = data.get("modules", {}) if isinstance(data, dict) else {}
+        await self._update_index()
 
     async def _update_index(self):
         writer = self.ix.writer()
