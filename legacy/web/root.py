@@ -277,9 +277,10 @@ class Web:
 
         return web.Response(status=201, body=self._qr_login.url)
 
-    def _get_client(self) -> CustomTelegramClient:
-    session = MemorySession()
-    session.set_dc(2, "149.154.167.51", 443)
+    def _get_client(self) 
+    CustomTelegramClient:
+        session = MemorySession()
+        session.set_dc(2, "149.154.167.51", 443)
 
     return CustomTelegramClient(
         session,
