@@ -233,8 +233,8 @@ settings:
   legacy: | 
     <blockquote>{}</blockquote>
     <blockquote><emoji document_id=6028346797368283073>✈️</emoji> <b>Legacy-Tl-New:</b> <i>{}</i>
-    <emoji document_id=5289608677244811430>📁</emoji> <b>Aiogram:</b> <i>{}</i>
-    <emoji document_id=5300928913956938544>👩‍💻</emoji> <b>Python:</b> <i>{}</i></blockquote>
+    <blockquote><b><emoji document_id=5258391003806584549>🧃</emoji> <b>Aiogram:</b> <i>{}</i>
+    <emoji document_id=5289608677244811430>📁</emoji> <b>Python:</b> <i>{}</i></blockquote>
     <blockquote><emoji document_id=5316692281451887373>⭐️</emoji> <b>Особая благодарность</b></blockquote>
     <blockquote>@Admt_450 — поддержка + поиск и исправление ошибок</blockquote>
   _cls_doc: "Управление базовыми настройками юзербота"
