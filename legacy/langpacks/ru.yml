@@ -236,7 +236,7 @@ settings:
     <emoji document_id=5289608677244811430>📁</emoji> <b>Aiogram:</b> <i>{}</i>
     <emoji document_id=5300928913956938544>👩‍💻</emoji> <b>Python:</b> <i>{}</i></blockquote>
     <blockquote><emoji document_id=5316692281451887373>⭐️</emoji> <b>Особая благодарность</b></blockquote>
-    <blockquote>@Admt_450 — поддержка + поиск и исправление ошибок</blockquote>"
+    <blockquote>@Admt_450 — поддержка + поиск и исправление ошибок</blockquote>
   _cls_doc: "Управление базовыми настройками юзербота"
   confirm_cleardb: "⚠️ <b>Вы уверены, что хотите сбросить базу данных?</b>"
   cleardb_confirm: "🗑 Очистить базу"
