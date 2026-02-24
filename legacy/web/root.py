@@ -277,24 +277,23 @@ class Web:
 
         return web.Response(status=201, body=self._qr_login.url)
 
-    def _get_client(self) ->
-    CustomTelegramClient:
-        session = MemorySession()
-        session.set_dc(2, "149.154.167.51", 443)
+    def _get_client(self) -> CustomTelegramClient:
+session = MemorySession()
+session.set_dc(2, "149.154.167.51", 443)
 
-    return CustomTelegramClient(
-        session,
-        self.api_token.ID,
-        self.api_token.HASH,
-        connection=(self.connection or None),
-        proxy=self.proxy,
-        connection_retries=None,
-        device_model=main.get_app_name(),
-        system_version=main.generate_random_system_version(),
-        app_version=__version__,
-        lang_code="en",
-        system_lang_code="en-US",
-    )
+return CustomTelegramClient(  
+    session,  
+    self.api_token.ID,  
+    self.api_token.HASH,  
+    connection=(self.connection or None),  
+    proxy=self.proxy,  
+    connection_retries=None,  
+    device_model=main.get_app_name(),  
+    system_version=main.generate_random_system_version(),  
+    app_version=__version__,  
+    lang_code="en",  
+    system_lang_code="en-US",  
+)
 
     async def can_add(self, request: web.Request) -> web.Response:
         host = utils.get_current_platform() or utils._hosts.get("vds")
