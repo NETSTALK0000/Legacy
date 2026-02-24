@@ -376,7 +376,7 @@ class Legacy:
             BASE_DIR = self.arguments.data_root
             BASE_PATH = Path(BASE_DIR)
             CONFIG_PATH = BASE_PATH / "config.json"
-        self.loop = asyncio.get_event_loop()
+        self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
 
         self.clients = SuperList()
