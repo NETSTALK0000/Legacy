@@ -127,7 +127,8 @@ class InlineStuff(loader.Module):
         if not args:
             await utils.answer(message, self.strings["token_not_provided"])
             return
-
+            
+        url = f"https://api.telegram.org/bot{args}/getMe"
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.get(url) as response:
