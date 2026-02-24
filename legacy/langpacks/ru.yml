@@ -238,7 +238,7 @@ settings:
     <blockquote><emoji document_id=5316692281451887373>⭐️</emoji> <b>Особая благодарность</b></blockquote>
     <blockquote>@Admt_450 — поддержка + поиск и исправление ошибок</blockquote>"
   _cls_doc: "Управление базовыми настройками юзербота"
-  confirm_cleardb: "⚠️ <b>Вы уверены, что хотите сбросить базу данных?</b>
+  confirm_cleardb: "⚠️ <b>Вы уверены, что хотите сбросить базу данных?</b>"
   cleardb_confirm: "🗑 Очистить базу"
   cancel: "🚫 Отмена"
   who_to_blacklist: "<emoji document_id=5382187118216879236>❓</emoji> <b>Кого заблокировать то?</b>"
