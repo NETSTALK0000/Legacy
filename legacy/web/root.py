@@ -281,7 +281,7 @@ class Web:
         session = MemorySession()
         session.set_dc(2, "149.154.167.51", 443)
 
-    return CustomTelegramClient(  
+        return CustomTelegramClient(  
     session,  
     self.api_token.ID,  
     self.api_token.HASH,  
