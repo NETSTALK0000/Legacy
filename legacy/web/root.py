@@ -279,7 +279,7 @@ class Web:
 
     def _get_client(self) -> CustomTelegramClient:
     session = MemorySession()
-session.set_dc(2, "149.154.167.51", 443)
+    session.set_dc(2, "149.154.167.51", 443)
 
     return CustomTelegramClient(  
     session,  
