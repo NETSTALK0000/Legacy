@@ -11,7 +11,7 @@ RUN apt update && \
     gcc python3-dev
 
 
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 
 RUN rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp/*
