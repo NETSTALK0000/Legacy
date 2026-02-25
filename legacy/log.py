@@ -290,14 +290,22 @@ class TelegramLogsHandler(logging.Handler):
                 error_msg = stderr.decode().strip() if stderr else "Unknown error"
                 await bot.send_message(
                     chat_id=call.chat_id,
-                    text=f"❌ <b>Failed to install <code>{lib}</code>:</b>\n<code>{error_msg}</code>",
+                    text=(
+                         f"❌ <b>Failed to install <code>{html.escape(str(lib))}</code>:</b>\n"
+                         f"<code>{html.escape(str(error_msg))}</code>"
+                    ),
+                    parse_mode="HTML",
                 )
                 return await call.answer()
 
         except Exception as e:
             await bot.send_message(
                 chat_id=call.chat_id,
-                text=f"❌ <b>Exception during installation of <code>{lib}</code>:</b>\n<code>{str(e)}</code>",
+                text=(
+                     f"❌ <b>Exception during installation of <code>{html.escape(str(lib))}</code>:</b>\n" 
+                     f"<code>{html.escape(str(e))}</code>"
+                ),
+                parse_mode="HTML",
             )
             return await call.answer()
 
