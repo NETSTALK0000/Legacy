@@ -7,6 +7,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+import html
 import asyncio
 import contextlib
 import inspect
@@ -296,7 +297,7 @@ class TelegramLogsHandler(logging.Handler):
         except Exception as e:
             await bot.send_message(
                 chat_id=call.chat_id,
-                text=f"❌ <b>Exception during installation of <code>{lib}</code>:</b>\n<code>{str(e)}<code>",
+                text=f"❌ <b>Exception during installation of <code>{lib}</code>:</b>\n<code>{str(e)}</code>",
             )
             return await call.answer()
 
