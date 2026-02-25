@@ -182,7 +182,7 @@ class TokenObtainment(InlineUnit):
                         "custom_bot",
                         False,
                     ) and not re.search(
-                        r"@{utils.get_version_raw()}_[0-9a-zA-Z]{6}_bot", button.text
+                        rf"@{utils.get_version_raw()}_[0-9a-zA-Z]{{6}}_bot", button.text
                     ):
                         continue
 
