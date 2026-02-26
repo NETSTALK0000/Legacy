@@ -723,12 +723,12 @@ class LoaderMod(loader.Module):
                     f"<emoji document_id=5458497936763676259>😖</emoji> <b>{utils.escape_html(str(e))}</b>",
                 )
 
-except loader.SelfSuspend as e:
-    logger.debug("Suspending %s, because it raised SelfSuspend", instance)
+            except loader.SelfSuspend as e:
+                logger.debug("Suspending %s, because it raised SelfSuspend", instance)
                 if message:
                     return f"🥶 <b>Module suspended itself\nReason: {utils.escape_html(str(e))}</b>"
                 return f"🥶 <b>Module suspended itself\nReason: {utils.escape_html(str(e))}</b>"
-        except Exception as e:
+            except Exception as e:
             logger.exception("Module threw because of %s", e)
 
             if message is not None:
