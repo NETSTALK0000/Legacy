@@ -640,7 +640,7 @@ class LoaderMod(loader.Module):
                 return await utils.answer(
                     message,
                     f"<emoji document_id=5454225457916420314>😖</emoji> <b>{utils.escape_html(str(e))}</b>",
-                    (
+                    )
             except Exception as e:
                 logger.exception("Loading external module failed due to %s", e)
                 return await utils.answer(message, self.strings("load_failed"))
