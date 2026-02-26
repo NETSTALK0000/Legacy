@@ -727,9 +727,9 @@ class LoaderMod(loader.Module):
             except Exception as e:
                 logger.exception("Module threw because of %s", e)
 
-            if message is not None:
-                return self.strings["load_failed"]
+                if message is not None:
                     return self.strings["load_failed"]
+                return self.strings["load_failed"]
 
         instance.legacy_meta_pic = next(
             (
