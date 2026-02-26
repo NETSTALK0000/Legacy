@@ -701,7 +701,12 @@ class LoaderMod(loader.Module):
                 with contextlib.suppress(Exception):
                     self.allmodules.modules.remove(instance)
 
-                return "<emoji document_id=5458497936763676259>😖</emoji> <b>{utils.escape_html(str(e))}</b>"
+                        if not message:
+                            return
+                return await utils.answer(
+                    message,
+                f"<emoji document_id=5458497936763676259>😖</emoji> <b>{utils.escape_html(str(e))}</b>",
+                )
             except loader.SelfUnload as e:
                 logger.debug("Unloading %s, because it raised `SelfUnload`", instance)
                 with contextlib.suppress(Exception):
