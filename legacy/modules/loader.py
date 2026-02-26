@@ -524,11 +524,14 @@ class LoaderMod(loader.Module):
 
             with contextlib.suppress(Exception):
                 self.allmodules.modules.remove(instance)
-
+                    
             if not message:
                 return
 
-            return self.strings(f"overwrite_{e.type}").format(
+            return await utils.answer(
+                message,
+            
+                     self.strings(f"overwrite_{e.type}").format(
                 *(
                     (e.target,)
                     if e.type == "module"
@@ -631,7 +634,13 @@ class LoaderMod(loader.Module):
 
                 with contextlib.suppress(Exception):
                     self.allmodules.modules.remove(instance)
-                return f"<emoji document_id=5454225457916420314>😖</emoji> <b>{utils.escape_html(str(e))}</b>"
+
+                if not message:
+                    return
+                return await utils.answer(
+                    message,
+                    f"<emoji document_id=5454225457916420314>😖</emoji> <b>{utils.escape_html(str(e))}</b>",
+                    (
             except Exception as e:
                 logger.exception("Loading external module failed due to %s", e)
                 return await utils.answer(message, self.strings("load_failed"))
