@@ -729,11 +729,11 @@ class LoaderMod(loader.Module):
                     return f"🥶 <b>Module suspended itself\nReason: {utils.escape_html(str(e))}</b>"
                 return f"🥶 <b>Module suspended itself\nReason: {utils.escape_html(str(e))}</b>"
             except Exception as e:
-            logger.exception("Module threw because of %s", e)
+                logger.exception("Module threw because of %s", e)
 
             if message is not None:
                 return self.strings["load_failed"]
-            return self.strings["load_failed"]
+                    return self.strings["load_failed"]
 
         instance.legacy_meta_pic = next(
             (
