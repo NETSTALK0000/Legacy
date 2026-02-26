@@ -692,32 +692,38 @@ class LoaderMod(loader.Module):
                     from_dlmod=bool(message),
                 )
                 task.cancel()
+                
             except CoreOverwriteError as e:
-                return await core_overwrite(e)
+                text = await core_overwrite(e)
+                if not message:
+                    return
+                return await utils.answer(message, text)
             except loader.LoadError as e:
                 with contextlib.suppress(Exception):
                     await self.allmodules.unload_module(instance.__class__.__name__)
-
                 with contextlib.suppress(Exception):
                     self.allmodules.modules.remove(instance)
-
-                        if not message:
-                            return
+                if not message:
+                    return
                 return await utils.answer(
                     message,
-                f"<emoji document_id=5458497936763676259>😖</emoji> <b>{utils.escape_html(str(e))}</b>",
+                    f"<emoji document_id=5458497936763676259>😖</emoji> <b>{utils.escape_html(str(e))}</b>",
                 )
             except loader.SelfUnload as e:
-                logger.debug("Unloading %s, because it raised `SelfUnload`", instance)
+                logger.debug("Unloading %s, because it raised SelfUnload", instance)
                 with contextlib.suppress(Exception):
                     await self.allmodules.unload_module(instance.__class__.__name__)
-
                 with contextlib.suppress(Exception):
                     self.allmodules.modules.remove(instance)
+                if not message:
+                    return
+                return await utils.answer(
+                    message,
+                    f"<emoji document_id=5458497936763676259>😖</emoji> <b>{utils.escape_html(str(e))}</b>",
+                )
 
-                return f"<emoji document_id=5458497936763676259>😖</emoji> <b>{utils.escape_html(str(e))}</b>"
-            except loader.SelfSuspend as e:
-                logger.debug("Suspending %s, because it raised `SelfSuspend`", instance)
+except loader.SelfSuspend as e:
+    logger.debug("Suspending %s, because it raised SelfSuspend", instance)
                 if message:
                     return f"🥶 <b>Module suspended itself\nReason: {utils.escape_html(str(e))}</b>"
                 return f"🥶 <b>Module suspended itself\nReason: {utils.escape_html(str(e))}</b>"
