@@ -537,7 +537,8 @@ class LoaderMod(loader.Module):
                     if e.type == "module"
                     else (utils.escape_html(self.get_prefix()), e.target)
                 )
-            )
+            ),
+        )
 
         try:
             try:
