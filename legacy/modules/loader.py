@@ -730,6 +730,8 @@ class LoaderMod(loader.Module):
                 if message is not None:
                     return self.strings["load_failed"]
                 return self.strings["load_failed"]
+        except Exception as e:
+            logger.exception("Unexpected exception.", exc_info=e)
 
         instance.legacy_meta_pic = next(
             (
