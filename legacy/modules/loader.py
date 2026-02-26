@@ -360,7 +360,7 @@ class LoaderMod(loader.Module):
             await utils.answer(message, self.strings("provide_module"))
             return
 
-        message = await utils.answer(message, self.strings("loading_module_via_file"))
+        await utils.answer(message, self.strings("loading_module_via_file"))
 
         path_ = None
         doc = await msg.download_media(bytes)
