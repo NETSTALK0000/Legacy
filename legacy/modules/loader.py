@@ -716,12 +716,8 @@ class LoaderMod(loader.Module):
                     await self.allmodules.unload_module(instance.__class__.__name__)
                 with contextlib.suppress(Exception):
                     self.allmodules.modules.remove(instance)
-                if not message:
-                    return
-                return await utils.answer(
-                    message,
-                    f"<emoji document_id=5458497936763676259>😖</emoji> <b>{utils.escape_html(str(e))}</b>",
-                )
+                if message:
+                    return f"<emoji document_id=5458497936763676259>😖</emoji> <b>{utils.escape_html(str(e))}</b>"
 
             except loader.SelfSuspend as e:
                 logger.debug("Suspending %s, because it raised SelfSuspend", instance)
