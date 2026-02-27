@@ -199,6 +199,15 @@ class Utils(InlineUnit):
                                 ],
                             )
                         ]
+                    elif "switch_inline_query_chosen_chat" in button:
+                        line += [
+                            InlineKeyboardButton(
+                                text=str(button["text"]),
+                                switch_inline_query_chosen_chat=button[
+                                    "switch_inline_query_chosen_chat"
+                                ],
+                            )
+                        ]
                     elif "switch_inline_query" in button:
                         line += [
                             InlineKeyboardButton(
