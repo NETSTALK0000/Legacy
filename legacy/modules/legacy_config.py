@@ -973,6 +973,7 @@ class LegacyConfigMod(loader.Module):
                             {
                                 "text": self.strings["libraries"],
                                 "callback": self.inline__global_config,
+                                "style": "primary",
                                 "kwargs": {"obj_type": "library"},
                             }
                         ]
@@ -981,7 +982,13 @@ class LegacyConfigMod(loader.Module):
                     and any(hasattr(lib, "config") for lib in self.allmodules.libraries)  # type: ignore
                     else []
                 ),
-                [{"text": self.strings["close_btn"], "action": "close"}],
+                [
+                    {
+                        "text": self.strings["close_btn"],
+                        "action": "close",
+                        "style": "danger",
+                    }
+                ],
             ],
         )
 
