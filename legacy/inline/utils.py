@@ -722,6 +722,11 @@ class Utils(InlineUnit):
                 or "data" in button
                 or "action" in button
                 or "copy" in button
+                or "switch_inline_query_chosen_chat" in button
+                or "switch_inline_query_current_chat" in button
+                or "switch_inline_query" in button
+                or "web_app" in button
+                or "login_url" in button
                 for button in row
             )
             for row in buttons
@@ -734,7 +739,12 @@ class Utils(InlineUnit):
                 "  - `input`\n"
                 "  - `data`\n"
                 "  - `action`\n"
-                "  - `copy`"
+                "  - `copy`\n"
+                "  - switch_inline_query_chosen_chat\n"
+                "  - switch_inline_query_current_chat\n"
+                "  - switch_inline_query\n"
+                "  - web_app\n"
+                "  - login_url"
             )
             return None
 
