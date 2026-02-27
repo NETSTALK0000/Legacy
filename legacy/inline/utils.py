@@ -117,6 +117,7 @@ class Utils(InlineUnit):
                             InlineKeyboardButton(
                                 text=str(button["text"]),
                                 url=button["url"],
+                                style=button.get("style"),
                             )
                         ]
 
@@ -125,6 +126,7 @@ class Utils(InlineUnit):
                             InlineKeyboardButton(
                                 text=str(button["text"]),
                                 copy_text=CopyTextButton(text=button["copy"]),
+                                style=button.get("style"),
                             )
                         ]
                     elif "callback" in button:
@@ -132,6 +134,7 @@ class Utils(InlineUnit):
                             InlineKeyboardButton(
                                 text=str(button["text"]),
                                 callback_data=button["_callback_data"],
+                                style=button.get("style"),
                             )
                         ]
                         if setup_callbacks:
@@ -176,6 +179,7 @@ class Utils(InlineUnit):
                             InlineKeyboardButton(
                                 text=str(button["text"]),
                                 callback_data=button["data"],
+                                style=button.get("style"),
                             )
                         ]
                     elif "web_app" in button:
@@ -183,6 +187,7 @@ class Utils(InlineUnit):
                             InlineKeyboardButton(
                                 text=str(button["text"]),
                                 web_app=WebAppInfo(url=button["data"]),
+                                style=button.get("style"),
                             )
                         ]
                     elif "switch_inline_query_current_chat" in button:
