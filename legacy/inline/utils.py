@@ -205,7 +205,11 @@ class Utils(InlineUnit):
                             InlineKeyboardButton(
                                 text=str(button["text"]),
                                 switch_inline_query_chosen_chat=SwitchInlineQueryChosenChat(
-                                    query=button["switch_inline_query_chosen_chat"]
+                                    query=button["switch_inline_query_chosen_chat"],
+                                    allow_user_chats=True,
+                                    allow_group_chats=True,
+                                    allow_channel_chats=True,
+                                    allow_bot_chats=True,
                                 ),
                             )
                         ]
