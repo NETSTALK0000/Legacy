@@ -30,6 +30,7 @@ from aiogram.types import (
     InputMediaPhoto,
     InputMediaVideo,
     WebAppInfo,
+    SwitchInlineQueryChosenChat,
 )
 
 from .. import utils
@@ -203,9 +204,9 @@ class Utils(InlineUnit):
                         line += [
                             InlineKeyboardButton(
                                 text=str(button["text"]),
-                                switch_inline_query_chosen_chat=button[
-                                    "switch_inline_query_chosen_chat"
-                                ],
+                                switch_inline_query_chosen_chat=SwitchInlineQueryChosenChat(
+                                    query=button["switch_inline_query_chosen_chat"]
+                                ),
                             )
                         ]
                     elif "switch_inline_query" in button:
