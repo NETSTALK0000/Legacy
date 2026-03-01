@@ -94,7 +94,7 @@ class UpdateNotifier(loader.Module):
         if self._pending not in {utils.get_git_hash(), self._notified}:
             m = await self.inline.bot.send_photo(
                 self.tg_id,
-                "https://i.postimg.cc/1RWpKs8z/legacy-update-banner.png",
+                "https://raw.githubusercontent.com/NETSTALK0000/gallery/d966d567fcbc9cd3b3041eaf5dcbb4e5ef4dddc1/UPDATE%20Legacy.jpg",
                 caption=self.strings("update_required").format(
                     utils.get_git_hash()[:6],
                     '<a href="https://github.com/NETSTALK0000/Legacy/compare/{}...{}">{}</a>'.format(
