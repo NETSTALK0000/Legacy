@@ -16,7 +16,7 @@
 <b>⚙ Manual installation (no script):</b><br>
 
 ```bash
-apt update && apt install git python3 -y && git clone https://github.com/Crayz310/Legacy && cd Legacy && pip install -r requirements.txt && python3 -m legacy
+apt update && apt install git python3 -y && git clone https://github.com/NETSTALK0000/Legacy && cd Legacy && pip install -r requirements.txt && python3 -m legacy
 ```
 
 <i>If you are on VPS\VDS, type <code>--proxy-pass</code> in the end of command to open SSH tunnel to your Legacy web interface, or use <code>--no-web</code> to complete setup in console</i><br>
@@ -24,11 +24,11 @@ apt update && apt install git python3 -y && git clone https://github.com/Crayz31
 <b>🐬 Docker:</b><br>
 
 ```bash
-git clone https://github.com/Crayz310/Legacy && cd Legacy && sudo docker build . -t Crayz310/legacy:latest
+git clone https://github.com/NETSTALK0000/Legacy && cd Legacy && sudo docker build . -t NETSTALK0000/legacy:latest
 ```
 
 ```bash
-sudo docker run --restart=unless-stopped --name <container name> -p <port>:8080 --detach -it Crayz310/legacy:latest
+sudo docker run --restart=unless-stopped --name <container name> -p <port>:8080 --detach -it NETSTALK0000/legacy:latest
 ```
 
 <b>🚂 Deploy on <a href="https://railway.com/template/47hYUn?referralCode=PvevLV">Railway</a></b>
