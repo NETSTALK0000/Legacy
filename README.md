@@ -24,7 +24,7 @@ apt update && apt install git python3 -y && git clone https://github.com/NETSTAL
 <b>🐬 Docker:</b><br>
 
 ```bash
-git clone https://github.com/Crayz310/Legacy && cd Legacy && sudo docker build . -t NETSTALK0000/legacy:latest
+git clone https://github.com/NETSTALK0000/Legacy && cd Legacy && sudo docker build . -t NETSTALK0000/legacy:latest
 ```
 
 ```bash
