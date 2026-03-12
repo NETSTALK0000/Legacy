@@ -1,10 +1,10 @@
 <a href="https://www.codacy.com/gh/Crayz310/Legacy/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Crayz310/Legacy&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/97e3ea868f9344a5aa6e4d874f83db14"/></a>
-<a href="#"><img src="https://img.shields.io/github/languages/code-size/Crayz310/Legacy"/></a>
-<a href="#"><img src="https://img.shields.io/github/issues-raw/Crayz310/Legacy"/></a>
-<a href="#"><img src="https://img.shields.io/github/license/Crayz310/Legacy"/></a>
-<a href="#"><img src="https://img.shields.io/github/commit-activity/m/Crayz310/Legacy"/></a><br>
-<a href="#"><img src="https://img.shields.io/github/forks/Crayz310/Legacy?style=flat"/></a>
-<a href="#"><img src="https://img.shields.io/github/stars/Crayz310/Legacy"/></a>&nbsp;<a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a><br>
+<a href="#"><img src="https://img.shields.io/github/languages/code-size/NETSTALK0000/Legacy"/></a>
+<a href="#"><img src="https://img.shields.io/github/issues-raw/NETSTALK0000/Legacy"/></a>
+<a href="#"><img src="https://img.shields.io/github/license/NETSTALK0000/Legacy"/></a>
+<a href="#"><img src="https://img.shields.io/github/commit-activity/m/NETSTALK0000/Legacy"/></a><br>
+<a href="#"><img src="https://img.shields.io/github/forks/NETSTALK0000/Legacy?style=flat"/></a>
+<a href="#"><img src="https://img.shields.io/github/stars/NETSTALK0000/Legacy"/></a>&nbsp;<a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a><br>
 
 ### Disclaimer
 
@@ -16,7 +16,7 @@
 <b>⚙ Manual installation (no script):</b><br>
 
 ```bash
-apt update && apt install git python3 -y && git clone https://github.com/Crayz310/Legacy && cd Legacy && pip install -r requirements.txt && python3 -m legacy
+apt update && apt install git python3 -y && git clone https://github.com/NETSTALK0000/Legacy && cd Legacy && pip install -r requirements.txt && python3 -m legacy
 ```
 
 <i>If you are on VPS\VDS, type <code>--proxy-pass</code> in the end of command to open SSH tunnel to your Legacy web interface, or use <code>--no-web</code> to complete setup in console</i><br>
@@ -24,11 +24,11 @@ apt update && apt install git python3 -y && git clone https://github.com/Crayz31
 <b>🐬 Docker:</b><br>
 
 ```bash
-git clone https://github.com/Crayz310/Legacy && cd Legacy && sudo docker build . -t Crayz310/legacy:latest
+git clone https://github.com/Crayz310/Legacy && cd Legacy && sudo docker build . -t NETSTALK0000/legacy:latest
 ```
 
 ```bash
-sudo docker run --restart=unless-stopped --name <container name> -p <port>:8080 --detach -it Crayz310/legacy:latest
+sudo docker run --restart=unless-stopped --name <container name> -p <port>:8080 --detach -it NETSTALK0000/legacy:latest
 ```
 
 <b>🚂 Deploy on <a href="https://railway.com/template/47hYUn?referralCode=PvevLV">Railway</a></b>
