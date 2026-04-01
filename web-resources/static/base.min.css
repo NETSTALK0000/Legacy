@@ -33,7 +33,9 @@ body {
 
 .bg {
   z-index: -2;
-  background: #000;
+  /* background: #000; */
+  background-image: url("https://w.wallhaven.cc/full/k8/wallhaven-k81776.jpg");
+  filter: blur(8px)
 }
 
 .bg_inner {
@@ -258,8 +260,7 @@ label {
 }
 
 .gg-smartphone {
-  background: linear-gradient(to left, currentColor 5px, transparent 0) 5px
-    12px/1px 1px no-repeat;
+  background: linear-gradient(to left, currentColor 5px, transparent 0) 5px 12px/1px 1px no-repeat;
   box-sizing: border-box;
   display: block;
   transform: scale(var(--ggs, 1));
@@ -450,6 +451,7 @@ label {
 }
 
 @media screen and (max-width: 736px) {
+
   .auth,
   .auth-code-form,
   .eula-form {
@@ -538,13 +540,29 @@ label {
 
 .legacy_label {
   display: inline-block;
-  background: #fff;
+  /* background: #fff; */
+
+  background: linear-gradient(to right, #ee7752, #e73c7e, #23a6d5, #23d5ab, #ee7752);
+  background-size: 200% 100%;
+
   padding: 10px 15px;
   border-radius: 30px;
   font-family: Movement;
   color: #000;
   font-size: 30px;
   line-height: 30px;
+
+  animation: moveRight 3s linear infinite;
+}
+
+@keyframes moveRight {
+  from {
+    background-position: 0% 0%;
+  }
+
+  to {
+    background-position: -200% 0%;
+  }
 }
 
 .label_inner {
