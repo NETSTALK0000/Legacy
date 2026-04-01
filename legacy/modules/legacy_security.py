@@ -545,7 +545,12 @@ class LegacySecurityMod(loader.Module):
             user = await self._client.get_entity(user, exp=0)
 
         if user.id in getattr(self._client.dispatcher.security, group):
-            await utils.answer(message, self.strings("already_in_group").format(user.id, user.first_name, group))
+            await utils.answer(
+                message,
+                self.strings("already_in_group").format(
+                    user.id, user.first_name, group
+                ),
+            )
             return
 
         if not confirmed:
