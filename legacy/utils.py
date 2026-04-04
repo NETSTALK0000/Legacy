@@ -159,11 +159,11 @@ def get_args(message: typing.Union[Message, str]) -> typing.List[str]:
         return False
 
     if message.startswith(prefix):
-        message = message[len(prefix):].strip()
+        message = message[len(prefix) :].strip()
 
     if len(message := message.split(maxsplit=1)) <= 1:
         return []
-    
+
     message = message[1]
 
     try:
@@ -181,12 +181,12 @@ def get_args_raw(message: typing.Union[Message, str]) -> str:
     :return: Raw string of arguments
     """
     prefix = message.client.loader.get_prefix(message.sender_id)
-    
+
     if not (message := getattr(message, "message", message)):
         return False
-    
+
     if message.startswith(prefix):
-        message = message[len(prefix):].strip()
+        message = message[len(prefix) :].strip()
 
     return args[1] if len(args := message.split(maxsplit=1)) > 1 else ""
 
@@ -912,12 +912,14 @@ async def asset_channel(
     client._channels_cache[title] = {"peer": peer, "exp": int(time.time())}
     return peer, True
 
+
 if typing.TYPE_CHECKING:
     from .database import Database
 
+
 async def asset_forum_topic(
     client: CustomTelegramClient,
-    db: 'Database',
+    db: "Database",
     peer: hints.Entity,
     title: str,
     description: typing.Optional[str] = None,
@@ -927,59 +929,76 @@ async def asset_forum_topic(
     entity = await client.get_entity(peer)
 
     if not isinstance(entity, Channel):
-        raise TypeError(f"Expected entity to be 'Channel', but got '{type(entity).__name__}'")
-    
+        raise TypeError(
+            f"Expected entity to be 'Channel', but got '{type(entity).__name__}'"
+        )
+
     async def create_topic() -> ForumTopic:
-        result = await client(CreateForumTopicRequest(
-            channel=entity,
-            title=title,
-            icon_emoji_id=(icon_emoji_id if client.legacy_me.premium else None)
-        ))
+        result = await client(
+            CreateForumTopicRequest(
+                channel=entity,
+                title=title,
+                icon_emoji_id=(icon_emoji_id if client.legacy_me.premium else None),
+            )
+        )
 
         await fw_protect()
 
-        await client.send_message(entity=entity, message=(description if description else f"<emoji document_id=5258503720928288433>ℹ️</emoji> <b>Content related to <i>'{title}'</i> will be here</b>"), reply_to=result.updates[0].id)
+        await client.send_message(
+            entity=entity,
+            message=(
+                description
+                if description
+                else f"<emoji document_id=5258503720928288433>ℹ️</emoji> <b>Content related to <i>'{title}'</i> will be here</b>"
+            ),
+            reply_to=result.updates[0].id,
+        )
 
         await fw_protect()
 
-        result = await client(GetForumTopicsByIDRequest(channel=entity, topics=[result.updates[0].id]))
+        result = await client(
+            GetForumTopicsByIDRequest(channel=entity, topics=[result.updates[0].id])
+        )
 
         return result.topics[0]
-    
+
     forums_cache = db.get("legacy.forums", "forums_cache", {})
 
-    if (topic_id := forums_cache.get(entity.title, {}).get(title)):
+    if topic_id := forums_cache.get(entity.title, {}).get(title):
         await fw_protect()
-        topic = await client(GetForumTopicsByIDRequest(channel=entity, topics=[topic_id]))
+        topic = await client(
+            GetForumTopicsByIDRequest(channel=entity, topics=[topic_id])
+        )
         topic = topic.topics[0]
 
         if not isinstance(topic, ForumTopicDeleted):
             return topic
         else:
-            logger.warning(f"Topic: '{title}' was found in the database but does not exist in the channel and will be recreated")
+            logger.warning(
+                f"Topic: '{title}' was found in the database but does not exist in the channel and will be recreated"
+            )
             await fw_protect()
             new_topic = await create_topic()
             forums_cache[entity.title][title] = new_topic.id
-            
+
     else:
         await fw_protect()
         new_topic = await create_topic()
         forums_cache.setdefault(entity.title, {})[title] = new_topic.id
-    
+
     db.set("legacy.forums", "forums_cache", forums_cache)
 
     if invite_bot:
         await fw_protect()
         if all(
             p.id != client.loader.inline.bot_id
-            for p in await client.get_participants(
-                entity, limit=20
-            )
+            for p in await client.get_participants(entity, limit=20)
         ):
             await fw_protect()
             await invite_inline_bot(client, entity)
 
     return new_topic
+
 
 async def dnd(
     client: CustomTelegramClient,
@@ -1517,7 +1536,7 @@ def get_commit_url() -> str:
     """
     try:
         hash_ = get_git_hash()
-        return f'<a href="https://github.com/Crayz310/Legacy/commit/{hash_}">#{hash_[:7]}</a>'
+        return f'<a href="https://github.com/NETSTALK0000/Legacy/commit/{hash_}">#{hash_[:7]}</a>'
     except Exception:
         return "Unknown"
 
@@ -1819,7 +1838,7 @@ def get_git_info() -> typing.Tuple[str, str]:
     hash_ = get_git_hash()
     return (
         hash_,
-        f"https://github.com/Crayz310/Legacy/commit/{hash_}" if hash_ else "",
+        f"https://github.com/NETSTALK0000/Legacy/commit/{hash_}" if hash_ else "",
     )
 
 

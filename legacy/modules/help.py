@@ -261,12 +261,16 @@ class Help(loader.Module):
         args = utils.get_args_raw(message)
         force = False
         only_hidden = False
+        only_core = False
         if "-f" in args:
             args = args.replace(" -f", "").replace("-f", "")
             force = True
         if "-h" in args:
             args = args.replace(" -h", "").replace("-h", "")
             only_hidden = True
+        if "-v" in args:
+            args = args.replace(" -v", "").replace("-v", "")
+            only_core = True
 
         if args:
             await self.modhelp(message, args)
@@ -276,6 +280,8 @@ class Help(loader.Module):
 
         plain_ = []
         core_ = []
+        core_hidden_ = []
+        core_no_commands_ = []
         no_commands_ = []
 
         for mod in self.allmodules.modules:
@@ -283,15 +289,21 @@ class Help(loader.Module):
                 logger.debug("Module %s is not inited yet", mod.__class__.__name__)
                 continue
 
+            core = mod.__origin__.startswith("<core")
+
             if len(mod.commands) == 0 and len(mod.inline_handlers) == 0:
-                no_commands_ += [
+                tmp = [
                     "{} <code>{}</code>\n".format(
                         self.config["empty_emoji"], mod.strings["name"]
                     )
                 ]
+                no_commands_ += tmp
+
+                if only_core and core:
+                    core_no_commands_ += tmp
                 continue
 
-            if mod.__class__.__name__ in self.get("hide", []) and not force:
+            if mod.__class__.__name__ in hidden and not force and not only_core:
                 continue
 
             tmp = ""
@@ -301,7 +313,6 @@ class Help(loader.Module):
             except KeyError:
                 name = getattr(mod, "name", "ERROR")
 
-            core = mod.__origin__.startswith("<core")
             tmp += "{} <code>{}</code>".format(
                 self.config["core_emoji"] if core else self.config["plain_emoji"], name
             )
@@ -341,7 +352,9 @@ class Help(loader.Module):
 
             if commands or icommands:
                 tmp += " )\n" if self.config["show_cmds"] else "\n"
-                if core:
+                if core and mod in hidden:
+                    core_hidden_ += [tmp]
+                elif core:
                     core_ += [tmp]
                 else:
                     plain_ += [tmp]
@@ -368,25 +381,33 @@ class Help(loader.Module):
         core_.sort(key=extract_name)
         no_commands_.sort(key=extract_name)
 
-        reply = self.strings("all_header").format(
-            len(self.allmodules.modules),
-            (
-                0
-                if force
-                else sum(
-                    module.__class__.__name__ in hidden
-                    for module in self.allmodules.modules
-                )
-            ),
-            len(no_commands_),
-        )
-        full_list = (
-            core_ + plain_ + no_commands_
-            if force
-            else hidden_mods + no_commands_
-            if only_hidden
-            else core_ + plain_
-        )
+        if only_core:
+            reply = self.strings("only_core_header").format(len(core_) + len(core_hidden_))
+        elif only_hidden:
+            reply = self.strings("only_hidden_header").format(len(hidden_mods))
+        else:
+            reply = self.strings("all_header").format(
+                len(self.allmodules.modules),
+                (
+                    0
+                    if force
+                    else sum(
+                        module.__class__.__name__ in hidden
+                        for module in self.allmodules.modules
+                    )
+                ),
+                len(no_commands_),
+            )
+
+        if force:
+            full_list = core_ + plain_ + no_commands_
+        elif only_core:
+            full_list = core_ + core_hidden_
+        elif only_hidden:
+            full_list = hidden_mods + no_commands_
+        else:
+            full_list = core_ + plain_
+
         await utils.answer(
             message,
             (self.config["desc_icon"] + " {}\n {}{}").format(

@@ -42,7 +42,7 @@ class UpdaterMod(loader.Module):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "GIT_ORIGIN_URL",
-                "https://github.com/Crayz310/Legacy",
+                "https://github.com/NETSTALK0000/Legacy",
                 lambda: self.strings("origin_cfg_doc"),
                 validator=loader.validators.Link(),
             )

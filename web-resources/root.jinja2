@@ -30,13 +30,13 @@
 </div>
 <div class="blur auth vert_center">
   <div id="tg_icon"></div>
-  <div class="waiting_for_auth">Waiting for authentification...</div>
-  <div class="confirm_auth">Please, confirm action in <span style="color:#28a0dc">Telegram</span></div>
+  <div class="waiting_for_auth">Ожидание аутентификации...</div>
+  <div class="confirm_auth">Пожалуйста, подтвердите действие в <span style="color:#28a0dc">Telegram</span></div>
 </div>
 <div class="auth-code-form blur">
   <div id="monkey"></div>
   <div id="monkey-close"></div>
-  <span class="code-caption">Enter the code you recieved from Telegram</span>
+  <span class="code-caption">Введите код, который вы получили от Telegram</span>
   <input type="text" class="code-input" autocomplete="off">
   <div class="enter">Enter</div>
 </div>
@@ -45,8 +45,8 @@
     <div>
       <div id="law"></div>
       <br><br>
-      <span class="code-caption">You are <span style="color:#c54245">prohibited</span> from adding more than 1 account
-        on the current platform by its EULA.</span>
+      <span class="code-caption">Ты <span style="color:#c54245">запрещенный</span> от добавления более 1 аккаунта 
+      на текущей платформе согласно лицензионному соглашению.</span>
     </div>
   </div>
 </div>
@@ -55,14 +55,14 @@
     <div id="installation_icon"></div>
     <div class="title">Legacy is installed</div>
     <div class="description">
-      Legacy is installed. You can close this page now.
+      Легаси установлен. Вы можете закрыть эту страницу.
       <br>
-      <b>It might take a while for installation to fully complete. Please, be patient.</b>
+      <b>Для полного завершения установки может потребоваться некоторое время. Пожалуйста, будьте терпеливы.</b>
       <br>
-      <b>Legacy will restart and might send several configuration messages to complete the installation!</b>
+      <b>Legacy перезагрузится и может отправить несколько сообщений конфигурации для завершения установки!</b>
       <br>
-      <span style="font-size: 24px;">Check <span style="color:#28a0dc">Telegram</span> for a message from your <b>inline
-          bot</b></span>
+      <span style="font-size: 24px;">Проверь <span style="color:#28a0dc">Телеграм</span> за сообщение от твоего <b>inline
+          бота</b></span>
     </div>
   </div>
   <div class="blur main installation">
@@ -73,14 +73,14 @@
         </div>
       </div>
     </div><br>
-    <div class="description">Incomprehensibly <span style="color:#c54245">the best</span> userbot<br><span
-        style="color: #18cc18; display: none" class="authorized">Authorized!</span></div>
+    <div class="description">Непостижимо <span style="color: #c54245">лучший</span> userbot<br><span
+        style="color: #18cc18; display: none" class="авторизован">Авторизован!</span></div>
     <div class="center">
       {% if not tg_done %}
       <div class="button" id="get_started">
         <div class="horiz_center">
           <div class="vert_center">
-            Get started
+            Начать
           </div>
 
           <div class="vert_center">
@@ -92,7 +92,7 @@
       <div class="button" id="get_started">
         <div class="horiz_center">
           <div class="vert_center">
-            Add phone
+            Добавить телефон
           </div>
 
           <div class="vert_center">
@@ -105,7 +105,7 @@
       <div class="button" id="enter_api">
         <div class="horiz_center">
           <div class="vert_center">
-            Change API Creds
+            Изменить учетные данные API
           </div>
 
           <div class="vert_center">
@@ -123,12 +123,12 @@
         <input class="api_hash" id="api_hash" placeholder="••••••••••••••••••••••••••••••••" style="width: 24em;">
       </span>
       <span id="block_phone">
-        <label class="phone" for="phone">Phone: </label>
+        <label class="phone" for="phone">Телефон: </label>
         <input class="phone" id="phone" placeholder="••••••••••••" style="width: 12em;">
       </span>
       <span id="block_custom_bot">
         <label class="custom_bot" for="custom_bot">Inline bot username (E.g. @username_bot): </label>
-        <input class="custom_bot" id="custom_bot" placeholder="Leave empty to generate automatically"
+        <input class="custom_bot" id="custom_bot" placeholder="Оставьте пустым, чтобы генерировать автоматически"
           style="width: 20em;" type="text">
       </span>
       <span id="block_qr_login">
@@ -142,13 +142,13 @@
         <div class="tg_guide">
           <ol>
             <li>
-              <span>Open Telegram on your phone</span>
+              <span>Откройте Telegram на своем телефоне.</span>
             </li>
             <li>
-              <span>Go to <b>Settings</b> → <b>Devices</b> → <b>Link Desktop Device</b></span>
+              <span>Откройте <b>Настройки</b> → <b>Устройства</b> → <b>Подключить устройство</b></span>
             </li>
             <li>
-              <span>Point your phone at this screen to confirm login</span>
+              <span>Наведите свой телефон на экран, чтобы подтвердить вход.</span>
             </li>
           </ol>
         </div>
@@ -159,7 +159,7 @@
       <div id="continue_btn" class="button">
         <div class="horiz_center">
           <div class="vert_center">
-            Continue
+            Продолжить
           </div>
 
           <div class="vert_center">
@@ -170,7 +170,7 @@
       <div id="denyqr" class="button">
         <div class="horiz_center">
           <div class="vert_center">
-            Auth using phone instead
+            Вместо этого авторизуйтесь с помощью номера телефона
           </div>
 
           <div class="vert_center">

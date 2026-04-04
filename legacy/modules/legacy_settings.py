@@ -34,7 +34,6 @@ ALL_INVOKES = [
     "inspect_modules",
 ]
 
-
 @loader.tds
 class LegacySettingsMod(loader.Module):
     strings = {"name": "LegacySettings"}
@@ -462,7 +461,18 @@ class LegacySettingsMod(loader.Module):
     async def inline__setting(self, call: InlineCall, key: str, state: bool = False):
         if callable(key):
             key()
-            ltl_ext_html.CUSTOM_EMOJIS = not main.get_config_key("disable_custom_emojis")
+            ltl_ext_html.CUSTOM_EMOJIS = not main.get_config_key(
+                
+                "disable_custom_emojis"
+            
+            )
+            ltl_ext_html.CUSTOM_EMOJIS = not main.get_config_key(
+                
+                
+                "disable_custom_emojis"
+            
+            
+            )
         else:
             self._db.set(main.__name__, key, state)
 
@@ -874,3 +884,18 @@ class LegacySettingsMod(loader.Module):
             message,
             self.strings("invoke").format(method, utils.escape_html(result)),
         )
+
+    @loader.command()
+    async def invokelistcmd(self, message: Message):
+
+        result: str = "<b>🌙 LegacySettings:\n\nℹ️ Список invoke\n\n</b>"
+
+        result += "▫️ <u>core:</u><i>\n"
+
+        for invoke in ALL_INVOKES:
+            result += f"   - {invoke}\n"
+
+        result += "</i>"
+        
+        await utils.answer(message, result)
+        

@@ -83,9 +83,9 @@ BASE_DIR = (
 )
 
 BASE_PATH = Path(BASE_DIR)
-ASSETS_PATH = "https://raw.githubusercontent.com/Crayz310/Legacy/refs/heads/master/assets/legacy-assets.png"
-BACKUPS_PATH = "https://raw.githubusercontent.com/Crayz310/Legacy/refs/heads/master/assets/legacy-backups.png"
-LOGS_PATH = "https://raw.githubusercontent.com/Crayz310/Legacy/refs/heads/master/assets/legacy-logs.png"
+ASSETS_PATH = "https://raw.githubusercontent.com/NETSTALK0000/Legacy/refs/heads/master/assets/legacy-assets.png"
+BACKUPS_PATH = "https://raw.githubusercontent.com/NETSTALK0000/Legacy/refs/heads/master/assets/legacy-backups.png"
+LOGS_PATH = "https://raw.githubusercontent.com/NETSTALK0000/Legacy/refs/heads/master/assets/legacy-logs.png"
 AVATAR_PATH = os.path.join(os.getcwd(), "assets", "legacy-pfp.png")
 CONFIG_PATH = BASE_PATH / "config.json"
 
@@ -817,7 +817,7 @@ class Legacy:
                 "https://i.postimg.cc/13x4nnxm/41-9-D6-DF8-E.gif",
                 caption=(
                     "🌙 <b>Legacy started!</b>\n"
-                    '⚙ <b>GitHub commit SHA: <a href="https://github.com/Crayz310/Legacy/commit/{}">{}</a></b>\n'
+                    '⚙ <b>GitHub commit SHA: <a href="https://github.com/NETSTALK0000/Legacy/commit/{}">{}</a></b>\n'
                     "🔎 <b>Update status: {}</b>\n<b>{}</b>"
                 ).format(
                     build,

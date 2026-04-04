@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <a href="https://www.codacy.com/gh/Crayz310/Legacy/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Crayz310/Legacy&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/97e3ea868f9344a5aa6e4d874f83db14"/></a>
 <a href="#"><img src="https://img.shields.io/github/languages/code-size/NETSTALK0000/Legacy"/></a>
 <a href="#"><img src="https://img.shields.io/github/issues-raw/NETSTALK0000/Legacy"/></a>
@@ -5,6 +6,15 @@
 <a href="#"><img src="https://img.shields.io/github/commit-activity/m/NETSTALK0000/Legacy"/></a><br>
 <a href="#"><img src="https://img.shields.io/github/forks/NETSTALK0000/Legacy?style=flat"/></a>
 <a href="#"><img src="https://img.shields.io/github/stars/NETSTALK0000/Legacy"/></a>&nbsp;<a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a><br>
+=======
+<a href="https://www.codacy.com/gh/NETSTALK0000/Legacy/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=NETSTALK0000/Legacy&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/97e3ea868f9344a5aa6e4d874f83db14"/></a>
+<a href="#"><img src="https://img.shields.io/github/languages/code-size/NETSTALK0000/Legacy"/></a>
+<a href="#"><img src="https://img.shields.io/github/issues-raw/NETSTALK0000/Legacy"/></a>
+<a href="#"><img src="https://img.shields.io/github/license/NETSTALK0000/Legacy"/></a>
+<a href="#"><img src="https://img.shields.io/github/commit-activity/m/NETSTALK0000/Legacy"/></a><br>
+<a href="#"><img src="https://img.shields.io/github/forks/NETSTALK0000/Legacy?style=flat"/></a>
+<a href="#"><img src="https://img.shields.io/github/stars/NETSTALK0000/Legacy"/></a>&nbsp;<a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a><br>
+>>>>>>> Stashed changes
 
 ### Disclaimer
 
