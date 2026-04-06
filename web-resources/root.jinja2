@@ -26,186 +26,189 @@
 
 {% block after %}
 <div class="bg">
-  <div class="bg_inner"></div>
+	<div class="bg_inner"></div>
 </div>
 <div class="blur auth vert_center">
-  <div id="tg_icon"></div>
-  <div class="waiting_for_auth">Ожидание аутентификации...</div>
-  <div class="confirm_auth">Пожалуйста, подтвердите действие в <span style="color:#28a0dc">Telegram</span></div>
+	<div id="tg_icon"></div>
+	<div class="waiting_for_auth">Ожидание аутентификации...</div>
+	<div class="confirm_auth">Пожалуйста, подтвердите действие в <span style="color:#28a0dc">Telegram</span></div>
 </div>
 <div class="auth-code-form blur">
-  <div id="monkey"></div>
-  <div id="monkey-close"></div>
-  <span class="code-caption">Введите код, который вы получили от Telegram</span>
-  <input type="text" class="code-input" autocomplete="off">
-  <div class="enter">Enter</div>
+	<div id="monkey"></div>
+	<div id="monkey-close"></div>
+	<span class="code-caption">Введите код, который вы получили от Telegram</span>
+	<input type="text" class="code-input" autocomplete="off">
+	<div class="enter">Enter</div>
 </div>
 <div class="eula-form blur">
-  <div class="vert_center" style="height: 100%">
-    <div>
-      <div id="law"></div>
-      <br><br>
-      <span class="code-caption">Ты <span style="color:#c54245">запрещенный</span> от добавления более 1 аккаунта 
-      на текущей платформе согласно лицензионному соглашению.</span>
-    </div>
-  </div>
+	<div class="vert_center" style="height: 100%">
+		<div>
+			<div id="law"></div>
+			<br><br>
+			<span class="code-caption">Ты <span style="color:#c54245">запрещенный</span> от добавления более 1 аккаунта
+				на текущей платформе согласно лицензионному соглашению.</span>
+		</div>
+	</div>
 </div>
 <div class="wrapper">
-  <div class="blur main finish_block">
-    <div id="installation_icon"></div>
-    <div class="title">Legacy is installed</div>
-    <div class="description">
-      Легаси установлен. Вы можете закрыть эту страницу.
-      <br>
-      <b>Для полного завершения установки может потребоваться некоторое время. Пожалуйста, будьте терпеливы.</b>
-      <br>
-      <b>Legacy перезагрузится и может отправить несколько сообщений конфигурации для завершения установки!</b>
-      <br>
-      <span style="font-size: 24px;">Проверь <span style="color:#28a0dc">Телеграм</span> за сообщение от твоего <b>inline
-          бота</b></span>
-    </div>
-  </div>
-  <div class="blur main installation">
-    <div class="title">
-      <div class="legacy_label">
-        <div class="label_inner">
-          &#127769;&nbsp;Legacy
-        </div>
-      </div>
-    </div><br>
-    <div class="description">Непостижимо <span style="color: #c54245">лучший</span> userbot<br><span
-        style="color: #18cc18; display: none" class="авторизован">Авторизован!</span></div>
-    <div class="center">
-      {% if not tg_done %}
-      <div class="button" id="get_started">
-        <div class="horiz_center">
-          <div class="vert_center">
-            Начать
-          </div>
+	<div class="blur main finish_block">
+		<div id="installation_icon"></div>
+		<div class="title">Legacy is installed</div>
+		<div class="description">
+			Легаси установлен. Вы можете закрыть эту страницу.
+			<br>
+			<b>Для полного завершения установки может потребоваться некоторое время. Пожалуйста, будьте терпеливы.</b>
+			<br>
+			<b>Legacy перезагрузится и может отправить несколько сообщений конфигурации для завершения установки!</b>
+			<br>
+			<span style="font-size: 24px;">Проверь <span style="color:#28a0dc">Телеграм</span> за сообщение от твоего
+				<b>inline
+					бота</b></span>
+		</div>
+	</div>
+	<div class="blur main installation">
+		<div class="title">
+			<div class="legacy_label">
+				<div class="label_inner">
+					&#127769;&nbsp;Legacy
+				</div>
+			</div>
+		</div><br>
+		<div class="description">Непостижимо <span style="color: #c54245">лучший</span> userbot<br><span
+				style="color: #18cc18; display: none" class="authorized">Авторизован!</span></div>
+		<div class="center">
+			{% if not tg_done %}
+			<div class="button" id="get_started">
+				<div class="horiz_center">
+					<div class="vert_center">
+						Начать
+					</div>
 
-          <div class="vert_center">
-            <i class="gg-arrow-right-r"></i>
-          </div>
-        </div>
-      </div>
-      {% else %}
-      <div class="button" id="get_started">
-        <div class="horiz_center">
-          <div class="vert_center">
-            Добавить телефон
-          </div>
+					<div class="vert_center">
+						<i class="gg-arrow-right-r"></i>
+					</div>
+				</div>
+			</div>
+			{% else %}
+			<div class="button" id="get_started">
+				<div class="horiz_center">
+					<div class="vert_center">
+						Добавить телефон
+					</div>
 
-          <div class="vert_center">
-            <i class="gg-add"></i>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-      {% if skip_creds %}
-      <div class="button" id="enter_api">
-        <div class="horiz_center">
-          <div class="vert_center">
-            Изменить учетные данные API
-          </div>
+					<div class="vert_center">
+						<i class="gg-add"></i>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+			{% if skip_creds %}
+			<div class="button" id="enter_api">
+				<div class="horiz_center">
+					<div class="vert_center">
+						Изменить учетные данные API
+					</div>
 
-          <div class="vert_center">
-            <i class="gg-brackets"></i>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-      <span id="block_api_id">
-        <label class="api_id" for="api_id">Telegram API ID: </label>
-        <input class="api_id" id="api_id" placeholder="••••" style="width: 4em;">
-      </span>
-      <span id="block_api_hash">
-        <label class="api_hash" for="api_hash">Telegram API hash: </label>
-        <input class="api_hash" id="api_hash" placeholder="••••••••••••••••••••••••••••••••" style="width: 24em;">
-      </span>
-      <span id="block_phone">
-        <label class="phone" for="phone">Телефон: </label>
-        <input class="phone" id="phone" placeholder="••••••••••••" style="width: 12em;">
-      </span>
-      <span id="block_custom_bot">
-        <label class="custom_bot" for="custom_bot">Inline bot username (E.g. @username_bot): </label>
-        <input class="custom_bot" id="custom_bot" placeholder="Оставьте пустым, чтобы генерировать автоматически"
-          style="width: 20em;" type="text">
-      </span>
-      <span id="block_qr_login">
-        <div class="qr_outer">
-          <div class="qr_inner">
-            <dotlottie-player autoplay loop mode="normal" src="https://static.dan.tatar/4T7FajtZbx.lottie"
-              style="width: 100px; height: 100px">
-            </dotlottie-player>
-          </div>
-        </div>
-        <div class="tg_guide">
-          <ol>
-            <li>
-              <span>Откройте Telegram на своем телефоне.</span>
-            </li>
-            <li>
-              <span>Откройте <b>Настройки</b> → <b>Устройства</b> → <b>Подключить устройство</b></span>
-            </li>
-            <li>
-              <span>Наведите свой телефон на экран, чтобы подтвердить вход.</span>
-            </li>
-          </ol>
-        </div>
-      </span>
-    </div>
+					<div class="vert_center">
+						<i class="gg-brackets"></i>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+			<span id="block_api_id">
+				<label class="api_id" for="api_id">Telegram API ID: </label>
+				<input class="api_id" id="api_id" placeholder="••••" style="width: 4em;">
+			</span>
+			<span id="block_api_hash">
+				<label class="api_hash" for="api_hash">Telegram API hash: </label>
+				<input class="api_hash" id="api_hash" placeholder="••••••••••••••••••••••••••••••••"
+					style="width: 24em;">
+			</span>
+			<span id="block_phone">
+				<label class="phone" for="phone">Телефон: </label>
+				<input class="phone" id="phone" placeholder="••••••••••••" style="width: 12em;">
+			</span>
+			<span id="block_custom_bot">
+				<!-- <label class="custom_bot" for="custom_bot">Inline bot username (E.g. @username_bot): </label> -->
+				<label class="custom_bot" for="custom_bot">Пользовательское имя inline бота (Например, @username_bot): </label>
+				<input class="custom_bot" id="custom_bot"
+					placeholder="Оставьте пустым, чтобы генерировать автоматически" style="width: 20em;" type="text">
+			</span>
+			<span id="block_qr_login">
+				<div class="qr_outer">
+					<div class="qr_inner">
+						<dotlottie-player autoplay loop mode="normal" src="https://static.dan.tatar/4T7FajtZbx.lottie"
+							style="width: 100px; height: 100px">
+						</dotlottie-player>
+					</div>
+				</div>
+				<div class="tg_guide">
+					<ol>
+						<li>
+							<span>Откройте Telegram на своем телефоне.</span>
+						</li>
+						<li>
+							<span>Откройте <b>Настройки</b> → <b>Устройства</b> → <b>Подключить устройство</b></span>
+						</li>
+						<li>
+							<span>Наведите свой телефон на экран, чтобы подтвердить вход.</span>
+						</li>
+					</ol>
+				</div>
+			</span>
+		</div>
 
-    <div class="horiz_center">
-      <div id="continue_btn" class="button">
-        <div class="horiz_center">
-          <div class="vert_center">
-            Продолжить
-          </div>
+		<div class="horiz_center">
+			<div id="continue_btn" class="button">
+				<div class="horiz_center">
+					<div class="vert_center">
+						Продолжить
+					</div>
 
-          <div class="vert_center">
-            <i class="gg-chevron-right-o"></i>
-          </div>
-        </div>
-      </div>
-      <div id="denyqr" class="button">
-        <div class="horiz_center">
-          <div class="vert_center">
-            Вместо этого авторизуйтесь с помощью номера телефона
-          </div>
+					<div class="vert_center">
+						<i class="gg-chevron-right-o"></i>
+					</div>
+				</div>
+			</div>
+			<div id="denyqr" class="button">
+				<div class="horiz_center">
+					<div class="vert_center">
+						Вместо этого авторизуйтесь с помощью номера телефона
+					</div>
 
-          <div class="vert_center">
-            <i class="gg-smartphone"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div id="root">
+					<div class="vert_center">
+						<i class="gg-smartphone"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="root">
 
-  </div>
+	</div>
 </div>
 <div class="lights">
-  <div class="light x1"></div>
-  <div class="light x2"></div>
-  <div class="light x3"></div>
-  <div class="light x4"></div>
-  <div class="light x5"></div>
-  <div class="light x6"></div>
-  <div class="light x7"></div>
-  <div class="light x8"></div>
-  <div class="light x9"></div>
+	<div class="light x1"></div>
+	<div class="light x2"></div>
+	<div class="light x3"></div>
+	<div class="light x4"></div>
+	<div class="light x5"></div>
+	<div class="light x6"></div>
+	<div class="light x7"></div>
+	<div class="light x8"></div>
+	<div class="light x9"></div>
 </div>
 <script>
-  var skip_creds = "{{ skip_creds }}" == "True";
-  var auth_required = true;
-  fetch("/check_session", {
-    method: "POST",
-    credentials: "include"
-  })
-    .then(response => response.text())
-    .then((response) => {
-      auth_required = response != "1";
-    })
+	var skip_creds = "{{ skip_creds }}" == "True";
+	var auth_required = true;
+	fetch("/check_session", {
+		method: "POST",
+		credentials: "include"
+	})
+		.then(response => response.text())
+		.then((response) => {
+			auth_required = response != "1";
+		})
 </script>
 <script src="{{ static("root.min.js") }}"></script>
 {% endblock %}

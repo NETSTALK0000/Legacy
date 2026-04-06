@@ -281,7 +281,6 @@ class Help(loader.Module):
         plain_ = []
         core_ = []
         core_hidden_ = []
-        core_no_commands_ = []
         no_commands_ = []
 
         for mod in self.allmodules.modules:
@@ -299,8 +298,6 @@ class Help(loader.Module):
                 ]
                 no_commands_ += tmp
 
-                if only_core and core:
-                    core_no_commands_ += tmp
                 continue
 
             if mod.__class__.__name__ in hidden and not force and not only_core:
@@ -379,6 +376,7 @@ class Help(loader.Module):
 
         plain_.sort(key=extract_name)
         core_.sort(key=extract_name)
+
         no_commands_.sort(key=extract_name)
 
         if only_core:

@@ -32,7 +32,7 @@ body {
 }
 
 .bg {
-  z-index: -2;
+  /* z-index: -2; */
   /* background: #000; */
   background-image: url("https://w.wallhaven.cc/full/k8/wallhaven-k81776.jpg");
   filter: blur(8px)
