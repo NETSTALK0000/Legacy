@@ -9,6 +9,7 @@ import logging
 import legacytl
 from legacytl.tl.types import Message
 from legacytl import types, functions, extensions
+from deep_translator import GoogleTranslator
 
 from .. import loader, utils
 
@@ -41,52 +42,18 @@ class Translator(loader.Module):
                 return
 
             text = reply.raw_text
-            entities = reply.entities
-        else:
-            entities = []
 
         try:
             await utils.answer(
                 message,
-                await self.translate(
-                    message.peer_id,
-                    message,
-                    lang,
-                    raw_text=text,
-                    entities=entities,
-                ),
+                '<blockquote>' +
+                await self.translate(text, lang) +
+                '</blockquote>',
             )
         except Exception:
             logger.exception("Unable to translate text")
             await utils.answer(message, self.strings("error"))
 
-    async def translate(self, peer, message, to_lang, raw_text, entities) -> str:
-        msg_id = legacytl.utils.get_message_id(message) or 0
-        if not msg_id:
-            return None
-
-        if not isinstance(message, types.Message):
-            message = (await self.get_messages(peer, ids=[msg_id]))[0]
-
-        result = await self._client(
-            functions.messages.TranslateTextRequest(
-                peer=peer,
-                id=[msg_id],
-                text=[
-                    types.TextWithEntities(
-                        raw_text or message.raw_text,
-                        entities or message.entities or [],
-                    )
-                ],
-                to_lang=to_lang,
-            )
-        )
-
-        return (
-            extensions.html.unparse(
-                result.result[0].text,
-                result.result[0].entities,
-            )
-            if result and result.result
-            else ""
-        )
+    async def translate(self, text: str, to_lang: str) -> str:
+        translator = GoogleTranslator(target=to_lang)
+        return translator.translate(text=text)
