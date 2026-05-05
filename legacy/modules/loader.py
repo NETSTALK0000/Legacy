@@ -37,7 +37,6 @@ from ..types import CoreOverwriteError, CoreUnloadError
 
 logger = logging.getLogger(__name__)
 
-
 MODULE_LOADING_FAILED = 0
 MODULE_LOADING_SUCCESS = 1
 
@@ -461,6 +460,32 @@ class LoaderMod(loader.Module):
             photo="https://i.postimg.cc/Jh4zTCP8/legacy-joined.png",
         )
 
+    async def install_requirements(self, requirements: list):
+        is_venv = hasattr(sys, "real_prefix") or sys.prefix != getattr(
+            sys, "base_prefix", sys.prefix
+        )
+        need_user_flag = loader.USER_INSTALL and not is_venv
+
+        pip = await asyncio.create_subprocess_exec(
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--upgrade",
+            "-q",
+            "--disable-pip-version-check",
+            "--no-warn-script-location",
+            *["--user"] if need_user_flag else [],
+            *requirements,
+        )
+
+        rc = await pip.wait()
+
+        if rc != 0:
+            return False
+
+        return True
+
     async def load_module(
         self,
         doc: str,
@@ -530,8 +555,7 @@ class LoaderMod(loader.Module):
 
             return await utils.answer(
                 message,
-            
-                     self.strings(f"overwrite_{e.type}").format(
+                self.strings(f"overwrite_{e.type}").format(
                 *(
                     (e.target,)
                     if e.type == "module"
@@ -603,23 +627,8 @@ class LoaderMod(loader.Module):
                         ),
                     )
 
-                pip = await asyncio.create_subprocess_exec(
-                    sys.executable,
-                    "-m",
-                    "pip",
-                    "install",
-                    "--upgrade",
-                    "-q",
-                    "--disable-pip-version-check",
-                    "--no-warn-script-location",
-                    *["--user"] if loader.USER_INSTALL else [],
-                    *requirements,
-                )
-
-                rc = await pip.wait()
-
-                if rc != 0:
-                    return self.strings["requirements_failed"]
+                if not await self.install_requirements(requirements):
+                    return await utils.answer(message, self.strings["requirements_failed"])
 
                 importlib.invalidate_caches()
 
