@@ -632,7 +632,12 @@ class Modules:
 
         module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = module
-        spec.loader.exec_module(module)
+
+        try:
+            spec.loader.exec_module(module)
+        except ModuleNotFoundError as e:
+            logger.error("Module not found: %s", e.name)
+            return
 
         ret = None
 
