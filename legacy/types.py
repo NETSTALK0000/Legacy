@@ -303,7 +303,7 @@ class Module:
         event.set()
         await call.edit(
             (
-                "✖️ <b>Declined joining <a"
+                "✖️ <b>Отказался от вступления <a"
                 f' href="https://t.me/{channel.username}">{utils.escape_html(channel.title)}</a></b>'
             ),
             photo="https://i.postimg.cc/fRYzWTgD/legacy-join-request.png",
@@ -342,7 +342,9 @@ class Module:
         if channel.id in self._db.get("legacy.main", "declined_joins", []):
             if assure_joined:
                 raise LoadError(
-                    f"You need to join @{channel.username} in order to use this module"
+                    # f"You need to join @{channel.username} in order to use this module"
+                    f"К сожалению вы отклонили запрос на подписку канала: @{channel.username} для использования модуля: {self.__class__.__name__} нужно быть обязательно подписаным на канал: @{channel.username}\n\n" + 
+                    "Что бы повторить попытку загрузите снова этот модуль и примите запрос на подписку."
                 )
 
             return False
@@ -372,12 +374,12 @@ class Module:
             reply_markup=self.inline.generate_markup(
                 [
                     {
-                        "text": "💫 Approve",
+                        "text": "💫 Принять",
                         "callback": self.lookup("loader").approve_internal,
                         "args": (channel, event),
                     },
                     {
-                        "text": "✖️ Decline",
+                        "text": "✖️ Отказаться",
                         "callback": self._decline,
                         "args": (channel, event),
                     },
@@ -398,7 +400,9 @@ class Module:
 
         if assure_joined and not event.status:
             raise LoadError(
-                f"You need to join @{channel.username} in order to use this module"
+                # f"Вы должны вступить в @{channel.username} чтобы пользоваться этим модулем!"
+                f"К сожалению вы отклонили запрос на подписку канала: @{channel.username} для использования модуля: {self.__class__.__name__} нужно быть обязательно подписаным на канал: @{channel.username}\n\n" + 
+                "Что бы повторить попытку загрузите снова этот модуль и примите запрос на подписку."
             )
 
         return event.status

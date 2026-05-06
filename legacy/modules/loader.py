@@ -689,6 +689,7 @@ class LoaderMod(loader.Module):
                                         utils.escape_html(channel.title),
                                         utils.escape_html(reason),
                                         self.inline.bot_username,
+                                        self.inline.bot_username
                                     ),
                                 )
                                 return
