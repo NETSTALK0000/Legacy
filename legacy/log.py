@@ -165,6 +165,46 @@ class LegacyException:
             message=override_text(exc_value)
             or (
                 "{}<b>🎯 Source:</b> <code>{}:{}</code><b> in"
+                ' </b><code>{}</code>\n<b>❓ Error:</b> <pre><code class="language-python">{}</code></pre>{}'
+            ).format(
+                (
+                    (
+                        "🔮 <b>Cause: method </b><code>{}</code><b> of"
+                        " </b><code>{}</code>\n\n"
+                    ).format(
+                        utils.escape_html(caller.__name__),
+                        utils.escape_html(caller.__self__.__class__.__name__),
+                    )
+                    if (
+                        caller
+                        and hasattr(caller, "__self__")
+                        and hasattr(caller, "__name__")
+                    )
+                    else ""
+                ),
+                utils.escape_html(filename),
+                lineno,
+                utils.escape_html(name),
+                utils.escape_html(
+                    "".join(
+                        traceback.format_exception_only(exc_type, exc_value)
+                    ).strip()
+                ),
+                (
+                    "\n💭 <b>Message:</b>"
+                    f" <code>{utils.escape_html(str(comment))}</code>"
+                    if comment
+                    else ""
+                ),
+            ),
+            full_stack=full_traceback,
+            sysinfo=(exc_type, exc_value, tb),
+        )
+
+        return cls(
+            message=override_text(exc_value)
+            or (
+                "{}<b>🎯 Source:</b> <code>{}:{}</code><b> in"
                 " </b><code>{}</code>\n<b>❓ Error:</b> <code>{}</code>{}"
             ).format(
                 (
@@ -309,22 +349,45 @@ class TelegramLogsHandler(logging.Handler):
             )
             return await call.answer()
 
+    # async def _show_full_trace(
+    #     self,
+    #     call: BotInlineCall,
+    #     bot: "aiogram.Bot",  # type: ignore  # noqa: F821
+    #     item: LegacyException,
+    # ):
+    #     chunks = item.message + "\n\n<b>🌙 Full traceback:</b>\n" + item.full_stack
+
+    #     chunks = list(utils.smart_split(*legacytl.extensions.html.parse(chunks), 4096))
+
+    #     await call.edit(
+    #         chunks[0],
+    #     )
+
+    #     for chunk in chunks[1:]:
+    #         await bot.send_message(chat_id=call.chat_id, text=chunk)
+
     async def _show_full_trace(
         self,
         call: BotInlineCall,
         bot: "aiogram.Bot",  # type: ignore  # noqa: F821
         item: LegacyException,
     ):
-        chunks = item.message + "\n\n<b>🌙 Full traceback:</b>\n" + item.full_stack
+        chunks = (
+            item.message
+            + "\n\n<b>🪐 Full traceback:</b>\n"
+            + f'<pre><code class="language-python">{item.full_stack}</code></pre>'
+        )
 
         chunks = list(utils.smart_split(*legacytl.extensions.html.parse(chunks), 4096))
 
-        await call.edit(
-            chunks[0],
-        )
+        await call.edit(chunks[0])
+
+        thread_id = call.message.message_thread_id
 
         for chunk in chunks[1:]:
-            await bot.send_message(chat_id=call.chat_id, text=chunk)
+            await bot.send_message(
+                chat_id=call.chat_id, text=chunk, message_thread_id=thread_id
+            )
 
     def get_logid_by_client(self, client_id: int) -> int:
         return self._mods[client_id].logchat
