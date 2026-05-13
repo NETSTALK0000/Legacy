@@ -248,6 +248,9 @@ class LegacyBackupMod(loader.Module):
 
     @loader.command()
     async def backup(self, message):
+
+        await utils.answer(message, self.strings("backup_wait"))
+        
         db_dump = ujson.dumps(self._db).encode()
 
         result = io.BytesIO()
