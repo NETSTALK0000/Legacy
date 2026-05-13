@@ -374,7 +374,7 @@ class TelegramLogsHandler(logging.Handler):
     ):
         chunks = (
             item.message
-            + "\n\n<b>🪐 Full traceback:</b>\n"
+            + "\n\n<b>🌙 Full traceback:</b>\n"
             + f'<pre><code class="language-python">{item.full_stack}</code></pre>'
         )
 
