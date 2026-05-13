@@ -283,7 +283,7 @@ class LoaderMod(loader.Module):
 
                     if not url:
                         if message is not None:
-                            output.append(self.strings("no_module").format(module_name))
+                            output.append(self.strings("no_module").format(module_name, f'{self.get_prefix()}dlm'))
 
                         buff.append(MODULE_LOADING_FAILED)
                         continue
@@ -298,7 +298,7 @@ class LoaderMod(loader.Module):
                     r = await self._storage.fetch(url, auth=self.config["basic_auth"])
                 except requests.exceptions.HTTPError:
                     if message is not None:
-                        output.append(self.strings("no_module").format(module_name))
+                        output.append(self.strings("no_module").format(module_name, f'{self.get_prefix()}dlm'))
 
                     buff.append(MODULE_LOADING_FAILED)
                     continue
@@ -314,15 +314,13 @@ class LoaderMod(loader.Module):
                     )
                 )
                 buff.append(MODULE_LOADING_SUCCESS)
-                continue
+                
             except Exception:
                 logger.exception("Failed to load %s", module_name)
                 buff.append(MODULE_LOADING_FAILED)
                 continue
-        if len(list(filter(None, output))) > 1:
+        if len(list(filter(None, output))) > 0:
             await utils.answer(message, "\n\n".join(output))
-            logger.debug(f"benis1 {buff}, {output}!")
-        logger.debug(f"benis2 {buff}, {output}!")
         return buff
 
     async def _inline__load(
