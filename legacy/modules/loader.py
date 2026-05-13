@@ -321,6 +321,8 @@ class LoaderMod(loader.Module):
                 continue
         if len(list(filter(None, output))) > 1:
             await utils.answer(message, "\n\n".join(output))
+            logger.debug(f"benis1 {buff}, {output}!")
+        logger.debug(f"benis2 {buff}, {output}!")
         return buff
 
     async def _inline__load(
