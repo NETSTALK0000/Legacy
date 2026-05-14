@@ -118,7 +118,7 @@ class InlineStuff(loader.Module):
 
         self._db.set("legacy.inline", "custom_bot", args)
         self._db.set("legacy.inline", "bot_token", None)
-        await utils.answer(message, self.strings["bot_updated"])
+        await utils.answer(message, self.strings["bot_updated"].format(pfx=self.get_prefix()))
 
     @loader.command()
     async def ch_bot_token(self, message):
