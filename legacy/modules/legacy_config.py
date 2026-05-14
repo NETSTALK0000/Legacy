@@ -143,7 +143,7 @@ class LegacyConfigMod(loader.Module):
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings["close_btn"], "action": "close"},
+                    {"text": self.strings["close_btn"], "action": "close", "style": "danger"},
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -175,7 +175,7 @@ class LegacyConfigMod(loader.Module):
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings["close_btn"], "action": "close"},
+                    {"text": self.strings["close_btn"], "action": "close", "style": "danger"},
                 ]
             ],
         )
@@ -319,7 +319,7 @@ class LegacyConfigMod(loader.Module):
                     "args": (mod,),
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings["close_btn"], "action": "close"},
+                {"text": self.strings["close_btn"], "action": "close", "style": "danger"},
             ],
         ]
 
@@ -437,7 +437,7 @@ class LegacyConfigMod(loader.Module):
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings["close_btn"], "action": "close"},
+                    {"text": self.strings["close_btn"], "action": "close", "style": "danger"},
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -504,7 +504,7 @@ class LegacyConfigMod(loader.Module):
                     "args": (mod,),
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings["close_btn"], "action": "close"},
+                {"text": self.strings["close_btn"], "action": "close", "style": "danger"},
             ],
         ]
 
@@ -546,7 +546,7 @@ class LegacyConfigMod(loader.Module):
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings["close_btn"], "action": "close"},
+                    {"text": self.strings["close_btn"], "action": "close", "style": "danger"},
                 ]
             ],
         )
@@ -650,7 +650,7 @@ class LegacyConfigMod(loader.Module):
                     "args": (mod,),
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings["close_btn"], "action": "close"},
+                {"text": self.strings["close_btn"], "action": "close", "style": "danger"},
             ],
         ]
 
@@ -719,7 +719,7 @@ class LegacyConfigMod(loader.Module):
                     "args": (mod,),
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings["close_btn"], "action": "close"},
+                {"text": self.strings["close_btn"], "action": "close", "style": "danger"},
             ],
         ]
 
@@ -855,7 +855,7 @@ class LegacyConfigMod(loader.Module):
                             "args": (mod,),
                             "kwargs": {"obj_type": obj_type},
                         },
-                        {"text": self.strings["close_btn"], "action": "close"},
+                        {"text": self.strings["close_btn"], "action": "close", "style": "danger"},
                     ],
                 ]
         else:
@@ -884,7 +884,7 @@ class LegacyConfigMod(loader.Module):
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings["close_btn"], "action": "close"},
+                    {"text": self.strings["close_btn"], "action": "close", "style": "danger"},
                 ],
             ]
 
@@ -946,7 +946,7 @@ class LegacyConfigMod(loader.Module):
                         "callback": self.inline__global_config,
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings["close_btn"], "action": "close"},
+                    {"text": self.strings["close_btn"], "action": "close", "style": "danger"},
                 ]
             ],
         )
@@ -1056,7 +1056,7 @@ class LegacyConfigMod(loader.Module):
                     "text": self.strings["back_btn"],
                     "callback": self.inline__choose_category,
                 },
-                {"text": self.strings["close_btn"], "action": "close"},
+                {"text": self.strings["close_btn"], "action": "close", "style": "danger"},
             ]
         ]
 
