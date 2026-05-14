@@ -303,16 +303,16 @@ class LoaderMod(loader.Module):
                     buff.append(MODULE_LOADING_FAILED)
                     continue
 
-                output.append(
-                    await self.load_module(
-                        r,
-                        message,
-                        module_name,
-                        url,
-                        blob_link=blob_link,
-                        suggest_sub=False if len(module_names) > 1 else True,
-                    )
+                result = await self.load_module(
+                    r,
+                    message,
+                    module_name,
+                    url,
+                    blob_link=blob_link,
+                    suggest_sub=False if len(module_names) > 1 else True,
                 )
+
+                if isinstance(result, str): output.append(result)
                 buff.append(MODULE_LOADING_SUCCESS)
                 
             except Exception:
