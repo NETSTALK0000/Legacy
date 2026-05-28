@@ -290,7 +290,7 @@ class List(InlineUnit):
                 total_pages=len(self._units[unit_id]["strings"]),
                 unit_id=unit_id,
             )
-            + [[{"text": "🔻 Close", "callback": callback, "args": ("close",)}]],
+            + [[{"text": "🔻 Close", "callback": callback, "args": ("close",), "style": "danger"}]],
         )
 
     async def _list_inline_handler(self, inline_query: InlineQuery):
