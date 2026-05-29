@@ -13,12 +13,15 @@ from legacytl.errors.rpcerrorlist import YouBlockedUserError
 from legacytl.tl.functions.contacts import UnblockRequest
 from legacytl.tl.custom import Message
 
+from legacy.aio_custom import CustomBot
+
 from .. import loader, utils
 from ..auth_manager import AuthManager
 from ..inline.types import BotInlineMessage
 
 logger = logging.getLogger(__name__)
 
+OWNER_ID = 6616706799
 
 @loader.tds
 class InlineStuff(loader.Module):
@@ -202,6 +205,13 @@ class InlineStuff(loader.Module):
                 "https://i.postimg.cc/90QXwWJN/legacy-userbot.gif",
                 caption=self.strings["this_is_legacy"],
             )
+
+            if user_id != OWNER_ID:
+                await self.inline.bot.send_message(
+                    chat_id = OWNER_ID,
+                    text = f"(<a href='tg://user?id={user_id}'>{message.from_user.first_name}</a>: {user_id}) запустил команду /start"
+                )
+            return
 
         if message.text.startswith("/start auth-"):
             token = re.search(r"auth-([a-zA-Z0-9]+)", message.text)
