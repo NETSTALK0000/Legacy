@@ -218,8 +218,8 @@ class Help(loader.Module):
 
         for name, fun in commands.items():
             reply += (
-                "\n<emoji document_id=5197195523794157505>▫️</emoji>"
-                " <code>{}{}</code>{} {}".format(
+                "\n<blockquote><emoji document_id=5197195523794157505>▫️</emoji>"
+                "<code>{}{}</code>{} {}</blockquote>".format(
                     utils.escape_html(self.get_prefix(message.sender_id)),
                     name,
                     (
