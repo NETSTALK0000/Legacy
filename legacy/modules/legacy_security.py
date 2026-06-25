@@ -504,9 +504,9 @@ class LegacySecurityMod(loader.Module):
         )
 
     async def _resolve_user(self, message: Message):
-        if not (args := utils.get_args_raw(message)) and not (
-            reply := await message.get_reply_message()
-        ):
+        reply = await message.get_reply_message()
+        args = utils.get_args_raw(message)
+        if not args and not reply:
             await utils.answer(message, self.strings("no_user"))
             return
 
@@ -520,6 +520,10 @@ class LegacySecurityMod(loader.Module):
                 user = await self._client.get_entity(args, exp=0)
 
         if user is None:
+            if reply is None:
+                await utils.answer(message, self.strings("invalid_id"))
+                return
+            
             try:
                 user = await self._client.get_entity(reply.sender_id, exp=0)
             except ValueError:
