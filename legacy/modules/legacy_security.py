@@ -958,30 +958,29 @@ class LegacySecurityMod(loader.Module):
         await self._confirm(message, "sgroup", target, possible_rules[0], duration)
 
     async def _tsec_user(self, message: Message, args: list):
-        if len(args) == 1 and not message.is_private and not message.is_reply:
-            await utils.answer(message, self.strings("no_target"))
-            return
+        target = None
 
         if len(args) >= 2:
-            try:
-                if not args[1].isdigit() and not args[1].startswith("@"):
-                    raise ValueError
-
-                target = await self._client.get_entity(
-                    int(args[1]) if args[1].isdigit() else args[1],
-                    exp=0,
-                )
-            except (ValueError, TypeError):
-                if message.is_private:
-                    target = await self._client.get_entity(message.peer_id, exp=0)
-                elif message.is_reply:
+            arg_target = args[1]
+            if (arg_target.isdigit() or arg_target.startswith("@") or arg_target.startswith("-")):
+                try:
                     target = await self._client.get_entity(
-                        (await message.get_reply_message()).sender_id,
-                        exp=0,
+                        int(arg_target) if arg_target.isdigit() or arg_target.startswith("-") else arg_target
                     )
-                else:
-                    await utils.answer(message, self.strings("no_target"))
-                    return
+                except (ValueError, TypeError):
+                    pass
+        
+        if not target and message.is_reply:
+            reply_msg = await message.get_reply_message()
+            if reply_msg:
+                target = await self._client.get_entity(reply_msg.sender_id)
+
+        if not target and message.is_private:
+            target = await self._client.get_entity(message.peer_id)
+
+        if not target:
+            await utils.answer(message, self.strings("no_target"))
+            return
 
         if target.id in self._client.dispatcher.security.owner:
             await utils.answer(message, self.strings("owner_target"))
