@@ -1027,32 +1027,47 @@ class LegacySecurityMod(loader.Module):
 
     @loader.command()
     async def tsecrm(self, message: Message):
-        if not (args := utils.get_args(message)) or args[0] not in [
-            "user",
-            "chat",
-            "sgroup",
-        ]:
+        args = utils.get_args(message)
+
+        if not args or args[0] not in ["user", "chat", "sgroup"]:
             await utils.answer(message, self.strings("no_target"))
             return
 
-        if args[0] == "user":
-            if not message.is_private and not message.is_reply:
+        mode = args[0]
+
+        if mode == "user":
+            if len(args) < 2:
                 await utils.answer(message, self.strings("no_target"))
                 return
 
-            if message.is_private:
-                target = await self._client.get_entity(message.peer_id, exp=0)
-            elif message.is_reply:
-                target = await self._client.get_entity(
-                    (await message.get_reply_message()).sender_id,
-                    exp=0,
-                )
+            target = None
+            rule_name = None
 
-            if not self._client.dispatcher.security.remove_rule(
-                "user",
-                target.id,
-                args[1],
-            ):
+            if len(args) >= 3:
+                arg_target = args[1]
+                if arg_target.isdigit() or arg_target.startswith("@") or arg_target.startswith("-"):
+                    try:
+                        target = await self._client.get_entity(
+                            int(arg_target) if arg_target.isdigit or arg_target.startswith("-") else arg_target
+                        )
+                        rule_name = args[2]
+                    except (ValueError, TypeError):
+                        pass
+
+            if not target:
+                rule_name = args[1]
+                if message.is_reply:
+                    reply_msg = await message.get_reply_message()
+                    if reply_msg:
+                        target = await self._client.get_entity(reply_msg.sender_id)
+                elif message.is_private:
+                    target = await self._client.get_entity(message.peer_id)
+
+            if not target:
+                await utils.answer(message, self.strings("no_target"))
+                return
+
+            if not self._client.dispatcher.security.remove_rule("user", target.id, rule_name):
                 await utils.answer(message, self.strings("no_rules"))
                 return
 
@@ -1061,25 +1076,23 @@ class LegacySecurityMod(loader.Module):
                 self.strings("rule_removed").format(
                     utils.get_entity_url(target),
                     utils.escape_html(get_display_name(target)),
-                    utils.escape_html(args[1]),
+                    utils.escape_html(rule_name),
                 ),
             )
             return
 
-        if args[0] == "sgroup":
+        if mode == "sgroup":
             if len(args) < 3 or args[1] not in self._sgroups:
                 await utils.answer(message, self.strings("no_target"))
                 return
 
             group = self._sgroups[args[1]]
-            permissions = group.permissions
-            _any = False
-            for rule in permissions:
-                if rule["rule"] == args[2]:
-                    permissions.remove(rule)
-                    _any = True
+            target_rule = args[2]
 
-            if not _any:
+            initial_len = len(group.permissions)
+            group.permissions = [r for r in group.permissions if r.get("rule") != target_rule]
+
+            if len(group.permissions) == initial_len:
                 await utils.answer(message, self.strings("no_rules"))
                 return
 
@@ -1090,29 +1103,30 @@ class LegacySecurityMod(loader.Module):
                 self.strings("rule_removed").format(
                     "",
                     utils.escape_html(group.name),
-                    utils.escape_html(args[2]),
+                    utils.escape_html(target_rule),
                 ),
             )
-            return
 
-        if message.is_private:
-            await utils.answer(message, self.strings("no_target"))
-            return
+        if mode == "chat":
+            if len(args) < 2 or message.is_private:
+                await utils.answer(message, self.strings("no_target"))
+                return
 
-        target = await self._client.get_entity(message.peer_id, exp=0)
+            target = await self._client.get_entity(message.peer_id)
+            rule_name = args[1]
 
-        if not self._client.dispatcher.security.remove_rule("chat", target.id, args[1]):
-            await utils.answer(message, self.strings("no_rules"))
-            return
-
-        await utils.answer(
-            message,
-            self.strings("rule_removed").format(
-                utils.get_entity_url(target),
-                utils.escape_html(get_display_name(target)),
-                utils.escape_html(args[1]),
-            ),
-        )
+            if not self._client.dispatcher.security.remove_rule("chat", target.id, rule_name):
+                await utils.answer(message, self.strings("no_rules"))
+                return
+            
+            await utils.answer(
+                message,
+                self.strings("rule_removed").format(
+                    utils.get_entity_url(target),
+                    utils.escape_html(get_display_name(target)),
+                    utils.escape_html(rule_name)
+                )
+            )
 
     @loader.command()
     async def tsecclr(self, message: Message):
