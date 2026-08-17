@@ -1203,6 +1203,8 @@ class LegacySecurityMod(loader.Module):
 
     @loader.command()
     async def tsec(self, message: Message):
+        me = await self._client.get_me()
+
         if not (args := utils.get_args(message)):
             rules_list = (
                 [
@@ -1218,14 +1220,23 @@ class LegacySecurityMod(loader.Module):
                     for rule in self._client.dispatcher.security.tsec_chat
                 ]
                 + [
-                    "<emoji document_id=6037122016849432064>👤</emoji> <b><a"
-                    " href='{}'>{}</a> {} {} {}</b> <code>{}</code>".format(
+                    # "<emoji document_id=6037122016849432064>👤</emoji> <b><a"
+                    # " href='{}'>{}</a> {} {} {}</b> <code>{}</code>".format(
+                    #     rule["entity_url"],
+                    #     utils.escape_html(rule["entity_name"]),
+                    #     self._convert_time(int(rule["expires"] - time.time())),
+                    #     self.strings("for"),
+                    #     self.strings(rule["rule_type"]),
+                    #     rule["rule"],
+                    # )
+                    # for rule in self._client.dispatcher.security.tsec_user
+                    "<emoji document_id=6037122016849432064>👤</emoji> <b>{} выдал пользователю <a href='{}'>{}</a> использовать {}</b> <code>{}</code>\n\n<blockquote><b>Время использования: {}</b></blockquote>".format(
+                        me.first_name,
                         rule["entity_url"],
                         utils.escape_html(rule["entity_name"]),
-                        self._convert_time(int(rule["expires"] - time.time())),
-                        self.strings("for"),
                         self.strings(rule["rule_type"]),
                         rule["rule"],
+                        self._convert_time(int(rule["expires"] - time.time()))
                     )
                     for rule in self._client.dispatcher.security.tsec_user
                 ]
