@@ -87,7 +87,7 @@ class LimokaAPI:
     async def get_all_modules(self, url):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
-                return json.loads(await response.text())
+                return json.loads(await response.text())["modules"]
 
 
 @loader.tds
