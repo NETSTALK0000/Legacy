@@ -99,6 +99,7 @@ legacy_settings:
   disabled: "<emoji document_id=5424885441100782420>👀</emoji> <b>Смотритель {} теперь <u>выключен</u></b>"
   enabled: "<emoji document_id=5424885441100782420>👀</emoji> <b>Смотритель {} теперь <u>включен</u></b>"
   args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Укажи имя смотрителя</b>"
+  invoke: "<emoji document_id=5215519585150706301>👍</emoji> <b>Вызван внутренний метод отладки</b> <code>{}</code>\n\n<emoji document_id=5784891605601225888>🔵</emoji> <b>Результат:\n{}</b>"
   user_nn: "<emoji document_id=5469791106591890404>🪄</emoji> <b>Состояние NoNick для этого пользователя: {}</b>"
   no_cmd: "<emoji document_id=5469791106591890404>🪄</emoji> <b>Укажи команду, для которой надо включить\\выключить NoNick</b>"
   cmd_nn: "<emoji document_id=5469791106591890404>🪄</emoji> <b>Состояние NoNick для</b> <code>{}</code><b>: {}</b>"

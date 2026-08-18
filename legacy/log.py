@@ -62,7 +62,7 @@ def override_text(exception: Exception) -> typing.Optional[str]:
     if isinstance(exception, NetworkError):
         return "✈️ <b>You have problems with internet connection on your server.</b>"
     if isinstance(exception, ServerError):
-        return "📡 <b>Telegram servers are currently experiencing issues. Please try again later.</b>"
+        return "📡 <b>Сервера Telegram в текущее время испытывают проблемы. Пожалуйста, повторите попытку позже.</b>"
     if isinstance(exception, RPCError) and "TRANSLATION_TIMEOUT" in str(exception):
         return (
             "🕓 <b>Telegram translation service timed out. Please try again later.</b>"
@@ -324,14 +324,14 @@ class TelegramLogsHandler(logging.Handler):
 
             if process.returncode == 0:
                 return await call.answer(
-                    f"✅ <b>Library {lib} installed successfully!</b>"
+                    f"✅ <b>Библиотека {lib} успешно установлена!</b>"
                 )
             else:
                 error_msg = stderr.decode().strip() if stderr else "Unknown error"
                 await bot.send_message(
                     chat_id=call.chat_id,
                     text=(
-                         f"❌ <b>Failed to install <code>{html.escape(str(lib))}</code>:</b>\n"
+                         f"❌ <b>Не удалось установить: <code>{html.escape(str(lib))}</code>:</b>\n"
                          f"<code>{html.escape(str(error_msg))}</code>"
                     ),
                     parse_mode="HTML",
@@ -342,7 +342,7 @@ class TelegramLogsHandler(logging.Handler):
             await bot.send_message(
                 chat_id=call.chat_id,
                 text=(
-                     f"❌ <b>Exception during installation of <code>{html.escape(str(lib))}</code>:</b>\n" 
+                     f"❌ <b>Ошибка во время установки: <code>{html.escape(str(lib))}</code>:</b>\n" 
                      f"<code>{html.escape(str(e))}</code>"
                 ),
                 parse_mode="HTML",
@@ -436,7 +436,7 @@ class TelegramLogsHandler(logging.Handler):
                                 lib = match.group(1)
                                 reply_markup_btns.append(
                                     {
-                                        "text": "⬇️ Install",
+                                        "text": "⬇️ Установить",
                                         "callback": self._install_pylib,
                                         "args": (self._mods[client_id].inline.bot, lib),
                                     }
@@ -465,8 +465,7 @@ class TelegramLogsHandler(logging.Handler):
                         self._mods[client_id].logchat,
                         logfile,
                         caption=(
-                            "<b>🧳 Journals are too big to be sent as separate"
-                            " messages</b>"
+                            "<b>🧳 Журналы слишком велики, чтобы их можно было отправлять отдельными сообщениями.</b>"
                         ),
                     )
 

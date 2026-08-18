@@ -812,39 +812,35 @@ class LegacySettingsMod(loader.Module):
         if module == "core":
             if method == "flush_entity_cache":
                 result = (
-                    f"Dropped {len(self._client._legacy_entity_cache)} cache records"
+                    f"Сброшено {len(self._client._legacy_entity_cache)} записей кэша"
                 )
                 self._client._legacy_entity_cache = {}
             elif method == "flush_fulluser_cache":
                 result = (
-                    f"Dropped {len(self._client._legacy_fulluser_cache)} cache records"
+                    f"Сброшено {len(self._client._legacy_fulluser_cache)} записей кэша"
                 )
                 self._client._legacy_fulluser_cache = {}
             elif method == "flush_fullchannel_cache":
                 result = (
-                    f"Dropped {len(self._client._legacy_fullchannel_cache)} cache"
-                    " records"
+                    f"Сброшено {len(self._client._legacy_fullchannel_cache)} записей кэша"
                 )
                 self._client._legacy_fullchannel_cache = {}
             elif method == "flush_perms_cache":
                 result = (
-                    f"Dropped {len(self._client._legacy_perms_cache)} cache records"
+                    f"Сброшено {len(self._client._legacy_perms_cache)} записей кэша"
                 )
                 self._client._legacy_perms_cache = {}
             elif method == "flush_loader_cache":
                 result = (
-                    f"Dropped {await self.lookup('loader').flush_cache()} cache records"
+                    f"Сброшено {await self.lookup('loader').flush_cache()} записей кэша"
                 )
             elif method == "flush_cache":
                 count = self.lookup("loader").flush_cache()
                 result = (
-                    f"Dropped {len(self._client._legacy_entity_cache)} entity cache"
-                    " records\nDropped"
-                    f" {len(self._client._legacy_fulluser_cache)} fulluser cache"
-                    " records\nDropped"
-                    f" {len(self._client._legacy_fullchannel_cache)} fullchannel cache"
-                    " records\nDropped"
-                    f" {count} loader links cache records"
+                    f"Сброшено {len(self._client._legacy_entity_cache)} записей кэша сущностей\n"
+                    f"Сброшено {len(self._client._legacy_fulluser_cache)} записей кэша пользователей\n"
+                    f"Сброшено {len(self._client._legacy_fullchannel_cache)} записей кэша каналов\n"
+                    f"Сброшено {count} записей кэша ссылок загрузчика"
                 )
                 self._client._legacy_entity_cache = {}
                 self._client._legacy_fulluser_cache = {}
@@ -852,20 +848,18 @@ class LegacySettingsMod(loader.Module):
                 self._client.legacy_me = await self._client.get_me()
             elif method == "reload_core":
                 core_quantity = await self.lookup("loader").reload_core()
-                result = f"Reloaded {core_quantity} core modules"
+                result = f"Перезагружено {core_quantity} системных модулей"
             elif method == "inspect_cache":
                 result = (
-                    "Entity cache:"
-                    f" {len(self._client._legacy_entity_cache)} records\nFulluser cache:"
-                    f" {len(self._client._legacy_fulluser_cache)} records\nFullchannel"
-                    " cache:"
-                    f" {len(self._client._legacy_fullchannel_cache)} records\nLoader"
-                    f" links cache: {self.lookup('loader').inspect_cache()} records"
+                    f"Кэш сущностей: {len(self._client._legacy_entity_cache)} записей\n"
+                    f"Кэш пользователей: {len(self._client._legacy_fulluser_cache)} записей\n"
+                    f"Кэш каналов: {len(self._client._legacy_fullchannel_cache)} записей\n"
+                    f"Кэш ссылок загрузчика: {self.lookup('loader').inspect_cache()} записей"
                 )
             elif method == "inspect_modules":
                 result = (
-                    "Loaded modules: {}\nLoaded core modules: {}\nLoaded user"
-                    " modules: {}"
+                    "Загружено модулей: {}\nЗагружено системных модулей: {}\nЗагружено"
+                    " пользовательских модулей: {}"
                 ).format(
                     len(self.allmodules.modules),
                     sum(
