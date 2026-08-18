@@ -10,7 +10,7 @@ import time
 import typing
 
 from legacytl.hints import EntityLike
-from legacytl.tl.types import Message, User
+from legacytl.tl.types import Message, User, PeerUser
 from legacytl.utils import get_display_name
 
 from .. import loader, main, security, utils
@@ -380,7 +380,9 @@ class LegacySecurityMod(loader.Module):
             await utils.answer(message, self.strings("sgroup_not_found").format(group))
             return
 
-        if user.id in group.users:
+        user_id = user.user_id if isinstance(user, PeerUser) else user.id
+
+        if user_id in group.users:
             await utils.answer(
                 message,
                 self.strings("user_already_in_sgroup").format(
@@ -390,7 +392,7 @@ class LegacySecurityMod(loader.Module):
             )
             return
 
-        group.users.append(user.id)
+        group.users.append(user_id)
         self._sgroups[group.name] = group
         self._reload_sgroups()
 
@@ -430,7 +432,9 @@ class LegacySecurityMod(loader.Module):
             await utils.answer(message, self.strings("sgroup_not_found").format(group))
             return
 
-        if user.id not in group.users:
+        user_id = user.user_id if isinstance(user, PeerUser) else user.id
+
+        if user_id not in group.users:
             await utils.answer(
                 message,
                 self.strings("user_not_in_sgroup").format(
@@ -440,7 +444,7 @@ class LegacySecurityMod(loader.Module):
             )
             return
 
-        group.users.remove(user.id)
+        group.users.remove(user_id)
         self._sgroups[group.name] = group
         self._reload_sgroups()
 
