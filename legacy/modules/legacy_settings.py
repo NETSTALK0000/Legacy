@@ -343,7 +343,7 @@ class LegacySettingsMod(loader.Module):
             return
 
         if args not in self.allmodules.commands:
-            await utils.answer(message, self.strings("cmd404"))
+            await utils.answer(message, self.strings("cmd404").format(args))
             return
 
         nn = self._db.get(main.__name__, "nonickcmds", [])
@@ -881,6 +881,7 @@ class LegacySettingsMod(loader.Module):
 
     @loader.command()
     async def invokelistcmd(self, message: Message):
+        """ - Выводит список invoke методов для отладки """
 
         result: str = "<b>🌙 LegacySettings:\n\nℹ️ Список invoke\n\n</b>"
 
