@@ -31,7 +31,7 @@ class LegacyBackupMod(loader.Module):
         if not self.get("period"):
             await self.inline.bot.send_photo(
                 self.tg_id,
-                photo="https://i.postimg.cc/8PPXPyK5/legacy-unit-alpha.png",
+                photo="https://raw.githubusercontent.com/NETSTALK0000/gallery/main/Unit-Alpha-Legacy.png",
                 caption=self.strings["period"],
                 reply_markup=self.inline.generate_markup(
                     utils.chunks(
