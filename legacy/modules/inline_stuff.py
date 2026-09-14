@@ -21,7 +21,7 @@ from ..inline.types import BotInlineMessage
 
 logger = logging.getLogger(__name__)
 
-OWNER_ID = 6616706799
+OWNER_ID = 8855182068
 
 @loader.tds
 class InlineStuff(loader.Module):
