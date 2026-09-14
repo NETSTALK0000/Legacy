@@ -127,9 +127,13 @@ class Limoka(loader.Module):
             8: "<emoji document_id=5416006506749383505>8️⃣</emoji>",
             9: "<emoji document_id=5415963015910544694>9️⃣</emoji>",
         },
-        "404": "<emoji document_id=5210952531676504517>❌</emoji> <b>Not found by query: <i>{query}</i></b>",
+        "404": (
+            "<emoji document_id=5210952531676504517>❌</emoji> <b>Not found by query: <i>{query}</i></b>"
+        ),
         "noargs": "<emoji document_id=5210952531676504517>❌</emoji> <b>No args</b>",
-        "?": "<emoji document_id=5951895176908640647>🔎</emoji> Request too short / not found",
+        "?": (
+            "<emoji document_id=5951895176908640647>🔎</emoji> Request too short / not found"
+        ),
         "no_info": "No information",
         "facts": [
             "<emoji document_id=5472193350520021357>🛡</emoji> The limoka catalog is carefully moderated!",
@@ -147,16 +151,22 @@ class Limoka(loader.Module):
         "apply_filters": "✅ Apply Filters",
         "clear_filters": "🗑 Clear Filters",
         "back_to_results": "🔙 Back to Results",
-        "empty_history": "<emoji document_id=5879939498149679716>🔎</emoji> <b>Your search history is empty!</b>",
+        "empty_history": (
+            "<emoji document_id=5879939498149679716>🔎</emoji> <b>Your search history is empty!</b>"
+        ),
         "enter_query": "🔍 Enter new search query:",
-        "global_search": "<emoji document_id=5413334818047940135>🔍</emoji> Global search for <b>{query}</b> — found <b>{count}</b> modules",
+        "global_search": (
+            "<emoji document_id=5413334818047940135>🔍</emoji> Global search for <b>{query}</b> — found <b>{count}</b> modules"
+        ),
         "change_query": "🔍 Change query",
         "no_modules": "No modules available.",
         "filter_title": "🏷 Filters",
         "category_title": "📂 Categories",
         "selected_categories": "✅ Selected categories: {categories}",
         "no_categories": "No categories found in the module database",
-        "select_category": "Select categories for query: <code>{query}</code>\n(You can select multiple)",
+        "select_category": (
+            "Select categories for query: <code>{query}</code>\n(You can select multiple)"
+        ),
         "back": "🔙 Back",
         "category": "📁 {category}",
         "no_category": "No category",
@@ -168,21 +178,33 @@ class Limoka(loader.Module):
         "inline_short_query": "❌ Query too short (min 2 chars)",
         "inline_switch_pm": "💬 Open in chat",
         "inline_switch_pm_text": "🔍 Results for: {query}",
-        "inline_start_message": "<emoji document_id=5413334818047940135>🔍</emoji> <b>Limoka Search</b>\n\nType module name or keyword",
+        "inline_start_message": (
+            "<emoji document_id=5413334818047940135>🔍</emoji> <b>Limoka Search</b>\n\nType module name or keyword"
+        ),
         "first_page": "This is the first page!",
         "last_page": "This is the last page!",
         "display_error": "Error displaying module. Please try again.",
         "error_occurred": "An error occurred. Please try again.",
-        "start_search_form": "<emoji document_id=5413334818047940135>🔍</emoji> <b>Limoka Search</b>\n\nEnter your query to search for modules:",
-        "global_search_form": "<emoji document_id=5413334818047940135>🔍</emoji> <b>Global Search</b>\n\nEnter your query to search ALL modules without filters:",
-        "history_cleared": "<emoji document_id=5427009710268689068>🧹</emoji> <b>Search history cleared!</b>",
-        "invalid_history_arg": "<emoji document_id=5210952531676504517>❌</emoji> <b>Invalid argument for history command. Use:</b>\n<code>.lshistory</code> - show history\n<code>.lshistory clear</code> - clear history",
+        "start_search_form": (
+            "<emoji document_id=5413334818047940135>🔍</emoji> <b>Limoka Search</b>\n\nEnter your query to search for modules:"
+        ),
+        "global_search_form": (
+            "<emoji document_id=5413334818047940135>🔍</emoji> <b>Global Search</b>\n\nEnter your query to search ALL modules without filters:"
+        ),
+        "history_cleared": (
+            "<emoji document_id=5427009710268689068>🧹</emoji> <b>Search history cleared!</b>"
+        ),
+        "invalid_history_arg": (
+            "<emoji document_id=5210952531676504517>❌</emoji> <b>Invalid argument for history command. Use:</b>\n<code>.lshistory</code> - show history\n<code>.lshistory clear</code> - clear history"
+        ),
         "close": "❌ Close",
         "watcher_no_tag": "❌ Invalid message format. No #limoka tag found.",
         "watcher_invalid_format": "❌ Invalid format. Expected: #limoka:path:signature",
         "watcher_signature_invalid": "❌ Signature invalid! Installation aborted.",
         "watcher_loader_missing": "❌ Loader module not found.",
-        "watcher_module_not_found": "❌ Module not found in Limoka database: <code>{path}</code>",
+        "watcher_module_not_found": (
+            "❌ Module not found in Limoka database: <code>{path}</code>"
+        ),
         "watcher_critical": "❌ Critical error: {error}",
     }
 
@@ -219,9 +241,15 @@ class Limoka(loader.Module):
             8: "<emoji document_id=5416006506749383505>8️⃣</emoji>",
             9: "<emoji document_id=5415963015910544694>9️⃣</emoji>",
         },
-        "404": "<emoji document_id=5210952531676504517>❌</emoji> <b>Не найдено по запросу: <i>{query}</i></b>",
-        "noargs": "<emoji document_id=5210952531676504517>❌</emoji> <b>Нет аргументов</b>",
-        "?": "<emoji document_id=5951895176908640647>🔎</emoji> Запрос слишком короткий / не найден",
+        "404": (
+            "<emoji document_id=5210952531676504517>❌</emoji> <b>Не найдено по запросу: <i>{query}</i></b>"
+        ),
+        "noargs": (
+            "<emoji document_id=5210952531676504517>❌</emoji> <b>Нет аргументов</b>"
+        ),
+        "?": (
+            "<emoji document_id=5951895176908640647>🔎</emoji> Запрос слишком короткий / не найден"
+        ),
         "no_info": "Нет информации",
         "facts": [
             "<emoji document_id=5472193350520021357>🛡</emoji> Каталог Limoka тщательно модерируется!",
@@ -243,16 +271,22 @@ class Limoka(loader.Module):
         "apply_filters": "✅ Применить фильтры",
         "clear_filters": "🗑 Очистить фильтры",
         "back_to_results": "🔙 Вернуться к результатам",
-        "empty_history": "<emoji document_id=5879939498149679716>🔎</emoji> <b>История поиска пуста!</b>",
+        "empty_history": (
+            "<emoji document_id=5879939498149679716>🔎</emoji> <b>История поиска пуста!</b>"
+        ),
         "enter_query": "🔍 Введите новый поисковый запрос:",
-        "global_search": "<emoji document_id=5413334818047940135>🔍</emoji> Глобальный поиск по <b>{query}</b> — найдено <b>{count}</b> модулей",
+        "global_search": (
+            "<emoji document_id=5413334818047940135>🔍</emoji> Глобальный поиск по <b>{query}</b> — найдено <b>{count}</b> модулей"
+        ),
         "change_query": "🔍 Изменить запрос",
         "no_modules": "Модули недоступны.",
         "filter_title": "🏷 Фильтры",
         "category_title": "📂 Категории",
         "selected_categories": "✅ Выбранные категории: {categories}",
         "no_categories": "Категории не найдены в базе модулей",
-        "select_category": "Выберите категории для запроса: <code>{query}</code>\n(Можно выбрать несколько)",
+        "select_category": (
+            "Выберите категории для запроса: <code>{query}</code>\n(Можно выбрать несколько)"
+        ),
         "back": "🔙 Назад",
         "category": "📁 {category}",
         "no_category": "Без категории",
@@ -264,21 +298,35 @@ class Limoka(loader.Module):
         "inline_short_query": "❌ Запрос слишком короткий (мин. 2 символа)",
         "inline_switch_pm": "💬 Открыть в чате",
         "inline_switch_pm_text": "🔍 Результаты для: {query}",
-        "inline_start_message": "<emoji document_id=5413334818047940135>🔍</emoji> <b>Limoka Поиск</b>\n\nВведите название модуля или ключевое слово",
+        "inline_start_message": (
+            "<emoji document_id=5413334818047940135>🔍</emoji> <b>Limoka Поиск</b>\n\nВведите название модуля или ключевое слово"
+        ),
         "first_page": "Это первая страница!",
         "last_page": "Это последняя страница!",
         "display_error": "Ошибка отображения модуля. Пожалуйста, попробуйте еще раз.",
         "error_occurred": "Произошла ошибка. Пожалуйста, попробуйте еще раз.",
-        "start_search_form": "<emoji document_id=5413334818047940135>🔍</emoji> <b>Limoka Поиск</b>\n\nВведите ваш запрос для поиска модулей:",
-        "global_search_form": "<emoji document_id=5413334818047940135>🔍</emoji> <b>Глобальный Поиск</b>\n\nВведите запрос для поиска ВСЕХ модулей без фильтров:",
-        "history_cleared": "<emoji document_id=5427009710268689068>🧹</emoji> <b>История поиска очищена!</b>",
-        "invalid_history_arg": "<emoji document_id=5210952531676504517>❌</emoji> <b>Неверный аргумент для команды истории. Используйте:</b>\n<code>.lshistory</code> - показать историю\n<code>.lshistory clear</code> - очистить историю",
+        "start_search_form": (
+            "<emoji document_id=5413334818047940135>🔍</emoji> <b>Limoka Поиск</b>\n\nВведите ваш запрос для поиска модулей:"
+        ),
+        "global_search_form": (
+            "<emoji document_id=5413334818047940135>🔍</emoji> <b>Глобальный Поиск</b>\n\nВведите запрос для поиска ВСЕХ модулей без фильтров:"
+        ),
+        "history_cleared": (
+            "<emoji document_id=5427009710268689068>🧹</emoji> <b>История поиска очищена!</b>"
+        ),
+        "invalid_history_arg": (
+            "<emoji document_id=5210952531676504517>❌</emoji> <b>Неверный аргумент для команды истории. Используйте:</b>\n<code>.lshistory</code> - показать историю\n<code>.lshistory clear</code> - очистить историю"
+        ),
         "close": "❌ Закрыть",
         "watcher_no_tag": "❌ Неверный формат сообщения. Тег #limoka не найден.",
-        "watcher_invalid_format": "❌ Неверный формат. Ожидается: #limoka:path:signature",
+        "watcher_invalid_format": (
+            "❌ Неверный формат. Ожидается: #limoka:path:signature"
+        ),
         "watcher_signature_invalid": "❌ Неверная подпись! Установка отменена.",
         "watcher_loader_missing": "❌ Модуль загрузчика не найден.",
-        "watcher_module_not_found": "❌ Модуль не найден в базе Limoka: <code>{path}</code>",
+        "watcher_module_not_found": (
+            "❌ Модуль не найден в базе Limoka: <code>{path}</code>"
+        ),
         "watcher_critical": "❌ Критическая ошибка: {error}",
         "_cls_doc": "Модули теперь в одном месте с простым и удобным поиском!",
     }
@@ -321,8 +369,11 @@ class Limoka(loader.Module):
 
         self._history = self.pointer("history", [])
 
-        data = await self.api.get_all_modules(self.config["limokaurl"] + "modules.json")
-        self.modules = data.get("modules", {}) if isinstance(data, dict) else {}
+        self.modules = await self.api.get_all_modules(
+            self.config["limokaurl"] + "modules.json"
+        )
+        if not isinstance(self.modules, dict):
+            self.modules = {}
         await self._update_index()
 
     async def _update_index(self):
@@ -411,7 +462,9 @@ class Limoka(loader.Module):
         description = html.escape(
             module_info.get("description") or self.strings["no_info"]
         )
-        dev_username = html.escape(str((module_info.get("meta") or {}).get("developer") or "Unknown"))
+        dev_username = html.escape(
+            str((module_info.get("meta") or {}).get("developer") or "Unknown")
+        )
 
         # Prefer explicit module_path argument (caller provides the key),
         # otherwise fall back to module_info['path'] if present.
