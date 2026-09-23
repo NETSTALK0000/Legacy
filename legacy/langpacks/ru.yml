@@ -350,7 +350,7 @@ test:
   _cls_doc: "Операции, связанные с самотестированием"
   send_anyway: "📤 Все равно отправить"
   cancel: "🚫 Отмена"
-  logs_cleared: "🗑 <b>Логи очищены</b>"
+  logs_cleared: "<emoji document_id=5255831443816327915>🗑</emoji> <b>Логи очищены</b>"
   _cmd_doc_clearlogs: "Очистить логи"
 
 update_notifier:
@@ -408,7 +408,7 @@ api_protection:
 
 help:
   _cls_doc: "Показывает справку по модулям и командам"
-  undoc: "🦥 Нет описания"
+  undoc: "<emoji document_id=5326015457155620929>😐</emoji> Нет описания"
   all_header: "<b>{} модулей доступно, {} скрыто, {} без команд:</b>"
   only_core_header: "<b>{} встроенных модулей:</b>"
   only_hidden_header: "<b>{} скрытых модулей:</b>"
