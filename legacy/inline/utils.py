@@ -307,7 +307,7 @@ class Utils(InlineUnit):
 
         return reply_markup
 
-    def sanitise_text(self, text: str) -> str:
+    def sanitise_text(self, text: typing.Optional[str]) -> str:
         """
         Replaces all animated emojis in text with normal ones,
         bc aiogram doesn't support them
@@ -315,6 +315,8 @@ class Utils(InlineUnit):
         :param text: text to sanitise
         :return: sanitised text
         """
+        if text is None:
+            return ""
         return re.sub(r"</?(?:emoji).*?>", "", text)
 
     async def _edit_unit(

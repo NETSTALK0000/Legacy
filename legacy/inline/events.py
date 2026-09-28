@@ -122,9 +122,9 @@ class Events(InlineUnit):
                                     message_text=self.sanitise_text(res["message"]),
                                     disable_web_page_preview=True,
                                 ),
-                                thumb_url=res.get("thumb"),
-                                thumb_width=128,
-                                thumb_height=128,
+                                thumbnail_url=res.get("thumb"),
+                                thumbnail_width=128,
+                                thumbnail_height=128,
                                 reply_markup=self.generate_markup(
                                     res.get("reply_markup")
                                 ),
@@ -139,7 +139,7 @@ class Events(InlineUnit):
                                     ),
                                     caption=self.sanitise_text(res.get("caption")),
                                     parse_mode="HTML",
-                                    thumb_url=res.get("thumb", res["photo"]),
+                                    thumbnail_url=res.get("thumb", res["photo"]),
                                     photo_url=res["photo"],
                                     reply_markup=self.generate_markup(
                                         res.get("reply_markup")
@@ -152,7 +152,7 @@ class Events(InlineUnit):
                                         title=self.sanitise_text(res.get("title")),
                                         caption=self.sanitise_text(res.get("caption")),
                                         parse_mode="HTML",
-                                        thumb_url=res.get("thumb", res["gif"]),
+                                        thumbnail_url=res.get("thumb", res["gif"]),
                                         gif_url=res["gif"],
                                         reply_markup=self.generate_markup(
                                             res.get("reply_markup")
@@ -170,7 +170,7 @@ class Events(InlineUnit):
                                                 res.get("caption")
                                             ),
                                             parse_mode="HTML",
-                                            thumb_url=res.get("thumb", res["video"]),
+                                            thumbnail_url=res.get("thumb", res["video"]),
                                             video_url=res["video"],
                                             mime_type="video/mp4",
                                             reply_markup=self.generate_markup(
@@ -188,7 +188,7 @@ class Events(InlineUnit):
                                                 res.get("caption")
                                             ),
                                             parse_mode="HTML",
-                                            thumb_url=res.get("thumb", res["file"]),
+                                            thumbnail_url=res.get("thumb", res["file"]),
                                             document_url=res["file"],
                                             mime_type=res["mime_type"],
                                             reply_markup=self.generate_markup(
@@ -432,9 +432,9 @@ class Events(InlineUnit):
                             ),
                             disable_web_page_preview=True,
                         ),
-                        thumb_url=thumb,
-                        thumb_width=128,
-                        thumb_height=128,
+                        thumbnail_url=thumb,
+                        thumbnail_width=128,
+                        thumbnail_height=128,
                         reply_markup=self.generate_markup(
                             {
                                 "text": self.translator.getkey("inline.run_command"),
@@ -462,11 +462,11 @@ class Events(InlineUnit):
                             ),
                             disable_web_page_preview=True,
                         ),
-                        thumb_url=(
+                        thumbnail_url=(
                             "https://img.icons8.com/fluency/50/000000/info-squared.png"
                         ),
-                        thumb_width=128,
-                        thumb_height=128,
+                        thumbnail_width=128,
+                        thumbnail_height=128,
                     )
                 ],
                 cache_time=0,
@@ -489,11 +489,11 @@ class Events(InlineUnit):
                         ),
                         disable_web_page_preview=True,
                     ),
-                    thumb_url=(
+                    thumbnail_url=(
                         "https://img.icons8.com/fluency/50/000000/info-squared.png"
                     ),
-                    thumb_width=128,
-                    thumb_height=128,
+                    thumbnail_width=128,
+                    thumbnail_height=128,
                 )
             ]
             + [i[0] for i in _help],

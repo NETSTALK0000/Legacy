@@ -214,7 +214,7 @@ class InlineQuery(AiogramInlineQuery):
                 title=title,
                 description=description,
                 input_message_content=InputTextMessageContent(
-                    "😶‍🌫️ <i>There is nothing here...</i>",
+                    message_text="😶‍🌫️ <i>Здесь ничего нет...</i>",
                     parse_mode="HTML",
                 ),
                 thumb_url=thumb_url,
@@ -224,11 +224,11 @@ class InlineQuery(AiogramInlineQuery):
         ]
 
     async def e400(self):
-        await self.answer(
+        await self.inline_query.answer(
             self._get_res(
                 "🚫 400",
                 (
-                    "Bad request. You need to pass right arguments, follow module's"
+                    "Плохая просьба. Вам нужно передать правильные аргументы, следуйте инструкциям модуля"
                     " documentation"
                 ),
                 "https://img.icons8.com/color/344/swearing-male--v1.png",
@@ -237,40 +237,40 @@ class InlineQuery(AiogramInlineQuery):
         )
 
     async def e403(self):
-        await self.answer(
+        await self.inline_query.answer(
             self._get_res(
                 "🚫 403",
-                "You have no permissions to access this result",
+                "У вас нет разрешений на доступ к этому результату",
                 "https://img.icons8.com/external-wanicon-flat-wanicon/344/external-forbidden-new-normal-wanicon-flat-wanicon.png",
             ),
             cache_time=0,
         )
 
     async def e404(self):
-        await self.answer(
+        await self.inline_query.answer(
             self._get_res(
                 "🚫 404",
-                "No results found",
+                "Результаты не найдены",
                 "https://img.icons8.com/external-justicon-flat-justicon/344/external-404-error-responsive-web-design-justicon-flat-justicon.png",
             ),
             cache_time=0,
         )
 
     async def e426(self):
-        await self.answer(
+        await self.inline_query.answer(
             self._get_res(
                 "🚫 426",
-                "You need to update Hikka before sending this request",
+                "Вам необходимо обновить Legacy перед отправкой этого запроса",
                 "https://img.icons8.com/fluency/344/approve-and-update.png",
             ),
             cache_time=0,
         )
 
     async def e500(self):
-        await self.answer(
+        await self.inline_query.answer(
             self._get_res(
                 "🚫 500",
-                "Internal userbot error while processing request. More info in logs",
+                "Внутренняя ошибка userbot при обработке запроса. Дополнительная информация в журналах",
                 "https://img.icons8.com/external-vitaliy-gorbachev-flat-vitaly-gorbachev/344/external-error-internet-security-vitaliy-gorbachev-flat-vitaly-gorbachev.png",
             ),
             cache_time=0,
