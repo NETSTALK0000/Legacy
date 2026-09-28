@@ -324,7 +324,7 @@ def parse_arguments() -> dict:
         dest="bot_token",
         action="store",
         type=str,
-        help="Your inline bot token",
+        help="Ваш встроенный токен бота",
     )
     arguments = parser.parse_args()
     logging.debug(arguments)
@@ -565,7 +565,7 @@ class Legacy:
 
     async def _phone_login(self, client: CustomTelegramClient) -> bool:
         phone = input(
-            "\033[0;96mEnter phone: \033[0m" if self.arguments.tty else "Enter phone: "
+            "\033[0;96mВведите номер: \033[0m" if self.arguments.tty else "Введите номер: "
         )
 
         await client.start(phone)
@@ -604,15 +604,15 @@ class Legacy:
 
             if (
                 input(
-                    "\033[0;96mUse QR code? [y/N]: \033[0m"
+                    "\033[0;96mИспользовать QR-код? [y/N]: \033[0m"
                     if self.arguments.tty
-                    else "Use QR code? [y/N]: "
+                    else "Использовать QR-код? [y/N]: "
                 ).lower()
                 != "y"
             ):
                 return await self._phone_login(client)
 
-            print("\033[0;96mLoading QR code...\033[0m")
+            print("\033[0;96mЗагрузка QR code...\033[0m")
             qr_login = await client.qr_login()
 
             def print_qr():
@@ -620,8 +620,8 @@ class Legacy:
                 qr.add_data(qr_login.url)
                 print("\033[2J\033[3;1f")
                 qr.print_ascii(invert=True)
-                print("\033[0;96mScan the QR code above to log in.\033[0m")
-                print("\033[0;96mPress Ctrl+C to cancel.\033[0m")
+                print("\033[0;96mОтсканируйте QR-код выше, чтобы войти в систему.\033[0m")
+                print("\033[0;96mНажмите Ctrl+C для отмены.\033[0m")
 
             async def qr_login_poll() -> bool:
                 logged_in = False
@@ -650,9 +650,9 @@ class Legacy:
                 password = await client(GetPasswordRequest())
                 while True:
                     _2fa = getpass(
-                        f"\033[0;96mEnter 2FA password ({password.hint}): \033[0m"
+                        f"\033[0;96mВведите пароль от 2FA ({password.hint}): \033[0m"
                         if self.arguments.tty
-                        else f"Enter 2FA password ({password.hint}): "
+                        else f"Введите пароль от 2FA ({password.hint}): "
                     )
                     try:
                         await client._on_login(
@@ -665,7 +665,7 @@ class Legacy:
                             ).user
                         )
                     except PasswordHashInvalidError:
-                        print("\033[0;91mInvalid 2FA password!\033[0m")
+                        print("\033[0;91mНеверный пароль 2FA!\033[0m")
                     except FloodWaitError as e:
                         seconds, minutes, hours = (
                             e.seconds % 3600 % 60,
@@ -726,7 +726,7 @@ class Legacy:
                     patcher.patch(client, session)
 
                 await client.connect()
-                client.phone = "Why do you need your own phone number?"
+                client.phone = "Зачем вам нужен свой номер телефона?"
 
                 self.clients += [client]
             except sqlite3.OperationalError:
@@ -784,7 +784,7 @@ class Legacy:
                 diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
             except Exception:
                 diff = ""
-            upd = "Update required" if diff else "Up-to-date"
+            upd = "Требуется обновление" if diff else "Up-to-date"
 
             logo = (
                 "   __\n"
