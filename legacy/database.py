@@ -254,9 +254,8 @@ class Database(dict):
             None,
         )
 
-        if (current_value := self.get(owner, key, None)) and type(
-            current_value
-        ) is not type(default):
+        current_value = self.get(owner, key, None)
+        if current_value is not None and type(current_value) is not type(default):
             raise ValueError(
                 f"Can't switch the type of pointer in database (current: {type(current_value)}, requested: {type(default)})"
             )
