@@ -535,6 +535,9 @@ async def answer(
         )
     )
 
+    if (caption := kwargs.pop("caption", None)) is not None:
+        return await answer_file(message, response, caption, **kwargs)
+
     if isinstance(response, str) and not kwargs.pop("asfile", False):
         text, entities = parse_mode.parse(response)
 
