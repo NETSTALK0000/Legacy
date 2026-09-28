@@ -120,6 +120,7 @@ class Events(InlineUnit):
                                 description=self.sanitise_text(res.get("description")),
                                 input_message_content=InputTextMessageContent(
                                     message_text=self.sanitise_text(res["message"]),
+                                    parse_mode="HTML",
                                     disable_web_page_preview=True,
                                 ),
                                 thumbnail_url=res.get("thumb"),
