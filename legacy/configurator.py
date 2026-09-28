@@ -33,51 +33,51 @@ def api_config(tty: typing.Optional[bool] = None):
 
     if tty is None:
         print("\033[0;91mThe quick brown fox jumps over the lazy dog\033[0m")
-        tty = input("Is the text above colored? [y/N]").lower() == "y"
+        tty = input("Текст выше цветной? [y/N]").lower() == "y"
 
     if tty:
         print_banner("banner.txt")
 
-    tty_print("\033[0;95mWelcome to Legacy Userbot!\033[0m", tty)
-    tty_print("\033[0;96m1. Go to https://my.telegram.org and login\033[0m", tty)
-    tty_print("\033[0;96m2. Click on \033[1;96mAPI development tools\033[0m", tty)
+    tty_print("\033[0;95mДобро пожаловать в Legacy Userbot!\033[0m", tty)
+    tty_print("\033[0;96m1. 1. Перейди на https://my.telegram.org и войди\033[0m", tty)
+    tty_print("\033[0;96m2. Нажми на \033[1;96mAPI development tools\033[0m", tty)
     tty_print(
         (
-            "\033[0;96m3. Create a new application, by entering the required"
+            "\033[0;96m3. Создай новое приложение, заполнив нужные поля и сохрани"
             " details\033[0m"
         ),
         tty,
     )
     tty_print(
         (
-            "\033[0;96m4. Copy your \033[1;96mAPI ID\033[0;96m and \033[1;96mAPI"
+            "\033[0;96m4. Скопируй \033[1;96mAPI ID\033[0;96m и \033[1;96mAPI"
             " hash\033[0m"
         ),
         tty,
     )
 
-    while api_id := tty_input("\033[0;95mEnter API ID: \033[0m", tty):
+    while api_id := tty_input("\033[0;95mВведи API ID: \033[0m", tty):
         if api_id.isdigit():
             break
 
-        tty_print("\033[0;91mInvalid ID\033[0m", tty)
+        tty_print("\033[0;91mНеверный ID\033[0m", tty)
 
     if not api_id:
-        tty_print("\033[0;91mCancelled\033[0m", tty)
+        tty_print("\033[0;91mОтменено\033[0m", tty)
         sys.exit(0)
 
-    while api_hash := tty_input("\033[0;95mEnter API hash: \033[0m", tty):
+    while api_hash := tty_input("\033[0;95mВведи API hash: \033[0m", tty):
         if len(api_hash) == 32 and all(
             symbol in string.hexdigits for symbol in api_hash
         ):
             break
 
-        tty_print("\033[0;91mInvalid hash\033[0m", tty)
+        tty_print("\033[0;91mНеверный hash\033[0m", tty)
 
     if not api_hash:
-        tty_print("\033[0;91mCancelled\033[0m", tty)
+        tty_print("\033[0;91mОтменено\033[0m", tty)
         sys.exit(0)
 
     main.save_config_key("api_id", int(api_id))
     main.save_config_key("api_hash", api_hash)
-    tty_print("\033[0;92mAPI config saved\033[0m", tty)
+    tty_print("\033[0;92mКонфиг API сохранён\033[0m", tty)
