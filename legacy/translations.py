@@ -58,7 +58,6 @@ class BaseTranslator:
         if all(len(key) == 2 for key in content):
             return {
                 language: {
-                    {
                         (
                             f"{module.strip('$')}.{key}"
                             if module.startswith("$")
@@ -67,7 +66,6 @@ class BaseTranslator:
                         for module, strings in pack.items()
                         for key, value in strings.items()
                         if key != "name"
-                    }
                 }
                 for language, pack in content.items()
             }
