@@ -29,7 +29,6 @@ from aiogram.types import (
     InputMediaDocument,
     InputMediaPhoto,
     InputMediaVideo,
-    WebAppInfo,
     SwitchInlineQueryChosenChat,
 )
 
@@ -180,14 +179,6 @@ class Utils(InlineUnit):
                             InlineKeyboardButton(
                                 text=str(button["text"]),
                                 callback_data=button["data"],
-                                style=button.get("style"),
-                            )
-                        ]
-                    elif "web_app" in button:
-                        line += [
-                            InlineKeyboardButton(
-                                text=str(button["text"]),
-                                web_app=WebAppInfo(url=button.get("data") or button.get("web_app")),
                                 style=button.get("style"),
                             )
                         ]
@@ -741,7 +732,6 @@ class Utils(InlineUnit):
                 or "switch_inline_query_chosen_chat" in button
                 or "switch_inline_query_current_chat" in button
                 or "switch_inline_query" in button
-                or "web_app" in button
                 or "login_url" in button
                 for button in row
             )
@@ -759,7 +749,6 @@ class Utils(InlineUnit):
                 "  - switch_inline_query_chosen_chat\n"
                 "  - switch_inline_query_current_chat\n"
                 "  - switch_inline_query\n"
-                "  - web_app\n"
                 "  - login_url"
             )
             return None
