@@ -39,7 +39,7 @@ def api_config(tty: typing.Optional[bool] = None):
         print_banner("banner.txt")
 
     tty_print("\033[0;95mДобро пожаловать в Legacy Userbot!\033[0m", tty)
-    tty_print("\033[0;96m1. 1. Перейди на https://my.telegram.org и войди\033[0m", tty)
+    tty_print("\033[0;96m1. Перейди на https://my.telegram.org и войди\033[0m", tty)
     tty_print("\033[0;96m2. Нажми на \033[1;96mAPI development tools\033[0m", tty)
     tty_print(
         (
