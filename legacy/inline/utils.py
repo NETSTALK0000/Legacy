@@ -187,7 +187,7 @@ class Utils(InlineUnit):
                         line += [
                             InlineKeyboardButton(
                                 text=str(button["text"]),
-                                web_app=WebAppInfo(url=button["data"]),
+                                web_app=WebAppInfo(url=button.get("data") or button.get("web_app")),
                                 style=button.get("style"),
                             )
                         ]
