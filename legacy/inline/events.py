@@ -384,12 +384,8 @@ class Events(InlineUnit):
                 ):
                     query = query.split(maxsplit=1)[1] if len(query.split()) > 1 else ""
 
-                    handler = button.get("handler") or button.get("callback")
-                    if not handler:
-                        return
-
                     try:
-                        return await handler(
+                        return await button["handler"](
                             InlineCall(chosen_inline_query, self, unit_id),
                             query,
                             *button.get("args", []),
