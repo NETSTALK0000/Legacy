@@ -991,7 +991,11 @@ class LoaderMod(loader.Module):
                 word_variants[current_lang][2], word_variant
             )
 
-            modconf = mod_config_string.format(mod_config_len)
+            modconf = mod_config_string.format(
+                mod_config_len,
+                prefix=self.get_prefix(),
+                module=instance.__class__.__name__,
+                )
 
         try:
             return (

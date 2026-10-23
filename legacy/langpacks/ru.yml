@@ -474,7 +474,7 @@ loader:
   bad_unicode: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Неверная кодировка модуля</b>"
   load_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Загрузка не увенчалась успехом. Смотри логи.</b>"
   loaded: "<blockquote><emoji document_id=5253521692008917018>🌙</emoji> <b>Модуль</b> <code>{}</code>{} <b>загружен {}</b>{}{}{}{}{}{}{}</blockquote>"
-  mod_config: "<emoji document_id=5316832430529722441>⚙️</emoji> <b>Доступно</b> <code>{}</code> <b>значений для конфигурации</b>"
+  mod_config: "<emoji document_id=5316832430529722441>⚙️</emoji> <b>Доступно</b> <code>{}</code> <b>значений для конфигурации. Открыть:</b> <code>{prefix}config {module}</code>"
   no_class: "<b>А что выгружать то?</b>"
   unloaded: "{} <b>Модуль {} выгружен.</b>"
   not_unloaded: "{} <b>Модуль {} не выгружен.</b>"
