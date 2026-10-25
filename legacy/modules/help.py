@@ -245,6 +245,16 @@ class Help(loader.Module):
                 )
             )
 
+
+            config_hint = ""
+        if hasattr(module, "config") and module.config:
+            config_hint = "\n\n" + self.strings("mod_config").format(
+                len(module.config),
+                prefix=self.get_prefix(message.sender_id),
+                module=module.__class__.__name__,
+            )
+
+
         await utils.answer(
             message,
             reply
@@ -254,6 +264,7 @@ class Help(loader.Module):
                 if module.__origin__.startswith("<core")
                 else ""
             ),
+            + config_hint,
         )
 
     @loader.command()
