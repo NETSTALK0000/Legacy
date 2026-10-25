@@ -263,7 +263,7 @@ class Help(loader.Module):
                 f"\n\n{self.strings('core_notice')}"
                 if module.__origin__.startswith("<core")
                 else ""
-            ),
+            )
             + config_hint,
         )
 
