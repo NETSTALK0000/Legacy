@@ -537,6 +537,7 @@ translations:
   rpc_error: "<emoji document_id=5877477244938489129>🚫</emoji> <b>Команда</b> <code>{}</code> <b>не вдалася через помилку RPC:</b> <code>{}</code>"
   _cmd_doc_dllangpack: "[посилання на пк | без аргументів щоб видалити] - Змінити зовнішній пак"
   _cmd_doc_setlang: "[мови] - Змінити стандартну мову"
+  loading: "⏳ <b>Застосовую налаштування...</b>"
 
 eval:
   eval: "<emoji document_id={}>💻</emoji><b> Код:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"

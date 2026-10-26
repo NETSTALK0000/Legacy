@@ -56,8 +56,10 @@ class Translations(loader.Module):
             )
             return
 
+        status_msg = await utils.answer(message, self.strings("loading"))
+
         if any(len(i) != 2 and not utils.check_url(i) for i in args.split()):
-            await utils.answer(message, self.strings("incorrect_language"))
+            await utils.answer(status_msg, self.strings("incorrect_language"))
             return
 
         seen = set()
@@ -68,7 +70,7 @@ class Translations(loader.Module):
         await self.allmodules.reload_translations()
 
         await utils.answer(
-            message,
+            status_msg,
             self.strings("lang_saved").format(
                 "".join(
                     [

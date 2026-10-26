@@ -555,6 +555,7 @@ translations:
   _cmd_doc_dllangpack: "[link to a langpack | empty to remove] - Change Legacy translate pack (external)"
   _cmd_doc_setlang: "[languages in the order of priority] - Change default language"
   _cls_doc: "Processes internal translations"
+  loading: "⏳ <b>Applying settings...</b>"
 
 eval:
   name: "Evaluator"
