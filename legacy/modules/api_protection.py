@@ -239,7 +239,7 @@ class APIRatelimiterMod(loader.Module):
             message=message,
             text=self.strings(text_key),
             reply_markup=[
-                {"text": self.strings("btn_no"), "action": "close"},
+                {"text": self.strings("btn_no"), "action": "close", "style": "danger"},
                 {"text": self.strings("btn_yes"), "callback": self._finish},
             ],
         )
@@ -252,8 +252,8 @@ class APIRatelimiterMod(loader.Module):
         text = self.strings("off" if is_disabled else "on")
         
         if is_disabled:
-            markup = [{"text": "✅ Включить", "callback": self._finish}]
+            markup = [{"text": "✅ Включить", "callback": self._finish, "style": "success"}]
         else:
-            markup = [{"text": "✅ Спасибо", "action": "close"}]
+            markup = [{"text": "✅ Спасибо", "action": "close", "style": "success"}]
 
         await call.edit(text, reply_markup=markup)
