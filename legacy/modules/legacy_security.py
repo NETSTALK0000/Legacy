@@ -1061,7 +1061,8 @@ class LegacySecurityMod(loader.Module):
                 if arg_target.isdigit() or arg_target.startswith("@") or arg_target.startswith("-"):
                     try:
                         target = await self._client.get_entity(
-                            int(arg_target) if arg_target.isdigit or arg_target.startswith("-") else arg_target
+                            int(arg_target) if arg_target.isdigit() or arg_target.startswith("-") else arg_target,
+                            exp=0,
                         )
                         rule_name = args[2]
                     except (ValueError, TypeError):
