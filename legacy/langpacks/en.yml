@@ -202,6 +202,7 @@ legacy_backup:
   invalid_args: "🚫 <b>Specify correct backup period in hours, or `0` to disable</b>"
   backup_caption: "👆 <b>This is your backup.\nDo not give it to anyone, it contains personal info.\nIf you need to restore it, you can use</b> <code>{prefix}restore</code> <b>in reply to this file or button below.</b>"
   reply_to_file: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Reply to .backup file</b>"
+  backup_wait: "Making a backup..."
   backup_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Backup restored, restarting...</b>"
   backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup has been sent to <a href='{}'>legacy-backups</a></b>"
   restore_this: "↪️ Restore this"
