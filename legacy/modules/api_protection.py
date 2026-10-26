@@ -233,7 +233,7 @@ class APIRatelimiterMod(loader.Module):
     @loader.command()
     async def api_fw_protection(self, message: Message):
         is_disabled = self.get("disable_protection", True)
-        text_key = "u_sure_on" if is_disabled else "u_sure_off"
+        text_key = "u_sure_off" if is_disabled else "u_sure_on"
 
         await self.inline.form(
             message=message,
