@@ -248,3 +248,12 @@ class APIRatelimiterMod(loader.Module):
         is_disabled = self.get("disable_protection", True)
         self.set("disable_protection", not is_disabled)
         await call.edit(self.strings("off" if is_disabled else "on"))
+
+        text = self.strings("off" if is_disabled else "on")
+        
+        if is_disabled:
+            markup = [{"text": "✅ Включить", "callback": self._finish}]
+        else:
+            markup = [{"text": "✅ Спасибо", "action": "close"}]
+
+        await call.edit(text, reply_markup=markup)
