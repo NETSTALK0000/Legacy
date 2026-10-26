@@ -232,9 +232,12 @@ class APIRatelimiterMod(loader.Module):
 
     @loader.command()
     async def api_fw_protection(self, message: Message):
+        is_disabled = self.get("disable_protection", True)
+        text_key = "u_sure_on" if is_disabled else "u_sure_off"
+
         await self.inline.form(
             message=message,
-            text=self.strings("u_sure"),
+            text=self.strings(text_key),
             reply_markup=[
                 {"text": self.strings("btn_no"), "action": "close"},
                 {"text": self.strings("btn_yes"), "callback": self._finish},
@@ -242,6 +245,6 @@ class APIRatelimiterMod(loader.Module):
         )
 
     async def _finish(self, call: InlineCall):
-        state = self.get("disable_protection", True)
-        self.set("disable_protection", not state)
-        await call.edit(self.strings("on" if state else "off"))
+        is_disabled = self.get("disable_protection", True)
+        self.set("disable_protection", not is_disabled)
+        await call.edit(self.strings("off" if is_disabled else "on"))
