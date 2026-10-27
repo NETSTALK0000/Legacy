@@ -315,7 +315,11 @@ class CommandDispatcher:
             and not self._db.get(main.__name__, "no_nickname", False)
             and command not in self._db.get(main.__name__, "nonickcmds", [])
             and initiator not in self._db.get(main.__name__, "nonickusers", [])
-            and not self.security.check_tsec(initiator, command)
+            and not self.security.check_tsec(
+                initiator,
+                command,
+                utils.get_chat_id(event),
+            )
             and utils.get_chat_id(event)
             not in self._db.get(main.__name__, "nonickchats", [])
         ):

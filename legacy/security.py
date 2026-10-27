@@ -334,7 +334,13 @@ class SecurityManager:
             for rule in self._tsec_user
         )
 
-    def check_tsec(self, user_id: int, command: str) -> bool:
+
+    def check_tsec(
+        self,
+        user_id: int,
+        command: str,
+        chat_id: typing.Optional[int] = None,
+    ) -> bool:
         for info in self._sgroups.copy().values():
             if user_id in info.users:
                 for permission in info.permissions:
@@ -357,8 +363,20 @@ class SecurityManager:
             ):
                 return True
 
-        return False
+        if chat_id is not None:
+            for info in self._tsec_chat.copy():
+                if info["target"] == chat_id and (
+                    info["rule_type"] == "command"
+                    and info["rule"] == command
+                    or info["rule_type"] == "module"
+                    and command in self._client.loader.commands
+                    and info["rule"]
+                    == self._client.loader.commands[command].__qualname__.split(".")[0]
+                ):
+                    return True
 
+        return False
+    
     async def check(
         self,
         message: typing.Optional[Message],
