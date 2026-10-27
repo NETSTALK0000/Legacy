@@ -1145,9 +1145,9 @@ class LegacySecurityMod(loader.Module):
             await utils.answer(
                 message,
                 self.strings("rule_removed").format(
+                    utils.escape_html(rule_name),
                     utils.get_entity_url(target),
                     utils.escape_html(get_display_name(target)),
-                    utils.escape_html(rule_name)
                 )
             )
 
