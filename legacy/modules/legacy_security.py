@@ -1105,21 +1105,28 @@ class LegacySecurityMod(loader.Module):
             target_rule = args[2]
 
             initial_len = len(group.permissions)
-            group.permissions = [r for r in group.permissions if r.get("rule") != target_rule]
+            new_permissions = [
+                r for r in group.permissions if r.get("rule") != target_rule
+            ]
 
-            if len(group.permissions) == initial_len:
+            if len(new_permissions) == initial_len:
                 await utils.answer(message, self.strings("no_rules"))
                 return
 
+            self._sgroups[group.name] = SecurityGroup(
+                group.name,
+                group.users,
+                new_permissions,
+            )
+            group = self._sgroups[group.name]
             self._reload_sgroups()
 
             await utils.answer(
                 message,
                 self.strings("rule_removed").format(
-                    utils.escape_html(args[2]),
+                    utils.escape_html(target_rule),
                     "",
                     utils.escape_html(group.name),
-                    utils.escape_html(target_rule),
                 ),
             )
 
