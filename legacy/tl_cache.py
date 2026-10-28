@@ -476,6 +476,9 @@ class CustomTelegramClient(TelegramClient):
                 if caller_module:
                     alert_msg = self.loader.translator.getkey("translations.security_alert")
 
+                    if not alert_msg:
+                        alert_msg = "🛡️ <b>Служба безопасности Legacy:</b>\nМодуль <code>{}</code> пытался выполнить <code>{}</code>!\n🚫 <b>Действие заблокировано.</b>\n🔍 <i>Детали: {}</i>"
+
                     logger.warning(
                         alert_msg.format(
                             caller_module,
