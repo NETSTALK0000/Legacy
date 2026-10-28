@@ -551,7 +551,6 @@ translations:
   _cmd_doc_dllangpack: "[ссылка на пак | пустое чтобы удалить] - Изменить внешний пак перевода"
   _cmd_doc_setlang: "[языки] - Изменить стандартный язык"
   loading: "⏳ <b>Применяю настройки...</b>"
-  security_alert: "🛡️ <b>Служба безопасности Legacy:</b>\nМодуль <code>{}</code> пытался выполнить <code>{}</code>!\n🚫 <b>Действие заблокировано.</b>\n🔍 <i>Детали: {}</i>"
 
 eval:
   eval: "<emoji document_id={}>💻</emoji><b> Код:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
