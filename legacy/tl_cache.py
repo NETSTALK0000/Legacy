@@ -475,10 +475,10 @@ class CustomTelegramClient(TelegramClient):
 
                 if caller_module:
                     logger.warning(
-                        "🛡️ <b>Служба безопасности Legacy:</b>\n"
-                        "Модуль <b>%s</b> попытался выполнить <code>%s</code>!\n"
-                        "🚫 <b>Действие заблокировано.</b>\n"
-                        "🔍 <i>Детали: %s</i>",
+                        "🛡️ Служба безопасности:\n"
+                        "Модуль %s попытался выполнить %s!\n"
+                        "🚫 Действие заблокировано.\n"
+                        "🔍 Детали: %s",
                         caller_module,
                         item.__class__.__name__,
                         utils.escape_html(str(item)),
