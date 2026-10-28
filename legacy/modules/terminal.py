@@ -255,6 +255,98 @@ class SudoMessageEditor(MessageEditor):
 class TerminalMod(loader.Module):
     strings = {"name": "Terminal"}
 
+    DANGER_RM_TARGETS = {
+        "/", "/bin", "/boot", "/dev", "/etc", "/lib", "/lib64", "/opt",
+        "/proc", "/root", "/sbin", "/sys", "/usr", "/var",
+    }
+    DANGER_RM_FILES = {
+        "/etc/passwd", "/etc/shadow",
+    }
+    DANGER_COMMAND = [
+        r"dd\s+.*if=.*of=/dev/",
+        r"mkfs\.",
+        r"fdisk\s+\/dev/",
+        r"chmod\s+.*000\s+.*\/",
+        r":\(\)\s*\{\s*:\|:&\s*\}\s*;\s*:",
+        r"cat\s+.*\/dev\/urandom\s+>\s+\/dev\/[hsv]d[a-z]",
+        r"ln\s+.*-s\s+\/\s+\/dev\/null",
+        r"curl\s+.*\|\s*(sh|bash|zsh|dash|ksh)",
+        r"wget\s+.*-O\s*-\s*\|\s*(sh|bash|zsh|dash|ksh)",
+        r"nc\s+.*-e\s+(sh|bash|zsh)",
+        r"ncat\s+.*-e\s+(sh|bash|zsh)",
+        r"python[23]?\s+-c\s+[\"']import\s+os",
+        r"python[23]?\s+-c\s+[\"']import\s+socket",
+        r">\s*/etc/passwd",
+        r">\s*/etc/shadow",
+        r"mv\s+.*\s+/etc/passwd",
+        r"mv\s+.*\s+/etc/shadow",
+        r"shred\s+",
+    ]
+
+    @staticmethod
+    def _split_command(cmd: str) -> list[str]:
+        import shlex
+        try:
+            lexer = shlex.shlex(cmd, posix=True, punctuation_chars=True)
+            lexer.whitespace_split = True
+            return list(lexer)
+        except ValueError:
+            return []
+
+    @classmethod
+    def _is_danger_rm_target(cls, target: str) -> bool:
+        import os
+        if not target or target.startswith("-"):
+            return False
+
+        target = target.rstrip()
+        normalized = os.path.normpath(target)
+
+        if normalized in cls.DANGER_RM_TARGETS | cls.DANGER_RM_FILES:
+            return True
+
+        if normalized == "/":
+            return target in {"/*", "/**"}
+
+        for danger_target in cls.DANGER_RM_TARGETS - {"/"}:
+            if normalized in {f"{danger_target}/*", f"{danger_target}/**"}:
+                return True
+
+        return False
+
+    @classmethod
+    def _has_danger_rm(cls, cmd: str) -> bool:
+        tokens = cls._split_command(cmd)
+        if not tokens:
+            return False
+
+        separators = {";", "&&", "||", "|", "&"}
+        rm_names = {"rm", "/bin/rm", "/usr/bin/rm"}
+
+        for index, token in enumerate(tokens):
+            if token not in rm_names:
+                continue
+
+            for target in tokens[index + 1 :]:
+                if target in separators:
+                    break
+                if target == "--":
+                    continue
+                if cls._is_danger_rm_target(target):
+                    return True
+
+        return False
+
+    def _is_dangerous(self, cmd: str) -> bool:
+        import re
+        if self._has_danger_rm(cmd):
+            return True
+
+        for pattern in self.DANGER_COMMAND:
+            if re.search(pattern, cmd, re.IGNORECASE):
+                return True
+        return False
+
     def __init__(self):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
@@ -292,6 +384,13 @@ class TerminalMod(loader.Module):
         cmd: str,
         editor: typing.Optional[MessageEditor] = None,
     ):
+
+        if self._is_dangerous(cmd):
+            return await utils.answer(
+                message,
+                self.strings("danger_command").format(utils.escape_html(cmd)),
+            )
+        
         if len(cmd.split(" ")) > 1 and cmd.split(" ")[0] == "sudo":
             needsswitch = True
 
