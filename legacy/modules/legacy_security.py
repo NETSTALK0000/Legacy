@@ -366,8 +366,11 @@ class LegacySecurityMod(loader.Module):
 
             try:
                 user = await self._client.get_entity(user, exp=0)
-            except ValueError:
-                await utils.answer(message, self.strings("no_args"))
+            except (ValueError, TypeError):
+                await utils.answer(
+                    message, 
+                    self.strings("user_not_found").format(utils.escape_html(str(user)))
+                )
                 return
         else:
             if not message.is_reply:
@@ -377,7 +380,7 @@ class LegacySecurityMod(loader.Module):
             group, user = args, await (await message.get_reply_message()).get_sender()
 
         if not (group := self._sgroups.get(group)):
-            await utils.answer(message, self.strings("sgroup_not_found").format(group))
+            await utils.answer(message, self.strings("sgroup_not_found").format(group, group))
             return
 
         user_id = user.user_id if isinstance(user, PeerUser) else user.id
@@ -418,8 +421,11 @@ class LegacySecurityMod(loader.Module):
 
             try:
                 user = await self._client.get_entity(user, exp=0)
-            except ValueError:
-                await utils.answer(message, self.strings("no_args"))
+            except (ValueError, TypeError):
+                await utils.answer(
+                    message, 
+                    self.strings("user_not_found").format(utils.escape_html(str(user)))
+                )
                 return
         else:
             if not message.is_reply:
@@ -429,7 +435,7 @@ class LegacySecurityMod(loader.Module):
             group, user = args, await (await message.get_reply_message()).get_sender()
 
         if not (group := self._sgroups.get(group)):
-            await utils.answer(message, self.strings("sgroup_not_found").format(group))
+            await utils.answer(message, self.strings("sgroup_not_found").format(group, group))
             return
 
         user_id = user.user_id if isinstance(user, PeerUser) else user.id
