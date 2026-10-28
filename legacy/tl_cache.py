@@ -9,6 +9,7 @@ import inspect
 import logging
 import time
 import typing
+from . import utils
 
 from legacytl import TelegramClient
 from legacytl import helpers
@@ -455,27 +456,34 @@ class CustomTelegramClient(TelegramClient):
         new_request = []
 
         for item in request:
-            if item.CONSTRUCTOR_ID in self._forbidden_constructors and next(
-                (
-                    frame_info.frame.f_locals["self"]
-                    for frame_info in inspect.stack()
-                    if hasattr(frame_info, "frame")
-                    and hasattr(frame_info.frame, "f_locals")
-                    and isinstance(frame_info.frame.f_locals, dict)
-                    and "self" in frame_info.frame.f_locals
-                    and isinstance(frame_info.frame.f_locals["self"], Module)
-                    and not getattr(
-                        frame_info.frame.f_locals["self"], "__origin__", ""
-                    ).startswith("<core")
-                ),
-                None,
-            ):
-                logger.debug(
-                    "🎉 I protected you from unintented %s (%s)!",
-                    item.__class__.__name__,
-                    item,
+            if item.CONSTRUCTOR_ID in self._forbidden_constructors:
+                caller_module = next(
+                    (
+                        frame_info.frame.f_locals["self"].__class__.__name__
+                        for frame_info in inspect.stack()
+                        if hasattr(frame_info, "frame")
+                        and hasattr(frame_info.frame, "f_locals")
+                        and isinstance(frame_info.frame.f_locals, dict)
+                        and "self" in frame_info.frame.f_locals
+                        and isinstance(frame_info.frame.f_locals["self"], Module)
+                        and not getattr(
+                            frame_info.frame.f_locals["self"], "__origin__", ""
+                        ).startswith("<core")
+                    ),
+                    None,
                 )
-                continue
+
+                if caller_module:
+                    alert_msg = self.loader.translator.getkey("translations.security_alert")
+
+                    logger.warning(
+                        alert_msg.format(
+                            caller_module,
+                            item.__class__.__name__,
+                            utils.escape_html(str(item)),
+                        )
+                    )
+                    continue
 
             new_request += [item]
 
