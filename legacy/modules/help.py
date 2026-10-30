@@ -246,7 +246,7 @@ class Help(loader.Module):
             )
 
 
-            config_hint = ""
+        config_hint = ""
         if hasattr(module, "config") and module.config:
             config_hint = "\n\n" + self.lookup("Loader").strings("mod_config").format(
                 len(module.config),
