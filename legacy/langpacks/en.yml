@@ -95,6 +95,7 @@ legacy_security:
   _cmd_doc_newsgroup: "<name> - Create new security group"
   _cmd_doc_sgroupadd: "<name> [user or reply] - Add user to security group"
   _cmd_doc_sgroupdel: "<name> [user or reply] - Remove user from security group"
+  already_in_group: "<emoji document_id=5271533904380046720>🙅‍♂️</emoji> <b>User ({}: {}) is already in group '{}'!</b>"
 
 legacy_settings:
   name: "LegacySettings"
@@ -193,6 +194,7 @@ terminal:
   _cmd_doc_terminate: "[-f to force kill] - Use in reply to send SIGTERM to a process"
   _cmd_doc_pip: "Install and manage Python packages using pip"
   _cls_doc: "Runs commands"
+  danger_command: "❌ <b>Command (<code>{}</code>) was cancelled for your safety.</b>\n\n💡 <i>This is a safety measure. Do not report it</i>"
 
 legacy_backup:
   name: "LegacyBackup"
@@ -240,11 +242,11 @@ settings:
   db_cleared: "<emoji document_id=5197474765387864959>👍</emoji> <b>Database cleared</b>"
   legacy: |
     <blockquote>{}</blockquote>
-    <blockquote><b><emoji document_id=5217890643321300022>✈️</emoji> <b>legacy-tl-fork:</b> <i>{}</i>
-    <blockquote><b><emoji document_id=5258391003806584549>🧃</emoji> <b>Aiogram:</b> <i>{}</i>
+    <blockquote><emoji document_id=5217890643321300022>✈️</emoji> <b>legacy-tl-New-Fork:</b> <i>{}</i></blockquote>
+    <blockquote><emoji document_id=5258391003806584549>🧃</emoji> <b>Aiogram:</b> <i>{}</i>
     <emoji document_id=5289608677244811430>📁</emoji> <b>Python:</b> <i>{}</i></blockquote>
     <blockquote><emoji document_id=5316692281451887373>⭐️</emoji> <b>Special thanks</b></blockquote>
-    <blockquote>@Admt_450 — owner + fix + error detection and correction</blockquote>
+    <blockquote>@Netstalk404 — owner, fixes, features, optimization</blockquote>
   confirm_cleardb: "⚠️ <b>Are you sure, that you want to clear database?</b>"
   cleardb_confirm: "🗑 Clear database"
   cancel: "🚫 Cancel"

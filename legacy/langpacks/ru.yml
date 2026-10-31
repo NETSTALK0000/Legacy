@@ -93,6 +93,8 @@ legacy_security:
   _cmd_doc_newsgroup: "<имя> - Создать новую группу безопасности"
   _cmd_doc_sgroupadd: "<имя> [пользователь или ответ] - Добавить пользователя в группу безопасности"
   _cmd_doc_sgroupdel: "<имя> [пользователь или ответ] - Удалить пользователя из группы безопасности"
+  li: '<emoji document_id=4974307891025543730>▫️</emoji> <b><a href="{}">{}</a></b> <b>| префикс:</b> <code>{}</code>'
+  everyone: "🌍 Все (Inline)"
 
 legacy_settings:
   watchers: "<emoji document_id=5424885441100782420>👀</emoji> <b>Смотрители:</b>\n\n<b>{}</b>"
@@ -162,6 +164,10 @@ legacy_settings:
   core_protection_confirm: "⚠️ <b>ВНИМАТЕЛЬНО ПРОЧТИТЕ!</b>\n\nУдаляя защиту ядра, вы подтверждаете, что знаете что это и для чего оно. В обычном сценарии жизни вам <b>не нужно</b>. Если вы не разработчик, вам <b>не нужно</b>. Если вы не уверены, вам <b>не нужно</b>.\n\n<b>Вы уверены, что хотите удалить защиту ядра?</b>"
   core_protection_btn: "🔓 Удалить защиту ядра"
   core_protection_removed: "🔓 <b>Защита ядра успешно удалена</b>"
+  no_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Не указаны аргументы</b>"
+  invoke404: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Внутренний метод отладки</b> <code>{}</code> <b>не найден, следовательно не может быть вызван</b>"
+  module404: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Модуль</b> <code>{}</code> <b>не найден</b>"
+  invoking: "<emoji document_id=5213452215527677338>⏳</emoji> <b>Вызов внутреннего метода отладки</b> <code>{}</code> <b>у</b> <code>{}</code><b>...</b>"
 
 terminal:
   _cls_doc: "Выполняет команды"
@@ -237,8 +243,8 @@ settings:
   db_cleared: "<emoji document_id=5197474765387864959>👍</emoji> <b>База очищена</b>"
   legacy: | 
     <blockquote>{}</blockquote>
-    <blockquote><emoji document_id=6028346797368283073>✈️</emoji> <b>legacy-tl-fork:</b> <i>{}</i>
-    <blockquote><b><emoji document_id=5258391003806584549>🧃</emoji> <b>Aiogram:</b> <i>{}</i>
+    <blockquote><emoji document_id=6028346797368283073>✈️</emoji> <b>legacy-tl-New-Fork:</b> <i>{}</i></blockquote>
+    <blockquote><emoji document_id=5258391003806584549>🧃</emoji> <b>Aiogram:</b> <i>{}</i>
     <emoji document_id=5289608677244811430>📁</emoji> <b>Python:</b> <i>{}</i></blockquote>
     <blockquote><emoji document_id=5316692281451887373>⭐️</emoji> <b>Особая благодарность</b></blockquote>
     <blockquote>@Netstalk404 — поддержка + поиск и исправление багов</blockquote>
@@ -354,6 +360,7 @@ test:
   cancel: "🚫 Отмена"
   logs_cleared: "<emoji document_id=5255831443816327915>🗑</emoji> <b>Логи очищены</b>"
   _cmd_doc_clearlogs: "Очистить логи"
+  bad_module: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Модуль не найден</b>"
 
 update_notifier:
   update_required: "🆕 <b>Доступно обновление Legacy!</b>\n\nВышла новая версия Legacy.\n🔮 <b>Legacy <s>{}</s> -> {}</b>\n\n{}"
