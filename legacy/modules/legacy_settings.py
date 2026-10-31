@@ -768,7 +768,7 @@ class LegacySettingsMod(loader.Module):
                 photo=("https://i.postimg.cc/52yrpPLG/legacy-opening-tunnel.png"),
             )
 
-        url = await main.legacy.web.get_url(proxy_pass=True)
+        url = (await main.legacy.web.get_url(proxy_pass=True)).strip()
 
         await form.edit(
             self.strings("tunnel_opened"),
