@@ -630,12 +630,10 @@ class LoaderMod(loader.Module):
                 if not await self.install_requirements(requirements):
                     return await utils.answer(message, self.strings["requirements_failed"])
 
-                importlib.invalidate_caches()
-
-                kwargs = utils.get_kwargs()
-                kwargs["did_requirements"] = True
-
-                return await self.load_module(**kwargs)  # Try again
+                return await utils.answer(
+                    message,
+                    self.strings("requirements_restart").format(e.name)
+                )
             except CoreOverwriteError as e:
                 return await core_overwrite(e)
             except loader.LoadError as e:
