@@ -473,7 +473,7 @@ loader:
   not_unloaded: "{} <b>Модуль {} не вивантажено.</b>"
   requirements_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Помилка встановлення залежностей</b>"
   requirements_installing: "<blockquote><emoji document_id=5316770651720137011>🚀</emoji> <b>Встановлюю залежності:</blockquote>\n\n<blockquote>{}</blockquote></b>"
-  requirements_restart: "<emoji document_id=5875145601682771643>🚀</emoji> <b>Залежності встановлено, але потрібне перезавантаження для застосування</b> <code>{}</code>"
+  requirements_restart: "<emoji document_id=5875145601682771643>🚀</emoji> <b>Залежності встановлено, але потрібне перезавантаження для застосування</b> <code>{}</code>\n\n<i>💡 Введіть:</i> <code>{}restart -f</code> <i>щоб застосувати.</i>\n<b>⚠️ Після перезавантаження завантажте модуль ще раз.</b>"
   all_modules_deleted: "<emoji document_id=5784993237412351403>✅</emoji> <b>Модулі видалено</b>"
   undoc: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> Немає опису"
   ihandler: "\n<emoji document_id=5372981976804366741>🤖</emoji> <code>{}</code> {}"

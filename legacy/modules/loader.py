@@ -632,7 +632,10 @@ class LoaderMod(loader.Module):
 
                 return await utils.answer(
                     message,
-                    self.strings("requirements_restart").format(e.name)
+                    self.strings("requirements_restart").format(
+                        e.name,
+                        self.get_prefix()
+                    )
                 )
             except CoreOverwriteError as e:
                 return await core_overwrite(e)

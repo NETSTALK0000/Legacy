@@ -493,7 +493,7 @@ loader:
   not_unloaded: "{} <b>Module(s) {} not unloaded.</b>"
   requirements_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Requirements installation failed</b>"
   requirements_installing: "<blockquote><emoji document_id=5316770651720137011>🚀</emoji> <b>Installing requirements:</blockquote>\n\n<blockquote>{}</blockquote></b>"
-  requirements_restart: "<emoji document_id=5875145601682771643>🚀</emoji> <b>Requirements installed, but a restart is required for</b> <code>{}</code> <b>to apply</b>"
+  requirements_restart: "<emoji document_id=5875145601682771643>🚀</emoji> <b>Requirements installed, but a restart is required for</b> <code>{}</code>\n\n<i>💡 Enter:</i> <code>{}restart -f</code> <i>to apply.</i>\n<b>⚠️ Load the module again after restarting.</b>"
   all_modules_deleted: "<emoji document_id=5784993237412351403>✅</emoji> <b>All modules deleted</b>"
   undoc: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> No docs"
   ihandler: "\n<emoji document_id=5372981976804366741>🤖</emoji> <code>{}</code> {}"

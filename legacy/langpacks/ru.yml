@@ -492,7 +492,7 @@ loader:
   not_found_mul: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Не удалось найти модули: {}!</b>"
   requirements_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Ошибка установки зависимостей</b>"
   requirements_installing: "<blockquote><emoji document_id=5316770651720137011>🚀</emoji> <b>Устанавливаю зависимости:</b></blockquote>\n\n<blockquote><b>{}</b></blockquote>"
-  requirements_restart: "<emoji document_id=5875145601682771643>🚀</emoji> <b>Зависимости установлены, но нужна перезагрузка для применения</b> <code>{}</code>"
+  requirements_restart: "<emoji document_id=5875145601682771643>🚀</emoji> <b>Зависимости установлены, но нужна перезагрузка для применения</b> <code>{}</code>\n\n<i>💡 Введите:</i> <code>{}restart -f</code> <i>чтобы применить.</i>\n<b>⚠️ После перезагрузки загрузите модуль ещё раз.</b>"
   all_modules_deleted: "<emoji document_id=5784993237412351403>✅</emoji> <b>Модули удалены</b>"
   undoc: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> Нет описания"
   ihandler: "\n<emoji document_id=5372981976804366741>🤖</emoji> <code>{}</code> {}"
